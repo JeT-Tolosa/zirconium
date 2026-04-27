@@ -28,8 +28,8 @@ export class TimeController extends ZirconViz {
   private _runCheckbox: IonToggle = null;
   private _timeFactorInput: HTMLInputElement = null;
 
-  constructor() {
-    super();
+  constructor(state: TimeControllerState) {
+    super(state);
     // Initialize Ionic Elements
     defineCustomElements(window);
   }

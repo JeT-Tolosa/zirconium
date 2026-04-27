@@ -6,8 +6,12 @@ import {
 import { v4 as uuid } from 'uuid';
 import { DataSeries } from '../../libraries/data-series/data-series';
 
-export interface VizBarJSChartState extends ZirconVizState {
-  series?: DataSeries<ChartData<'bar'>>;
+export interface VizJSChartState<
+  TType extends keyof ChartTypeRegistry,
+> extends ZirconVizState {
+  series?: DataSeries<ChartData<TType>>;
+  options?: ChartOptions<TType>;
+  chartType?: string;
 }
 
 const DEFAULT_OPTIONS: ChartOptions = {
@@ -31,7 +35,7 @@ export abstract class VizJSChart<
   TType extends keyof ChartTypeRegistry,
 > extends ZirconViz {
   private _chart: Chart<TType> = null;
-  private series: DataSeries<ChartData<TType>> = null;
+  private _series: DataSeries<ChartData<TType>> = null;
 
   // necessary cast
   private _chartOptions: ChartOptions<TType> =
@@ -42,11 +46,32 @@ export abstract class VizJSChart<
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state?: VizJSChartState<TType>) {
+    super(state);
   }
 
   public abstract getChartType(): TType;
+
+  public override async setState(state: VizJSChartState<TType>): Promise<void> {
+    await super.setState(state);
+    if (!state) return;
+    if (state.chartType && state.chartType !== this.getChartType())
+      throw new Error(
+        `Invalid chart type ${state.chartType} for this visualizer`,
+      );
+    if (state.series) this.setSeries(state.series);
+    if (state.options) this.setChartOptions(state.options);
+  }
+
+  public override generateCurrentState(): VizJSChartState<TType> {
+    return {
+      ...super.generateCurrentState(),
+      chartType: this.getChartType(),
+      series: this.getSeries(),
+      options: this.getChartOptions(),
+      type: this.getType(),
+    };
+  }
 
   /**
    * Create and insert chart into given canvas
@@ -70,7 +95,7 @@ export abstract class VizJSChart<
    * get input data
    */
   public getSeries(): DataSeries<ChartData<TType>> {
-    return this.series;
+    return this._series;
   }
 
   private onSeriesChange = () => this.updateData();
@@ -80,15 +105,15 @@ export abstract class VizJSChart<
    * @param series
    */
   public setSeries(series: DataSeries<ChartData<TType>>): void {
-    if (this.series === series) return;
-    if (this.series)
-      this.series.removeListener('SERIES_DATA_CHANGED', this.onSeriesChange);
+    if (this._series === series) return;
+    if (this._series)
+      this._series.removeListener('SERIES_DATA_CHANGED', this.onSeriesChange);
 
-    this.series = series;
-    if (this.series)
-      this.series.addListener('SERIES_DATA_CHANGED', this.onSeriesChange);
+    this._series = series;
+    if (this._series)
+      this._series.addListener('SERIES_DATA_CHANGED', this.onSeriesChange);
 
-    // this.emit('VIZ_INPUT_SERIES_CHANGED', { id: this.series.getId() });
+    //this.emit('VIZ_INPUT_SERIES_CHANGED', { id: this.series.getId() });
   }
 
   protected getChart(): Chart<TType> {
@@ -98,6 +123,7 @@ export abstract class VizJSChart<
   public getChartOptions(): ChartOptions<TType> {
     return this._chartOptions;
   }
+
   public setChartOptions(value: ChartOptions<TType>): boolean {
     if (!value) return false;
     this._chartOptions = value;

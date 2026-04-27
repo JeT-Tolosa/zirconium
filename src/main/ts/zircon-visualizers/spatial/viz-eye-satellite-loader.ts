@@ -81,8 +81,8 @@ export class VizSatCatLoader<
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state?: VizSatCatLoaderState) {
+    super(state);
   }
 
   public updateData(): boolean {

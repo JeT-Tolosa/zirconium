@@ -1,6 +1,9 @@
 import { v4 as uuid } from 'uuid';
 import './viz-eye-logger.css';
-import { ZirconViz } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import {
+  ZirconViz,
+  ZirconVizState,
+} from '../../zirconium/zircon-ui/zircon-viz-ui';
 
 /**
  * Messages levels
@@ -29,8 +32,8 @@ export class VizMessageLogger extends ZirconViz {
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state?: ZirconVizState) {
+    super(state);
     this.getEventDispatcher().onAny(
       (event: string | string[], ..._values: unknown[]) => {
         if (event === 'MESSAGE') {

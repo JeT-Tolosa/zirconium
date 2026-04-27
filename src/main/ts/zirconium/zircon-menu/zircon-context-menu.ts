@@ -3,6 +3,7 @@ import { v4 as uuid } from 'uuid';
 import {
   ZirconAppObject,
   ZirconAppObjectEventRegistry,
+  ZirconAppObjectState,
 } from '../zircon-core/zircon-app-object';
 import { ZirconContextMenuFactory } from './zircon-context-menu-factory';
 import { ZirconApplication } from '../zircon-core/zircon-app';
@@ -27,8 +28,8 @@ export class ZirconContextMenu<
    * Constructor
    * @param applicationUI
    */
-  constructor(applicationUI: ZirconApplication) {
-    super(applicationUI);
+  constructor(applicationUI: ZirconApplication, state?: ZirconAppObjectState) {
+    super(applicationUI, state);
     this._menu = document.createElement('div');
     this._menu.classList.add('zircon-context-menu');
     this._menu.id = `context-menu-${uuid()}`;

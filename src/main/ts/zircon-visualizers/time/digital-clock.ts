@@ -1,13 +1,15 @@
 import { v4 as uuid } from 'uuid';
 import { AbstractClock } from './clock';
 import './digital-clock.css';
+import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
 
-export interface DigitalClockState {
+export interface DigitalClockState extends ZirconVizState {
   type: typeof DigitalClock.DIGITAL_CLOCK_VISUALIZER_TYPE;
 }
 
 export class DigitalClock extends AbstractClock {
-  public static readonly DIGITAL_CLOCK_VISUALIZER_TYPE = 'DIGITAL_CLOCK_VISUALIZER_TYPE';
+  public static readonly DIGITAL_CLOCK_VISUALIZER_TYPE =
+    'DIGITAL_CLOCK_VISUALIZER_TYPE';
   private _mainDiv: HTMLDivElement = null;
   private _hourElement: HTMLParagraphElement = null;
   private _dateElement: HTMLParagraphElement = null;
@@ -15,8 +17,8 @@ export class DigitalClock extends AbstractClock {
   /**
    * Constructor
    */
-  constructor() {
-    super();
+  constructor(state?: DigitalClockState) {
+    super(state);
   }
 
   /**

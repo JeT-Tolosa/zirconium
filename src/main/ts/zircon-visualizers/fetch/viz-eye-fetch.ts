@@ -42,8 +42,8 @@ export class VizFetch extends ZirconViz {
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state?: VizFetchState) {
+    super(state);
   }
 
   public updateData(): boolean {

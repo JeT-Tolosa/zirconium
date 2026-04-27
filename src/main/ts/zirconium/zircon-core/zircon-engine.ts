@@ -57,8 +57,8 @@ export abstract class ZirconEngine<
   /**
    * Constructor
    */
-  constructor() {
-    super();
+  constructor(state?: ZirconEngineState) {
+    super(state);
   }
 
   protected override listenToEvents(): void {

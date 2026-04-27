@@ -37,8 +37,8 @@ export abstract class ZirconAppObject<
    * constructor
    * @param app the application this object belongs to
    */
-  constructor(app: ZirconApplication) {
-    super();
+  constructor(app: ZirconApplication, state?: ZirconAppObjectState) {
+    super(state);
     this._application = app;
     this.setEventDispatcher(app.getEventDispatcher());
   }

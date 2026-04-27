@@ -22,9 +22,10 @@ export interface VizPieJSChartState extends ZirconVizState {
 }
 
 export class VizPieJSChart extends VizJSChart<'pie'> {
-  public static readonly PIE_JSCHART_VISUALIZER_TYPE = 'PIE_JSCHART_VISUALIZER_TYPE';
-  constructor() {
-    super();
+  public static readonly PIE_JSCHART_VISUALIZER_TYPE =
+    'PIE_JSCHART_VISUALIZER_TYPE';
+  constructor(state?: VizPieJSChartState) {
+    super(state);
     Chart.register(PieController, CategoryScale, LinearScale, Tooltip, Legend);
   }
 
@@ -35,7 +36,7 @@ export class VizPieJSChart extends VizJSChart<'pie'> {
   public getChartType(): 'pie' {
     return 'pie';
   }
-  
+
   public override getType(): string {
     return VizPieJSChart.PIE_JSCHART_VISUALIZER_TYPE;
   }

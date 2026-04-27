@@ -116,8 +116,8 @@ export class ZirconDesktopManager<
    * Constructor for ZirconDesktopManager
    * @param appUI The Zircon application instance
    */
-  constructor(appUI: ZirconApplication) {
-    super(appUI);
+  constructor(appUI: ZirconApplication, state?: ZirconDesktopManagerState) {
+    super(appUI, state);
   }
 
   protected override listenToEvents(): void {
@@ -187,10 +187,12 @@ export class ZirconDesktopManager<
    * @param state The new state to apply
    * @returns A promise that resolves when the state is set
    */
-  public override setState(state: ZirconDesktopManagerState): Promise<void> {
-    return super.setState(state).then(() => {
-      this.setDesktopIds(state.desktopIds);
-    });
+  public override async setState(
+    state: ZirconDesktopManagerState,
+  ): Promise<void> {
+    if (!state) return;
+    await super.setState(state);
+    this.setDesktopIds(state.desktopIds);
   }
 
   /**

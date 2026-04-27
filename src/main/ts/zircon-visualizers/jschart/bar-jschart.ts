@@ -20,10 +20,11 @@ export interface VizBarJSChartState extends ZirconVizState {
 }
 
 export class VizBarJSChart extends VizJSChart<'bar'> {
-  public static readonly BAR_JSCHART_VISUALIZER_TYPE = 'BAR_JSCHART_VISUALIZER_TYPE';
+  public static readonly BAR_JSCHART_VISUALIZER_TYPE =
+    'BAR_JSCHART_VISUALIZER_TYPE';
 
-  constructor() {
-    super();
+  constructor(state?: VizBarJSChartState) {
+    super(state);
     Chart.register(
       BarController,
       BarElement,

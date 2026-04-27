@@ -19,13 +19,14 @@ import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
  */
 export interface VizBubbleJSChartState extends ZirconVizState {
   series?: DataSeries<ChartData<'bubble'>>;
-} 
+}
 
 export class VizBubbleJSChart extends VizJSChart<'bubble'> {
- public static readonly BUBBLE_JSCHART_VISUALIZER_TYPE = 'BUBBLE_JSCHART_VISUALIZER_TYPE';
+  public static readonly BUBBLE_JSCHART_VISUALIZER_TYPE =
+    'BUBBLE_JSCHART_VISUALIZER_TYPE';
 
- constructor() {
-    super();
+  constructor(state?: VizBubbleJSChartState) {
+    super(state);
     Chart.register(
       BubbleController,
       CategoryScale,
@@ -46,5 +47,4 @@ export class VizBubbleJSChart extends VizJSChart<'bubble'> {
   public override getType(): string {
     return VizBubbleJSChart.BUBBLE_JSCHART_VISUALIZER_TYPE;
   }
-
 }

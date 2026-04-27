@@ -107,8 +107,9 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
   constructor(
     catalogType: string,
     indexationMethod: (el: CatalogElement) => string,
+    state?: VizCatalogCollectionTabulatorState,
   ) {
-    super();
+    super(state);
     this._indexationMethod = indexationMethod;
     this._catalogType = catalogType;
     this._catColl = new CatalogCollection(

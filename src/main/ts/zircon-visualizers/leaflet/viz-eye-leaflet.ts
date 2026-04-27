@@ -1,4 +1,7 @@
-import { ZirconViz, ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import {
+  ZirconViz,
+  ZirconVizState,
+} from '../../zirconium/zircon-ui/zircon-viz-ui';
 import { v4 as uuid } from 'uuid';
 import * as Leaflet from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -24,8 +27,8 @@ export class VizLeaflet extends ZirconViz {
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state?: VizLeafletState) {
+    super(state);
   }
 
   public override getType(): string {

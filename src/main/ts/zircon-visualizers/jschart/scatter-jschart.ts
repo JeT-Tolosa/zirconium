@@ -22,9 +22,10 @@ export interface VizScatterJSChartState extends ZirconVizState {
  */
 
 export class VizScatterJSChart extends VizJSChart<'scatter'> {
-  public static readonly SCATTER_JSCHART_VISUALIZER_TYPE = 'SCATTER_JSCHART_VISUALIZER_TYPE';
-  constructor() {
-    super();
+  public static readonly SCATTER_JSCHART_VISUALIZER_TYPE =
+    'SCATTER_JSCHART_VISUALIZER_TYPE';
+  constructor(state?: VizScatterJSChartState) {
+    super(state);
     Chart.register(
       ScatterController,
       CategoryScale,

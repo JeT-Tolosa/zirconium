@@ -1,6 +1,11 @@
-import { ZirconViz } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import {
+  ZirconViz,
+  ZirconVizState,
+} from '../../zirconium/zircon-ui/zircon-viz-ui';
 //import * as THREE from 'three';
 import { v4 as uuid } from 'uuid';
+
+export interface VizThreeJSState extends ZirconVizState {}
 
 /**
  * Visualizer based on ThreeJS library
@@ -12,8 +17,8 @@ export abstract class VizThreeJS extends ZirconViz {
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state: VizThreeJSState) {
+    super(state);
   }
 
   public abstract createScene(): void;

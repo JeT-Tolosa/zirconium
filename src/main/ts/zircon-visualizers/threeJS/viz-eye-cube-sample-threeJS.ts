@@ -2,7 +2,6 @@ import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
 import { VizThreeJS } from './viz-eye-threeJS';
 import * as THREE from 'three';
 
-
 export interface VizCubeSampleThreeJSState extends ZirconVizState {
   type: typeof VizCubeSampleThreeJS.CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE;
 }
@@ -11,7 +10,8 @@ export interface VizCubeSampleThreeJSState extends ZirconVizState {
  * https://www.chartjs.org/docs/latest/samples/information.html
  */
 export class VizCubeSampleThreeJS extends VizThreeJS {
-  public static readonly CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE = 'CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE';
+  public static readonly CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE =
+    'CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE';
   private _cube: THREE.Mesh = null;
   private _geometry: THREE.BoxGeometry = null;
   private _scene: THREE.Scene = null;
@@ -22,8 +22,8 @@ export class VizCubeSampleThreeJS extends VizThreeJS {
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state?: VizCubeSampleThreeJSState) {
+    super(state);
   }
 
   /**

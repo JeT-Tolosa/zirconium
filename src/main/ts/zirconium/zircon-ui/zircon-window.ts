@@ -129,10 +129,7 @@ export class ZirconWindow<
   private __dragPosition: { x: number; y: number } = null; // window position when drag is initialized
   private __viz: ZirconViz = null;
 
-  constructor(
-    app: ZirconApplication,
-    state: ZirconWindowState = DEFAULT_WINDOW_STATE,
-  ) {
+  constructor(app: ZirconApplication, state?: ZirconWindowState) {
     super(app);
     this.setState(state);
   }
@@ -174,6 +171,7 @@ export class ZirconWindow<
   }
 
   public override async setState(state: ZirconWindowState): Promise<void> {
+    if (!state) return;
     await super.setState(state);
     this.setTitle(state.title);
     this.setPosition(state.left, state.top);

@@ -2,16 +2,16 @@ import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
 import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
 import { VizEventLogger } from './viz-eye-event-logger';
 
-
 export class VizEventLoggerFactory extends ZirconObjectFactory {
   public getType(): string {
     return VizEventLogger.EVENT_LOGGER_VISUALIZER_TYPE;
   }
 
-  public override createInstance(state: ZirconVizState): Promise<VizEventLogger> {
+  public override createInstance(
+    state: ZirconVizState,
+  ): Promise<VizEventLogger> {
     return Promise.resolve().then(() => {
-      const viz = new VizEventLogger();
-      viz.setState(state);
+      const viz = new VizEventLogger(state);
       return viz;
     });
   }

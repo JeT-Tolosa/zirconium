@@ -2,13 +2,15 @@ import { v4 as uuid } from 'uuid';
 import './analog-clock.css';
 import clockPng from './analog-clock.png';
 import { AbstractClock } from './clock';
+import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
 
-export interface AnalogClockState {
+export interface AnalogClockState extends ZirconVizState {
   type: typeof AnalogClock.ANALOG_CLOCK_VISUALIZER_TYPE;
-} 
+}
 
 export class AnalogClock extends AbstractClock {
-  public static readonly ANALOG_CLOCK_VISUALIZER_TYPE = 'ANALOG_CLOCK_VISUALIZER_TYPE';
+  public static readonly ANALOG_CLOCK_VISUALIZER_TYPE =
+    'ANALOG_CLOCK_VISUALIZER_TYPE';
   private _mainDiv: HTMLDivElement = null;
   private _clockDiv: HTMLDivElement = null;
   private _hourDiv: HTMLDivElement = null;
@@ -18,8 +20,8 @@ export class AnalogClock extends AbstractClock {
   private _secDiv: HTMLDivElement = null;
   private _scDiv: HTMLDivElement = null;
 
-  constructor() {
-    super();
+  constructor(state?: AnalogClockState) {
+    super(state);
   }
 
   public getMainDiv(): HTMLDivElement {

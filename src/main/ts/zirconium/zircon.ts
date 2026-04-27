@@ -58,8 +58,7 @@ export class Zircon {
     app: ZirconApplication,
     state: ZirconWindowState = DEFAULT_WINDOW_STATE,
   ): ZirconWindow {
-    const window = new ZirconWindow(app);
-    window.setState(state);
+    const window = new ZirconWindow(app, state);
     return window;
   }
 
@@ -73,8 +72,7 @@ export class Zircon {
     app: ZirconApplication,
     state: ZirconDesktopState,
   ): ZirconDesktop {
-    const desktop = new ZirconDesktop(app);
-    desktop.setState(state);
+    const desktop = new ZirconDesktop(app, state);
     return desktop;
   }
 

@@ -67,9 +67,10 @@ export abstract class ZirconObject<
   /**
    * constructor
    */
-  constructor() {
+  constructor(state?: ZirconObjectState) {
     this._eventEmitter = null;
     this._id = uuid();
+    this.setState(state);
   }
   /**
    * // TODO: memory leak if setEventDispatcher is used (we should remove listeners !)
@@ -127,10 +128,9 @@ export abstract class ZirconObject<
    * @param state *
    */
   public async setState(state: ZirconObjectState): Promise<void> {
-    return Promise.resolve().then(() => {
-      this.setId(state.id);
-      this.setName(state.name);
-    });
+    if (!state) return;
+    this.setId(state.id);
+    this.setName(state.name);
   }
 
   /**

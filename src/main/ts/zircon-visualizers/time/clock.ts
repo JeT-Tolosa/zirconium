@@ -3,7 +3,12 @@ import {
   TimeDescriptor,
   TimingHelper,
 } from '../../sharp-eye/engines/timing/timing';
-import { ZirconViz } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import {
+  ZirconViz,
+  ZirconVizState,
+} from '../../zirconium/zircon-ui/zircon-viz-ui';
+
+export interface ClockState extends ZirconVizState {}
 
 export abstract class AbstractClock extends ZirconViz {
   private _timeDescriptor: TimeDescriptor = null;
@@ -13,8 +18,8 @@ export abstract class AbstractClock extends ZirconViz {
   /**
    * Constructor
    */
-  constructor() {
-    super();
+  constructor(state?: ClockState) {
+    super(state);
     this._timeRunner = null;
     this._timeDescriptor = TimingHelper.createRealTimeDescriptor();
   }

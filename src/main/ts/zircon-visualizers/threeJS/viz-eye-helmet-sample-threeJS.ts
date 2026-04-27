@@ -9,14 +9,15 @@ import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
 
 export interface VizHelmetSampleThreeJSState extends ZirconVizState {
   type: typeof VizHelmetSampleThreeJS.HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE;
-} 
+}
 
 /**
  * Visualizer based on ThreeJS library
  * https://www.chartjs.org/docs/latest/samples/information.html
  */
 export class VizHelmetSampleThreeJS extends VizThreeJS {
-  public static readonly HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE = 'HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE';
+  public static readonly HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE =
+    'HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE';
   private _cube: THREE.Mesh = null;
   private _geometry: THREE.BoxGeometry = null;
   private _scene: THREE.Scene = null;
@@ -27,8 +28,8 @@ export class VizHelmetSampleThreeJS extends VizThreeJS {
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state?: VizHelmetSampleThreeJSState) {
+    super(state);
   }
 
   /**

@@ -1,6 +1,9 @@
 import { v4 as uuid } from 'uuid';
 import './viz-eye-logger.css';
-import { ZirconViz } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import {
+  ZirconViz,
+  ZirconVizState,
+} from '../../zirconium/zircon-ui/zircon-viz-ui';
 
 interface EventDescriptor {
   event: string;
@@ -19,8 +22,8 @@ export class VizEventLogger extends ZirconViz {
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state?: ZirconVizState) {
+    super(state);
   }
 
   protected override listenToEvents(): void {

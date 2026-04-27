@@ -1,7 +1,5 @@
 import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
-import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
 import { VizLeaflet, VizLeafletState } from './viz-eye-leaflet';
-
 
 export class VizLeafletFactory extends ZirconObjectFactory {
   public getType(): string {
@@ -10,8 +8,7 @@ export class VizLeafletFactory extends ZirconObjectFactory {
 
   public override createInstance(state: VizLeafletState): Promise<VizLeaflet> {
     return Promise.resolve().then(() => {
-      const viz = new VizLeaflet();
-      viz.setState(state);
+      const viz = new VizLeaflet(state);
       return viz;
     });
   }

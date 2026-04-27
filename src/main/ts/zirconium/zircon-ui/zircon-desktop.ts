@@ -88,12 +88,8 @@ export class ZirconDesktop<
    * constructor
    * @param param
    */
-  constructor(
-    app: ZirconApplication,
-    state: ZirconDesktopState = DEFAULT_DESKTOP_STATE,
-  ) {
-    super(app);
-    this.setState(state);
+  constructor(app: ZirconApplication, state?: ZirconDesktopState) {
+    super(app, state);
   }
 
   protected override listenToEvents(): void {
@@ -156,9 +152,9 @@ export class ZirconDesktop<
   }
 
   public override async setState(state: ZirconDesktopState): Promise<void> {
-    return super.setState(state).then(() => {
-      this.setWindowIds(state.windowIds);
-    });
+    if (!state) return;
+    await super.setState(state);
+    this.setWindowIds(state.windowIds);
   }
 
   /**

@@ -23,10 +23,11 @@ export interface VizLineJSChartState extends ZirconVizState {
 }
 
 export class VizLineJSChart extends VizJSChart<'line'> {
-  public static readonly LINE_JSCHART_VISUALIZER_TYPE = 'LINE_JSCHART_VISUALIZER_TYPE';
+  public static readonly LINE_JSCHART_VISUALIZER_TYPE =
+    'LINE_JSCHART_VISUALIZER_TYPE';
 
-  constructor() {
-    super();
+  constructor(state?: VizLineJSChartState) {
+    super(state);
     Chart.register(
       LineController,
       LineElement,

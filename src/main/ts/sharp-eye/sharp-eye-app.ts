@@ -55,8 +55,14 @@ import { VizGroundStationCatalogTabulator } from '../zircon-visualizers/spatial/
 import { VizLeaflet } from '../zircon-visualizers/leaflet/viz-eye-leaflet';
 import { VizCubeSampleThreeJS } from '../zircon-visualizers/threeJS/viz-eye-cube-sample-threeJS';
 import { VizHelmetSampleThreeJS } from '../zircon-visualizers/threeJS/viz-eye-helmet-sample-threeJS';
-import { VizBarJSChart } from '../zircon-visualizers/jschart/bar-jschart';
-import { VizLineJSChart } from '../zircon-visualizers/jschart/line-jschart';
+import {
+  VizBarJSChart,
+  VizBarJSChartState,
+} from '../zircon-visualizers/jschart/bar-jschart';
+import {
+  VizLineJSChart,
+  VizLineJSChartState,
+} from '../zircon-visualizers/jschart/line-jschart';
 import { VizEventLogger } from '../zircon-visualizers/logger/viz-eye-event-logger';
 import { DigitalClock } from '../zircon-visualizers/time/digital-clock';
 import { AnalogClock } from '../zircon-visualizers/time/analog-clock';
@@ -66,6 +72,7 @@ import { VizGroundStationLoader } from '../zircon-visualizers/spatial/viz-eye-gr
 import { VizFetch } from '../zircon-visualizers/fetch/viz-eye-fetch';
 import { VizSatelliteCatalogTabulatorFactory } from '../zircon-visualizers/spatial/viz-eye-satellite-catalog-tabulator-factory';
 import { VizGroundStationCatalogTabulatorFactory } from '../zircon-visualizers/spatial/viz-eye-ground-station-catalog-tabulator-factory';
+import { createSeriesBar, createSeriesLine } from './sharp-eye-panels';
 
 export class SharpEyedApp extends ZirconApplication {
   private _timeManager: TimeManager = null;
@@ -171,13 +178,15 @@ export class SharpEyedApp extends ZirconApplication {
       id: 'barChartVizId',
       type: VizBarJSChart.BAR_JSCHART_VISUALIZER_TYPE,
       name: 'Bar Chart',
-    });
+      series: createSeriesBar(),
+    } as VizBarJSChartState);
 
     this.registerState({
       id: 'lineChartVizId',
       type: VizLineJSChart.LINE_JSCHART_VISUALIZER_TYPE,
+      series: createSeriesLine(),
       name: 'Line Chart',
-    });
+    } as VizLineJSChartState);
 
     // Logger Visualizers
     this.registerState({

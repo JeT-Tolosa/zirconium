@@ -3,7 +3,10 @@ import * as Cesium from 'cesium';
 
 import 'cesium/Build/Cesium/Widgets/InfoBox/InfoBox.css';
 import 'cesium/Build/Cesium/Widgets/widgets.css';
-import { ZirconViz, ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import {
+  ZirconViz,
+  ZirconVizState,
+} from '../../zirconium/zircon-ui/zircon-viz-ui';
 
 /**
  * Visualizer based on Cesium library
@@ -30,8 +33,8 @@ export class VizCesium extends ZirconViz {
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state?: VizCesiumState) {
+    super(state);
   }
 
   public override getType(): string {

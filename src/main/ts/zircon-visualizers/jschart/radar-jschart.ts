@@ -22,10 +22,11 @@ export interface VizRadarJSChartState extends ZirconVizState {
 }
 
 export class VizRadarJSChart extends VizJSChart<'radar'> {
-  public static readonly RADAR_JSCHART_VISUALIZER_TYPE = 'RADAR_JSCHART_VISUALIZER_TYPE';
+  public static readonly RADAR_JSCHART_VISUALIZER_TYPE =
+    'RADAR_JSCHART_VISUALIZER_TYPE';
 
-  constructor() {
-    super();
+  constructor(state?: VizRadarJSChartState) {
+    super(state);
     Chart.register(
       RadarController,
       CategoryScale,

@@ -74,8 +74,8 @@ export class VizGroundStationLoader<
   /**
    * constructor
    */
-  constructor() {
-    super();
+  constructor(state?: VizGroundStationLoaderState) {
+    super(state);
   }
 
   public updateData(): boolean {

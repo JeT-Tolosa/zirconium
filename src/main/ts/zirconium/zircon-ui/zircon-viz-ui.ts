@@ -39,8 +39,9 @@ export abstract class ZirconViz<
    * constructor
    * @param appUI the application this object belongs to
    */
-  constructor() {
+  constructor(state?: ZirconVizState) {
     super();
+    this.setState(state);
   }
 
   protected override listenToEvents(): void {
