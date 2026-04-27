@@ -1,0 +1,30 @@
+- ~~Faire un système d'écoute et d'envoi de messages~~
+- ~~Faire un système de gestion du temps (temps réel, accélération, pause, etc...)~~
+- Faire un système de gestion des sélections (une sélection est une liste d'objets du même type (satellite, groundstation, etc...))
+  - selection courante
+  - demande d'ajout/suppression/remplacement d'objets dans la selection
+  - notification de changement de selection
+  - liste des selections
+  - gestion de la persistance des selections
+- ~~Faire un manager de temps (TimeDescriptor)~~
+- ~~Faire une horloge affichant le temps simulé~~
+- ~~Faire une interface de selection de de déroulement du temps simulé temps simulé~~
+- Faire une librairie permettant de faire la propagation d'un TLE sur un certaine période
+- Faire un service permettant de faire la propagation d'un TLE sur un certaine période
+- Faire l'affichage d'une trajection d'un satellite sur une carte 2D
+- Faire l'affichage d'une trajection d'un satellite sur un globe 3D
+- Faire un catalogue des NOTAM (ex: https://notams.aim.faa.gov/notamSearch/)
+- Faire le système de menu des Window
+- Faire l'affichage des paramètres d'une fenêtre ET de son contenu
+- ~~Trouver une libraie de création d'objets graphiques (input text, input numeric, color, etc...)~~ -> ionic
+- Faire un système de tchat
+- Faire un système de gestion des erreurs (affichage, log, etc...)
+- Faire un système de gestion des alertes (affichage, log, etc...)
+- Faire un système de gestion des notifications (affichage, log, etc...)
+- Faire un visualisateur de page HTML
+- Faire un visualisateur d'info sur les satellites à partir du site: https://satellitemap.space/sat/${NORAD_ID} lié a la selection active  catalogue des satellites
+- Faire un systeme permettant d'ajouter des fenetres dans un desktop à partir d'un catalogue de visualiseurs
+- Faire un systeme permettant d'ajouter des elements core dans une application à partir d'un catalogue d'elements core
+- ~~Implementer le drag&drop d'une fenetre vers un autre desktop: déposer sur le bouton du desktop~~
+- ~~Implementer le drag&drop d'une fenetre vers un autre desktop: Désposer sur un Desktop, Changer de Desktop en restant longtemps sur le bouton correspondant~~
+- ~~Use IOnic library~~ -> TimeController.ts

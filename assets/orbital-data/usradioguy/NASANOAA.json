@@ -1,0 +1,327 @@
+{
+   "type": "FeatureCollection",
+   "features": [
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -147.51,64.9735 ]
+    },
+    "properties": {
+    "Station_name":"Fairbanks CDA Station",
+    "Satellites_received":"",
+    "Province_State":"Alaska",
+    "Country":"USA",
+    "URL":"<a href=\"https://www.ospo.noaa.gov/FCDAS/index.html\">Fairbanks CDA</a>"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -133.54910837080158,68.31954060711722 ]
+    },
+    "properties": {
+    "Station_name":"Inuvik Satellite Station Facility",
+	"URL":"<a href=\"https://www.nrcan.gc.ca\">ISSF</a>",
+    "Country":"Canada",
+	"Province_State":"Inuvik",
+    "Satellites_received":"RADARSAT-2, NEOS Sat, SCISAT, M3MSat, RADARSAT Constellation Mission",
+	"Data_Imagery":""
+    }
+  },   
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 138.36285285736975,36.13239409339711 ]
+    },
+    "properties": {
+    "Station_name":"JAXA Tsukuba Space Center",
+	"URL":"<a href=\"http://www.jaxa.jp/projects/sas/great/index_j.html\">JAXA</a>",
+    "Country":"Japan",
+	"Province_State":"Nagano",
+    "Satellites_received":"GOES, POE, GK2A Himawari",
+	"Data_Imagery":""
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -2.308666947126448,53.23665760184464 ]
+    },
+    "properties": {
+    "Station_name":"Lovell Radio Telescope",
+	"URL":"<a href=\"http://www.jodrellbank.net/visit/whats-here/lovell-telescope\">LST</a>",
+    "Country":"United Kingdom of Great Britain and Northern Ireland",
+	"Province_State":"Macclesfield",
+    "Satellites_received":"Radio Astronomy",
+	"Data_Imagery":""
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -75.88949811759454,45.34903464915503 ]
+    },
+    "properties": {
+    "Station_name":"DDRC",
+	"URL":"<a href=\"http://www.drdc-rddc.gc.ca\">DRDC</a>",
+    "Country":"Canada",
+	"Province_State":"Ottawa",
+    "Satellites_received":"GOES, POE, Defense Sats",
+	"Data_Imagery":""
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 6.883286739640497,50.52485345893373 ]
+    },
+    "properties": {
+    "Station_name":"Effelsberg 100-m Radio Telescope",
+	"URL":"<a href=\"https://www.mpifr-bonn.mpg.de/effelsberg\">ERT</a>",
+    "Country":"Germany",
+	"Province_State":"Bad Münstereifel",
+    "Satellites_received":"Radio Astronomy",
+	"Data_Imagery":""
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.83981337397334,38.433036412663505 ]
+    },
+    "properties": {
+    "Station_name":"Green Bank Telescope",
+	"URL":"<a href=\"http://greenbankobservatory.org\">GBO</a>",
+    "Country":"United States Of America",
+	"Province_State":"West Virginia",
+    "Satellites_received":"Radio Astronomy",
+	"Data_Imagery":""
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -116.80548792603061,35.299898186076945 ]
+    },
+    "properties": {
+    "Station_name":"Goldstone Deep Space Communications Complex",
+	"URL":"<a href=\"https://www.gdscc.nasa.gov\">GDSC</a>",
+    "Country":"United States Of America",
+	"Province_State":"California",
+    "Satellites_received":"JWST, VOYAGER 1 and 2, Stereo A&B, MRO, Mars Odessey, MER, Rosetta, Juno, GOES, ACE, MSL, etc ",
+	"Data_Imagery":""
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.192188,39.434206 ]
+    },
+    "properties": {
+    "Station_name":"NOAA Consolidated Backup Center",
+	"URL":"",
+    "Country":"USA",
+	"Province_State":"Virginia",
+    "Satellites_received":""
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -45.001764,-22.682911 ]
+    },
+    "properties": {
+    "Station_name":"Centro de Previsão de Tempo e Estudos Climáticos",
+	"URL":"<a href=\"https://www.cptec.inpe.br/sobreocptec/pt\">CPTEC</a>",
+    "Country":"Brasil",
+	"Province_State":"Cachoeira Paulista",
+    "Satellites_received":"GOES 16, 17 Noaa 15 18 and 19",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, GNC-A, GRB, GVAR ISS"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -105.82075299926807,32.78728955676166 ]
+    },
+    "properties": {
+    "Station_name":"Sunspot Solar Observatory",
+	"URL":"<a href=\"https://sunspot.solar\">SSSO</a>",
+    "Country":"United States Of America",
+	"Province_State":"Sunspot, NM",
+    "Satellites_received":"",
+	"Data_Imagery":"GOES Spaceweather"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -107.61829925398234, 34.0787224775008 ]
+    },
+    "properties": {
+    "Station_name":"NRAO-Very Large Array",
+	"URL":"<a href=\"https://public.nrao.edu/visit/very-large-array\">SSEC</a>",
+    "Country":"United States Of America",
+	"Province_State":"Socorro, NM",
+    "Satellites_received":"",
+	"Data_Imagery":"1.0 GHz to 50 GHz"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -89.40694618028,43.07077686122483 ]
+    },
+    "properties": {
+    "Station_name":"Space Science and Engineering Center",
+	"URL":"<a href=\"https://www.ssec.wisc.edu\">SSEC</a>",
+    "Country":"United States Of America",
+	"Province_State":"Wisconsin",
+    "Satellites_received":"GOES, Kaplana, NOAA, Terra, Aqua, more",
+	"Data_Imagery":""
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 161.399541, 68.739912 ]
+    },
+    "properties": {
+    "Station_name":"NORTH-EAST SCIENCE STATION",
+	"URL":"<a href=\"https://eu-interact.org/field-sites/north-east-science-station\">NESS</a>",
+    "Country":"Russia",
+	"Province_State":"Sakha Republic",
+    "Satellites_received":"",
+	"Data_Imagery":""
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 24.96014883123849, 60.2038624542774 ]
+    },
+    "properties": {
+    "Station_name":"Finnish Meteorological Institute",
+	"URL":"<a href=\"http://ilmatieteenlaitos.fi\">Finnish Met Office</a>",
+    "Country":"Finland",
+	"Province_State":"Helsinki",
+    "Satellites_received":"GOES 16, Many Polar Satellites",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, GNC-A, GRB, GVAR ISS"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -21.907421,64.128152 ]
+    },
+    "properties": {
+    "Station_name":"Icelandic Meteorological Office",
+	"URL":"<a href=\"https://en.vedur.is\">Icelandic Met Office</a>",
+    "Country":"Iceland",
+	"Province_State":"Reykjavík",
+    "Satellites_received":"GOES 16, Many Polar Satellites",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, GNC-A, GRB, GVAR ISS"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -156.73938,71.28703 ]
+    },
+    "properties": {
+    "Station_name":"Barrow CDA",
+    "Satellites_received":"NOAA",
+    "Province_State":"Alaska",
+    "Country":"USA",
+    "URL":"<a href=\"https://www.ospo.noaa.gov/FCDAS/index.html\">Barrow CDA</a>"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.91340921577692,29.0670704905532 ]
+    },
+    "properties": {
+    "Station_name":"Ponce De Leon Inlet NASA Tracking Station",
+    "Satellites_received":"Multiple",
+    "Province_State":"Florida",
+    "Country":"USA",
+    "URL":"<a href=\"https://science.ksc.nasa.gov/facilities/mila/pdl.html\">NASA Tracking Station</a>"
+    }
+  },
+      {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -76.93665063093496,38.85177149242722  ]
+    },
+    "properties": {
+    "Station_name":"NOAA Satellite Operations Facility",
+    "Satellites_received":"NOAA",
+    "Province_State":"Maryland",
+    "Country":"USA",
+    "URL":"<a href=\"https://www.ospo.noaa.gov\">OSPO</a>"
+    }
+  },
+	  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -75.46622,37.93718 ]
+    },
+    "properties": {
+    "Station_name":"Wallops Island CDA",
+    "Satellites_received":"",
+    "Province_State":"Virginia",
+    "Country":"USA",
+    "URL":"<a href=\"https://www.ospo.noaa.gov/Operations/WCDAS/index.html\">Wallops Island CDA</a>"
+    }
+  },
+        {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 148.9814249138043,-35.402358097936 ]
+    },
+    "properties": {
+    "Station_name":"Canberra Deep Space Communication Complex",
+    "Satellites_received":"",
+    "Province_State":"Tidbinbilla, Australian Capital Territory",
+    "Country":"Australia",
+    "URL":"<a href=\"http://www.cdscc.nasa.gov\">Canberra Deep Space Communication Complex</a>"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 15.242803,78.134718 ]
+    },
+    "properties": {
+    "Station_name":"Svalbard Satellite Station",
+    "Satellites_received":"",
+    "Province_State":"Platåberget, Svalbard",
+    "Country":"Norway",
+    "URL":"<a href=\"http://www.ksat.no\">Svalbard Satellite Station</a>"
+    }
+  }
+]
+}

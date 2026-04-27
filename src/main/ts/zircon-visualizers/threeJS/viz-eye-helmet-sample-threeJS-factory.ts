@@ -1,0 +1,18 @@
+import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import { VizHelmetSampleThreeJS, VizHelmetSampleThreeJSState } from './viz-eye-helmet-sample-threeJS';
+
+
+export class VizHelmetSampleThreeJSFactory extends ZirconObjectFactory {
+  public getType(): string {
+    return VizHelmetSampleThreeJS.HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE;
+  }
+
+  public override createInstance(state: VizHelmetSampleThreeJSState): Promise<VizHelmetSampleThreeJS> {
+    return Promise.resolve().then(() => {
+      const viz = new VizHelmetSampleThreeJS();
+      viz.setState(state);
+      return viz;
+    });
+  }
+}

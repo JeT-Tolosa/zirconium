@@ -1,0 +1,7 @@
+install Git Bash
+install node
+install vs code and plugins
+cd $PROJECT
+npx yarn install
+npx yarn start
+

@@ -1,0 +1,115 @@
+/*
+.zircon-context-menu {
+  position: absolute;
+  min-width: 160px;
+  background: #cedce7;
+  color: #031b4e;
+  border: 1px solid #030229;
+  border-radius: 5px;
+  padding: 4px 0;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.95);
+  display: none;
+  z-index: 1000;
+  font-family: system-ui, sans-serif;
+}
+
+
+.zircon-context-menu-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: center;
+  transition: background 0.15s ease;
+  border-radius: 4px;
+  margin: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.zircon-context-menu-item:hover {
+  background: #031b4e;
+  color: white;
+}
+*/
+/*-----------------------------------------*/
+
+.zircon-context-menu.visible {
+  display: block;
+}
+
+.zircon-context-menu {
+  position: absolute;
+  min-width: 160px;
+  display: none;
+  z-index: 10000;
+  font-family: system-ui, sans-serif;
+}
+
+.zircon-context-menu.visible {
+  display: block;
+}
+
+.zircon-context-menu li {
+  border: 1px solid #030229;
+  border-radius: 5px;
+  padding: 4px 0;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.95);
+  background: #cedce7;
+  color: #031b4e;
+  border: 1px solid #030229;
+  border-radius: 5px;
+  padding: 4px 0;
+}
+
+.zircon-context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  z-index: 10001;
+}
+
+.zircon-context-menu li {
+  position: relative;
+  padding: 8px 32px 8px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.zircon-context-menu li:hover {
+  background: #031b4e;
+  color: white;
+}
+
+.zircon-context-menu li.has-children::after {
+  content: '▶';
+  position: absolute;
+  right: 10px;
+}
+
+/* si le sous-menu est à gauche */
+.zircon-context-menu li.has-children.open-left::after {
+  content: '◀';
+  right: auto;
+  left: 10px;
+}
+
+/* Sous-menu */
+.zircon-context-menu ul ul {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  display: none;
+  color: #031b4e;
+  border: 1px solid #030229;
+  border-radius: 6px;
+  z-index: 10002;
+}
+
+/* mode gauche */
+.zircon-context-menu ul ul.open-left {
+  left: auto;
+  right: 100%;
+}
+
+.zircon-context-menu li:hover > ul {
+  display: block;
+}

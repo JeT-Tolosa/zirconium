@@ -1,0 +1,21 @@
+{
+   "type": "FeatureCollection",
+   "features": [
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -105.313893,33.950312 ]
+    },
+    "properties": {
+    "Station_name":"Roswell Crash",
+	"URL":"<a href=\"https://en.wikipedia.org/wiki/Roswell_incident\">Roswell Incident</a>",
+    "Country":"USA",
+	"Province_State":"Corona, New Mexico",
+    "Transmission":"Trying to Phone Home",
+	"Imagery":"<a href=\"https://usradioguy.com/map/roswell.jpg\"><img src=\"https://usradioguy.com/map/roswellth.jpg\"></a>",
+	"Data_Imagery":" Project Mogul"
+    }
+  }
+]
+}

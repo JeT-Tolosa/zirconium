@@ -1,0 +1,17 @@
+.catalog-collection-selector select {
+  font-size: 1.5em;
+  padding: 10px;
+}
+.catalog-collection-selector label {
+  font-size: 1.5em;
+  padding: 10px;
+}
+
+.catalog-collection-selector select option {
+  padding: 10px;
+}
+
+ion-button img {
+  width: 32px;
+  height: 32px;
+}
