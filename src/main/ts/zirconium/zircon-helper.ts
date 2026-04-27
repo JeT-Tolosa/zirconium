@@ -29,6 +29,7 @@ export class ZirconHelper {
       return;
     }
     // add to target
+    if (targetDesktopId === sourceDesktop?.getId()) return Promise.resolve();
     const targetDesktopState = targetDesktop.generateCurrentState();
     targetDesktopState.windowIds.push(windowId);
     application.emit('SET_OBJECT_STATE_REQUEST', {
