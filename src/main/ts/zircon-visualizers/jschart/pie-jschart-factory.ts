@@ -10,8 +10,7 @@ export class VizPieJSChartFactory extends ZirconObjectFactory {
     state: VizPieJSChartState,
   ): Promise<VizPieJSChart> {
     return Promise.resolve().then(() => {
-      const viz = new VizPieJSChart();
-      viz.setState(state);
+      const viz = new VizPieJSChart(state);
       return viz;
     });
   }

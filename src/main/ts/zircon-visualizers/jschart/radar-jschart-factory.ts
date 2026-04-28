@@ -10,8 +10,7 @@ export class VizRadarJSChartFactory extends ZirconObjectFactory {
     state: VizRadarJSChartState,
   ): Promise<VizRadarJSChart> {
     return Promise.resolve().then(() => {
-      const viz = new VizRadarJSChart();
-      viz.setState(state);
+      const viz = new VizRadarJSChart(state);
       return viz;
     });
   }

@@ -300,9 +300,8 @@ export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
     );
     if (!zirconObjectId) return null;
-    const obj: ZirconDesktop = null;
-    console.error('not implemented');
-
+    const obj: ZirconDesktop =
+      this.getApplication().getExistingDesktop(zirconObjectId);
     if (!obj) return;
     return obj;
   }
@@ -313,6 +312,7 @@ export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
 
   public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
     const desktop: ZirconDesktop = this.getAssociatedZirconDesktop(element);
+    if (!desktop) return null;
     return [
       {
         label: `Desktop ${desktop.getName()}`,

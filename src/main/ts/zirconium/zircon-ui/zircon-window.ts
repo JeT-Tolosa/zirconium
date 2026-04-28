@@ -130,8 +130,7 @@ export class ZirconWindow<
   private __viz: ZirconViz = null;
 
   constructor(app: ZirconApplication, state?: ZirconWindowState) {
-    super(app);
-    this.setState(state);
+    super(app, state);
   }
 
   protected override listenToEvents(): void {
@@ -278,7 +277,7 @@ export class ZirconWindow<
           let el: HTMLElement = event.target as HTMLElement;
           while (!targetDesktopId && el) {
             targetDesktopId = el.getAttribute(ZIRCON_TARGET_DESKTOP_ID);
-            el = el.parentElement;
+            if (el) el = el.parentElement;
           }
 
           if (!targetDesktopId) {
@@ -487,9 +486,8 @@ export class ZirconContextMenuFactoryWindow extends ZirconContextMenuFactory {
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
     );
     if (!zirconObjectId) return null;
-    const obj: ZirconWindow = null;
-    console.error('not implemented');
-
+    const obj: ZirconWindow =
+      this.getApplication().getExistingWindow(zirconObjectId);
     if (!obj) return;
     return obj;
   }
@@ -500,6 +498,7 @@ export class ZirconContextMenuFactoryWindow extends ZirconContextMenuFactory {
 
   public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
     const window: ZirconWindow = this.getAssociatedZirconWindow(element);
+    if (!window) return null;
     return [
       {
         label: 'window',

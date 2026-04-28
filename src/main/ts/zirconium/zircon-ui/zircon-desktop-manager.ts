@@ -481,8 +481,11 @@ export class ZirconDesktopManager<
     );
     // update desktop name display
     const desktop: ZirconDesktop = this.__displayedDesktops[desktopId]?.desktop;
-    if (this.__desktopNameSpan)
+    if (this.__desktopNameSpan) {
+      this.__desktopNameSpan.classList.remove('highlight');
       this.__desktopNameSpan.innerHTML = desktop?.getName();
+      this.__desktopNameSpan.classList.add('highlight');
+    }
     return true;
   }
 }
@@ -513,11 +516,11 @@ export class ZirconContextMenuFactoryDesktopManager extends ZirconContextMenuFac
     const zirconObjectId = htmlElement.getAttribute(
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
     );
-    if (!zirconObjectId) return null;
-    const obj: ZirconDesktopManager = null;
-    console.error('not implemented');
-    if (!obj) return null;
-    return obj;
+
+    if (zirconObjectId === this.getApplication().getDesktopManager()?.getId()) {
+      return this.getApplication().getDesktopManager();
+    }
+    return null;
   }
 
   /**
@@ -537,7 +540,7 @@ export class ZirconContextMenuFactoryDesktopManager extends ZirconContextMenuFac
   public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
     const desktopManager: ZirconDesktopManager =
       this.getAssociatedZirconDesktopManager(element);
-
+    if (!desktopManager) return null;
     return [
       {
         label: 'Desktops',

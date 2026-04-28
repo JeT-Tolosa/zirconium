@@ -8,8 +8,7 @@ export class VizCesiumFactory extends ZirconObjectFactory {
 
   public override createInstance(state: VizCesiumState): Promise<VizCesium> {
     return Promise.resolve().then(() => {
-      const viz = new VizCesium();
-      viz.setState(state);
+      const viz = new VizCesium(state);
       return viz;
     });
   }
