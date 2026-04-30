@@ -135,6 +135,9 @@ export class Zircon {
     previous: string[],
     next: string[],
   ): ArrayComparisonResult {
+    if (!previous && !next) return { inserted: [], common: [], deleted: [] };
+    if (!previous && next) return { inserted: next, common: [], deleted: [] };
+    if (previous && !next) return { inserted: [], common: [], deleted: next };
     const setPrevious = new Set(previous);
     const setNext = new Set(next);
 

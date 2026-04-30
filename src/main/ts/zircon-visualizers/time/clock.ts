@@ -2,18 +2,44 @@ import {
   TimeRunner,
   TimeDescriptor,
   TimingHelper,
-} from '../../sharp-eye/engines/timing/timing';
+} from '../../libraries/timing/timing';
+import {
+  TimeManagerEngine,
+  TimeManagerEngineEvents,
+} from '../../sharp-eye/engines/time-manager/time-manager-engine';
+import {
+  MergePickEvents,
+  MergeZirconRegistries,
+  PickEvents,
+} from '../../zirconium/zircon-event';
 import {
   ZirconViz,
+  ZirconVizEventRegistry,
   ZirconVizState,
 } from '../../zirconium/zircon-ui/zircon-viz-ui';
 
-export interface ClockState extends ZirconVizState {}
+export type AbstractClockEventRegistry = MergeZirconRegistries<
+  {
+    incoming: MergePickEvents<
+      [PickEvents<TimeManagerEngineEvents, 'SIMULATED_TIMEDESCRIPTOR'>]
+    >;
+    outgoing: MergePickEvents<
+      [PickEvents<TimeManagerEngineEvents, 'SIMULATED_TIMEDESCRIPTOR_REQUEST'>]
+    >;
+  },
+  ZirconVizEventRegistry
+>;
 
-export abstract class AbstractClock extends ZirconViz {
+export interface ClockState extends ZirconVizState {
+  timeSource: string;
+}
+
+export abstract class AbstractClock<
+  R extends AbstractClockEventRegistry = AbstractClockEventRegistry,
+> extends ZirconViz<R> {
   private _timeDescriptor: TimeDescriptor = null;
   private _timeRunner: TimeRunner = null;
-  // private _intervalId: unknown = null;
+  private _timeSource: string = TimeManagerEngine.DEFAULT_TIME_SOURCE;
 
   /**
    * Constructor
@@ -26,10 +52,11 @@ export abstract class AbstractClock extends ZirconViz {
 
   protected override listenToEvents(): void {
     super.listenToEvents();
-    this.getEventDispatcher().addListener('SIMULATED_TIME_CHANGED', (arg) => {
-      this.setTimeDescriptor(arg.TimeDescriptor);
+    this.addListener('SIMULATED_TIMEDESCRIPTOR', (arg) => {
+      this.setTimeDescriptor(arg.timeSource, arg.timeDescriptor);
     });
   }
+
   /**
    * Get Time Runner
    */
@@ -44,13 +71,35 @@ export abstract class AbstractClock extends ZirconViz {
     this.displayTime(new Date(runner.getCurrentSimulatedTime()));
   }
 
+  protected getTimeSource(): string {
+    return this._timeSource;
+  }
+
+  public override generateCurrentState(): ClockState {
+    return {
+      ...super.generateCurrentState(),
+      timeSource: this._timeSource,
+    };
+  }
+
   /**
    * Set Time Descriptor
    * @param timeDescriptor
    */
-  public setTimeDescriptor(timeDescriptor: TimeDescriptor): void {
+  public setTimeDescriptor(
+    timeSource: string,
+    timeDescriptor: TimeDescriptor,
+  ): void {
+    if (this._timeSource !== timeSource) return;
     this._timeDescriptor = timeDescriptor;
     this.getTimeRunner().setTimeDescriptor(this._timeDescriptor);
+  }
+
+  public override onDisplay(): void {
+    this.emit('SIMULATED_TIMEDESCRIPTOR_REQUEST', {
+      timeSource: this.getTimeSource(),
+    });
+    super.onDisplay();
   }
 
   protected abstract displayTime(simulatedDate: Date): void;

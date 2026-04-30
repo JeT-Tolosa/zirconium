@@ -9,9 +9,15 @@ import {
   ZirconDesktopState,
 } from '../zirconium/zircon-ui/zircon-desktop';
 import { ZirconApplication } from '../zirconium/zircon-core/zircon-app';
-import { SatelliteCatalogEngine } from './engines/spatial/satellite-catalog-engine';
-import { GroundStationCatalogEngine } from './engines/spatial/ground-station-catalog-engine';
-import { TimeManager } from './engines/timing/timing';
+import {
+  SatelliteCatalogEngine,
+  SatelliteCatalogEngineState,
+} from './engines/spatial/satellite-catalog-engine';
+import {
+  GroundStationCatalogEngine,
+  GroundStationCatalogEngineState,
+} from './engines/spatial/ground-station-catalog-engine';
+import { TimingHelper } from '../libraries/timing/timing';
 import { VizFetchFactory } from '../zircon-visualizers/fetch/viz-eye-fetch-factory';
 import {
   ZIRCON_DESKTOP_MANAGER_TYPE,
@@ -73,24 +79,47 @@ import { VizFetch } from '../zircon-visualizers/fetch/viz-eye-fetch';
 import { VizSatelliteCatalogTabulatorFactory } from '../zircon-visualizers/spatial/viz-eye-satellite-catalog-tabulator-factory';
 import { VizGroundStationCatalogTabulatorFactory } from '../zircon-visualizers/spatial/viz-eye-ground-station-catalog-tabulator-factory';
 import { createSeriesBar, createSeriesLine } from './sharp-eye-panels';
+import { SatelliteCatalogEngineFactory } from './engines/spatial/satellite-catalog-engine-factory';
+import { GroundStationCatalogEngineFactory } from './engines/spatial/ground-station-catalog-engine-factory';
+import { TimeManagerEngineFactory } from './engines/time-manager/time-manager-factory';
+import {
+  TimeManagerEngine,
+  TimeManagerEngineState,
+} from './engines/time-manager/time-manager-engine';
 
 export class SharpEyedApp extends ZirconApplication {
-  private _timeManager: TimeManager = null;
-  private _satcat: SatelliteCatalogEngine = null;
-  private _gscat: GroundStationCatalogEngine = null;
-
   /**
    * constructor
    */
   constructor() {
     super('Sharp Eye');
-    this._timeManager = new TimeManager();
-    this._satcat = new SatelliteCatalogEngine('Satellites Catalog');
-    this._gscat = new GroundStationCatalogEngine('Ground Station Catalog');
     this.setUIClass('sharp-eye-ui');
   }
 
+  private registerEngines(): void {
+    this.registerObjectFactory(new SatelliteCatalogEngineFactory());
+    this.registerObjectFactory(new GroundStationCatalogEngineFactory());
+    this.registerObjectFactory(new TimeManagerEngineFactory());
+
+    this.registerEngineState({
+      id: `time-manager-${uuid()}`,
+      type: TimeManagerEngine.TIME_MANAGER_ENGINE_TYPE,
+      timeDescriptor: TimingHelper.createRealTimeDescriptor(),
+    } as TimeManagerEngineState);
+
+    this.registerEngineState({
+      id: `satellite-catalog-${uuid()}`,
+      type: SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE,
+    } as SatelliteCatalogEngineState);
+
+    this.registerEngineState({
+      id: `gs-catalog-${uuid()}`,
+      type: GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE,
+    } as GroundStationCatalogEngineState);
+  }
+
   public create(): void {
+    this.registerEngines();
     this.registerVisualizers();
     this.registerVisualizerStates();
 
@@ -104,7 +133,7 @@ export class SharpEyedApp extends ZirconApplication {
         this.createDesktops4().id,
       ],
     };
-    this.registerState(desktopManagerState);
+    this.registerObjectState(desktopManagerState);
   }
 
   public registerVisualizers(): void {
@@ -148,40 +177,40 @@ export class SharpEyedApp extends ZirconApplication {
 
   public registerVisualizerStates(): void {
     // 3D Visualizers
-    this.registerState({
+    this.registerObjectState({
       id: 'globusVizId',
       type: VizOpenGlobus.OPENGLOBUS_VISUALIZER_TYPE,
       name: 'OpenGlobus Globe',
     });
 
-    this.registerState({
+    this.registerObjectState({
       id: 'leafletVizId',
       type: VizLeaflet.LEAFLET_VISUALIZER_TYPE,
       name: 'Leaflet Map',
     });
 
     // Three.js Visualizers
-    this.registerState({
+    this.registerObjectState({
       id: 'cubeVizId',
       type: VizCubeSampleThreeJS.CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE,
       name: 'Three.js Cube Sample',
     });
 
-    this.registerState({
+    this.registerObjectState({
       id: 'helmetVizId',
       type: VizHelmetSampleThreeJS.HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE,
       name: 'Three.js Helmet Sample',
     });
 
     // Chart.js Visualizers
-    this.registerState({
+    this.registerObjectState({
       id: 'barChartVizId',
       type: VizBarJSChart.BAR_JSCHART_VISUALIZER_TYPE,
       name: 'Bar Chart',
       series: createSeriesBar(),
     } as VizBarJSChartState);
 
-    this.registerState({
+    this.registerObjectState({
       id: 'lineChartVizId',
       type: VizLineJSChart.LINE_JSCHART_VISUALIZER_TYPE,
       series: createSeriesLine(),
@@ -189,65 +218,65 @@ export class SharpEyedApp extends ZirconApplication {
     } as VizLineJSChartState);
 
     // Logger Visualizers
-    this.registerState({
+    this.registerObjectState({
       id: 'loggerVizId',
       type: VizEventLogger.EVENT_LOGGER_VISUALIZER_TYPE,
       name: 'Event Logger',
     });
 
     // Time Visualizers
-    this.registerState({
+    this.registerObjectState({
       id: 'clock1VizId',
       type: DigitalClock.DIGITAL_CLOCK_VISUALIZER_TYPE,
       name: 'Digital Clock',
     });
 
-    this.registerState({
+    this.registerObjectState({
       id: 'clock2VizId',
       type: AnalogClock.ANALOG_CLOCK_VISUALIZER_TYPE,
       name: 'Analog Clock',
     });
 
-    this.registerState({
+    this.registerObjectState({
       id: 'timeControllerVizId',
       type: TimeController.TIME_CONTROLLER_VISUALIZER_TYPE,
       name: 'Time Controller',
     });
 
     // Spatial Loaders
-    this.registerState({
+    this.registerObjectState({
       id: 'satelliteLoaderVizId',
       type: VizSatCatLoader.VIZ_SAT_CAT_LOADER_TYPE,
       name: 'Satellite Loader',
     });
 
-    this.registerState({
+    this.registerObjectState({
       id: 'groundStationVizId',
       type: VizGroundStationLoader.VIZ_GROUND_STATION_LOADER_TYPE,
       name: 'Ground Station Loader',
     });
 
     // Fetch Visualizer
-    this.registerState({
+    this.registerObjectState({
       id: 'fetchVizId',
       type: VizFetch.FETCH_VISUALIZER_TYPE,
       name: 'Data Fetcher',
     });
 
     // Catalog Visualizers
-    this.registerState({
+    this.registerObjectState({
       id: 'satcat1VizId',
       type: VizSatelliteCatalogTabulator.VIZ_SATELLITE_CATALOG_TABULATOR_TYPE,
       name: 'Satellite Catalog 1',
     });
 
-    this.registerState({
+    this.registerObjectState({
       id: 'satcat2VizId',
       type: VizSatelliteCatalogTabulator.VIZ_SATELLITE_CATALOG_TABULATOR_TYPE,
       name: 'Satellite Catalog 2',
     });
 
-    this.registerState({
+    this.registerObjectState({
       id: 'groundStationCatalogVizId',
       type: VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE,
       name: 'Ground Station Catalog',
@@ -268,7 +297,7 @@ export class SharpEyedApp extends ZirconApplication {
       height: 520,
       vizId: 'barChartVizId',
     };
-    this.registerState(barChartState);
+    this.registerObjectState(barChartState);
     const helmetState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
       id: `window-${uuid()}`,
@@ -279,7 +308,7 @@ export class SharpEyedApp extends ZirconApplication {
       height: 520,
       vizId: 'helmetVizId',
     };
-    this.registerState(helmetState);
+    this.registerObjectState(helmetState);
     const cubeState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
       id: `window-${uuid()}`,
@@ -290,7 +319,7 @@ export class SharpEyedApp extends ZirconApplication {
       height: 520,
       vizId: 'cubeVizId',
     };
-    this.registerState(cubeState);
+    this.registerObjectState(cubeState);
     const globusState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
       id: `window-${uuid()}`,
@@ -301,7 +330,7 @@ export class SharpEyedApp extends ZirconApplication {
       height: 520,
       vizId: 'globusVizId',
     };
-    this.registerState(globusState);
+    this.registerObjectState(globusState);
 
     const clock2State: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
@@ -313,7 +342,7 @@ export class SharpEyedApp extends ZirconApplication {
       height: 420,
       vizId: 'clock2VizId',
     };
-    this.registerState(clock2State);
+    this.registerObjectState(clock2State);
 
     const desktop1State: ZirconDesktopState = {
       type: ZIRCON_DESKTOP_TYPE,
@@ -327,7 +356,7 @@ export class SharpEyedApp extends ZirconApplication {
         clock2State.id,
       ],
     };
-    this.registerState(desktop1State);
+    this.registerObjectState(desktop1State);
     return desktop1State;
   }
 
@@ -345,7 +374,7 @@ export class SharpEyedApp extends ZirconApplication {
       height: 520,
       vizId: 'lineChartVizId',
     };
-    this.registerState(lineChartState);
+    this.registerObjectState(lineChartState);
 
     const leafletState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
@@ -358,7 +387,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'leafletVizId',
     };
     // createVisualizerLeafletJS(),
-    this.registerState(leafletState);
+    this.registerObjectState(leafletState);
 
     const fetchState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
@@ -371,7 +400,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'fetchVizId',
     };
     // createVisualizerFetch(),
-    this.registerState(fetchState);
+    this.registerObjectState(fetchState);
 
     const loggerState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
@@ -384,7 +413,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'loggerVizId',
     };
     // createVisualizerLogger(),
-    this.registerState(loggerState);
+    this.registerObjectState(loggerState);
 
     const clock1State: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
@@ -397,7 +426,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'clock1VizId',
     };
     // window.setContentObject(digitalClock);
-    this.registerState(clock1State);
+    this.registerObjectState(clock1State);
 
     const timeControllerState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
@@ -410,7 +439,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'timeControllerVizId',
     };
     //const timeController = new TimeController();
-    this.registerState(timeControllerState);
+    this.registerObjectState(timeControllerState);
 
     const desktop2State: ZirconDesktopState = {
       type: ZIRCON_DESKTOP_TYPE,
@@ -425,7 +454,7 @@ export class SharpEyedApp extends ZirconApplication {
         lineChartState.id,
       ],
     };
-    this.registerState(desktop2State);
+    this.registerObjectState(desktop2State);
     return desktop2State;
   }
 
@@ -444,7 +473,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'satcat1VizId',
     };
     //const timeController = new TimeController();
-    this.registerState(satcat1WindowState);
+    this.registerObjectState(satcat1WindowState);
 
     const satcat2WindowState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
@@ -457,7 +486,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'satcat2VizId',
     };
     // createVisualizerSatelliteCatalog(),
-    this.registerState(satcat2WindowState);
+    this.registerObjectState(satcat2WindowState);
 
     const satelliteLoaderWindowState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
@@ -467,10 +496,10 @@ export class SharpEyedApp extends ZirconApplication {
       top: 10,
       width: 385,
       height: 220,
-      vizId: 'satelltieLoaderVizId',
+      vizId: 'satelliteLoaderVizId',
     };
     // window4.setContentObject(new VizSatelliteLoader());
-    this.registerState(satelliteLoaderWindowState);
+    this.registerObjectState(satelliteLoaderWindowState);
 
     const desktop3State: ZirconDesktopState = {
       type: ZIRCON_DESKTOP_TYPE,
@@ -482,7 +511,7 @@ export class SharpEyedApp extends ZirconApplication {
         satelliteLoaderWindowState.id,
       ],
     };
-    this.registerState(desktop3State);
+    this.registerObjectState(desktop3State);
     return desktop3State;
   }
 
@@ -501,7 +530,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'groundStationVizId',
     };
     // window5.setContentObject(new VizGroundStationLoader());
-    this.registerState(groundStationLoaderWindowState);
+    this.registerObjectState(groundStationLoaderWindowState);
 
     const groundStationCatalog1WindowState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
@@ -514,7 +543,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'groundStationCatalogVizId',
     };
     // createVisualizerGroundStationCatalog(),
-    this.registerState(groundStationCatalog1WindowState);
+    this.registerObjectState(groundStationCatalog1WindowState);
 
     const groundStationCatalog2WindowState: ZirconWindowState = {
       type: ZIRCON_WINDOW_TYPE,
@@ -527,7 +556,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'groundStationCatalogVizId',
     };
     // createVisualizerGroundStationCatalog(),
-    this.registerState(groundStationCatalog2WindowState);
+    this.registerObjectState(groundStationCatalog2WindowState);
 
     const desktop4State: ZirconDesktopState = {
       type: ZIRCON_DESKTOP_TYPE,
@@ -539,7 +568,7 @@ export class SharpEyedApp extends ZirconApplication {
         groundStationCatalog2WindowState.id,
       ],
     };
-    this.registerState(desktop4State);
+    this.registerObjectState(desktop4State);
     return desktop4State;
   }
 }

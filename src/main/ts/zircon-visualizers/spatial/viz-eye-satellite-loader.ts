@@ -74,7 +74,6 @@ export class VizSatCatLoader<
 > extends ZirconViz<R> {
   public static readonly VIZ_SAT_CAT_LOADER_TYPE = 'VIZ_SAT_CAT_LOADER_TYPE';
   private _div: HTMLDivElement = null;
-  private _satCatLoaderDiv: HTMLDivElement = null;
   private _fetchButton: HTMLButtonElement = null;
   private _dataSelector: HTMLSelectElement = null;
 
@@ -83,6 +82,10 @@ export class VizSatCatLoader<
    */
   constructor(state?: VizSatCatLoaderState) {
     super(state);
+  }
+
+  public override getType(): string {
+    return VizSatCatLoader.VIZ_SAT_CAT_LOADER_TYPE;
   }
 
   public updateData(): boolean {
@@ -232,8 +235,6 @@ export class VizSatCatLoader<
       return dataDescriptor.loader
         .loadLocalJson(dataDescriptor.localFile)
         .then((satellites: Satellite[]) => {
-          // this.setSatelliteData(satellites);
-
           this.emit('COLLECTION_CREATE_CATALOG_REQUEST', {
             catalogType: SATELLITE_TYPE,
             catalogDescriptor: { id: 'null', name: dataDescriptor.name },

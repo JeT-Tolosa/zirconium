@@ -1,9 +1,8 @@
 import { v4 as uuid } from 'uuid';
-import { AbstractClock } from './clock';
+import { AbstractClock, ClockState } from './clock';
 import './digital-clock.css';
-import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
 
-export interface DigitalClockState extends ZirconVizState {
+export interface DigitalClockState extends ClockState {
   type: typeof DigitalClock.DIGITAL_CLOCK_VISUALIZER_TYPE;
 }
 
@@ -57,5 +56,12 @@ export class DigitalClock extends AbstractClock {
     const s = simulatedDate.getSeconds();
     this.getClockElement().innerHTML = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}.${String(s).padStart(2, '0')}`;
     this.getDateElement().innerHTML = `${simulatedDate.toLocaleDateString()}`;
+  }
+
+  public override generateCurrentState(): DigitalClockState {
+    return {
+      ...super.generateCurrentState(),
+      type: DigitalClock.DIGITAL_CLOCK_VISUALIZER_TYPE,
+    };
   }
 }

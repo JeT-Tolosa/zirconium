@@ -1,24 +1,56 @@
-import { TimeDescriptor } from '../../sharp-eye/engines/timing/timing';
+import '@ionic/core/css/ionic.bundle.css';
 import { v4 as uuid } from 'uuid';
+import { TimeDescriptor } from '../../libraries/timing/timing';
 import { IonModal } from '@ionic/core/components/ion-modal';
 import { IonButton } from '@ionic/core/components/ion-button';
 import { IonToggle } from '@ionic/core/components/ion-toggle';
 import { IonDatetime } from '@ionic/core/components/ion-datetime';
 import { IonDatetimeButton } from '@ionic/core/components/ion-datetime-button';
 import { defineCustomElements } from '@ionic/core/loader';
-import '@ionic/core/css/ionic.bundle.css';
-import { ZirconViz } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import {
+  ZirconViz,
+  ZirconVizEventRegistry,
+} from '../../zirconium/zircon-ui/zircon-viz-ui';
+import {
+  MergePickEvents,
+  MergeZirconRegistries,
+  PickEvents,
+} from '../../zirconium/zircon-event';
+import {
+  TimeManagerEngine,
+  TimeManagerEngineEvents,
+} from '../../sharp-eye/engines/time-manager/time-manager-engine';
 
+/**
+ * State of the Time Controller Visualizer
+ */
 export interface TimeControllerState {
   type: typeof TimeController.TIME_CONTROLLER_VISUALIZER_TYPE;
   timeDescriptorId: string;
 }
 
+export type TimeControllerEventRegistry = MergeZirconRegistries<
+  {
+    incoming: MergePickEvents<[]>;
+    outgoing: MergePickEvents<
+      [
+        PickEvents<
+          TimeManagerEngineEvents,
+          'SIMULATED_SET_TIMEDESCRIPTOR_REQUEST'
+        >,
+      ]
+    >;
+  },
+  ZirconVizEventRegistry
+>;
+
 /**
  * Time Controller is a UI element to control time
- * It emits a TIME_CHANGE_REQUEST event when the user changes the time
+ * It emits a SIMULATED_TIME_CHANGE_REQUEST event when the user changes the time
  */
-export class TimeController extends ZirconViz {
+export class TimeController<
+  R extends TimeControllerEventRegistry = TimeControllerEventRegistry,
+> extends ZirconViz<R> {
   public static readonly TIME_CONTROLLER_VISUALIZER_TYPE =
     'TIME_CONTROLLER_VISUALIZER_TYPE';
   private _mainDiv: HTMLDivElement = null;
@@ -28,6 +60,10 @@ export class TimeController extends ZirconViz {
   private _runCheckbox: IonToggle = null;
   private _timeFactorInput: HTMLInputElement = null;
 
+  /**
+   * Constructor of the Time Controller Visualizer
+   * @param state State of the Time Controller Visualizer
+   */
   constructor(state: TimeControllerState) {
     super(state);
     // Initialize Ionic Elements
@@ -76,7 +112,7 @@ export class TimeController extends ZirconViz {
     this._setTimeButton = document.createElement('ion-button');
     this._setTimeButton.innerText = 'Set Time';
     this._setTimeButton.setAttribute('size', 'small');
-    this._setTimeButton.addEventListener('click', () => this.setTime());
+    this._setTimeButton.addEventListener('click', () => this.requestSetTime());
 
     return this._setTimeButton;
   }
@@ -139,7 +175,7 @@ export class TimeController extends ZirconViz {
   /**
    * Fire an event TIME_CHANGE_REQUEST with the new time descriptor
    */
-  private setTime(): void {
+  private requestSetTime(): void {
     const td: TimeDescriptor = {
       realStartTime: Date.now(),
       simulatedStartTime: new Date(this._dateInput.value as string).getTime(),
@@ -147,6 +183,9 @@ export class TimeController extends ZirconViz {
       timeMultiplicator: Number(this._timeFactorInput.value),
       running: this.getRunCheckbox().checked,
     };
-    this.emit('TIME_CHANGE_REQUEST', { TimeDescriptor: td });
+    this.emit('SIMULATED_SET_TIMEDESCRIPTOR_REQUEST', {
+      timeSource: TimeManagerEngine.DEFAULT_TIME_SOURCE,
+      timeDescriptor: td,
+    });
   }
 }

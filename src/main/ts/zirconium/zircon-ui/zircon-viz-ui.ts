@@ -45,12 +45,9 @@ export abstract class ZirconViz<
 
   protected override listenToEvents(): void {
     super.listenToEvents();
-    this.getEventDispatcher().addListener(
-      'VISUALIZER_REFRESH_REQUEST',
-      (arg) => {
-        this.onVISUALIZER_REFRESH_REQUEST(arg.vizId);
-      },
-    );
+    this.addListener('VISUALIZER_DISPLAY_REQUEST', (arg) => {
+      this.onVISUALIZER_REFRESH_REQUEST(arg.vizId);
+    });
   }
 
   private onVISUALIZER_REFRESH_REQUEST(vizId: string): void {

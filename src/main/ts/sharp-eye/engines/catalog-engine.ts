@@ -14,6 +14,9 @@ import {
   CatalogCollectionEvents,
 } from '../../libraries/catalog/catalog-collection';
 
+/**
+ * Events
+ */
 export type CatalogEngineEvents<CatalogElement> = {
   // create catalog
   COLLECTION_CREATE_CATALOG_REQUEST: {
@@ -154,37 +157,15 @@ export class CatalogEngine<
     indexation: (el: CatalogElement) => string,
   ) {
     super();
+    this.setName(name);
     this._catalogType = catalogType;
     this._indexation = indexation;
     this._catColl = new CatalogCollection<CatalogElement>(
       catalogType,
       indexation,
     );
-    this.addListener(
-      'COLLECTION_ADD_ELEMENTS_REQUEST',
-      (arg: R['incoming']['COLLECTION_ADD_ELEMENTS_REQUEST']) => {
-        this.onCOLLECTION_ADD_ELEMENTS_REQUEST(arg.catalogId, arg.elements);
-      },
-    );
-    this.addListener('COLLECTION_CLEAR_CATALOG_REQUEST', (_arg) => {
-      alert('onCOLLECTION_CLEAR_CATALOG_REQUEST not implemented');
-    });
-    this.addListener(
-      'COLLECTION_GET_CATALOG_DESCRIPTORS_REQUEST',
-      (_arg: R['incoming']['COLLECTION_GET_CATALOG_DESCRIPTORS_REQUEST']) => {
-        this.onCOLLECTION_GET_CATALOG_DESCRIPTORS_REQUEST();
-      },
-    );
-    this.addListener('COLLECTION_GET_CATALOG_CONTENT_REQUEST', (arg) => {
-      this.onCOLLECTION_GET_CATALOG_REQUEST(arg.catalogId);
-    });
-    this.addListener('COLLECTION_CREATE_CATALOG_REQUEST', (arg) => {
-      if (arg.catalogType !== this.getCatalogType()) return;
-      this.onCOLLECTION_CREATE_CATALOG_REQUEST(
-        arg.catalogDescriptor,
-        arg.elements,
-      );
-    });
+
+    // respond to catalog event
     this._catColl.subscriber('MANAGED_CATALOG_CONTENT_CHANGED', (arg) => {
       this.emit('MANAGED_CATALOG_CONTENT_CHANGED', {
         catalogType: this.getCatalogType(),
@@ -193,14 +174,35 @@ export class CatalogEngine<
     });
   }
 
-  public getCatalogType(): string {
-    return this._catalogType;
+  protected override listenToEvents(): void {
+    this.addListener('COLLECTION_ADD_ELEMENTS_REQUEST', (arg) => {
+      this.onCOLLECTION_ADD_ELEMENTS_REQUEST(arg.catalogId, arg.elements);
+    });
+    this.addListener('COLLECTION_CLEAR_CATALOG_REQUEST', (_arg) => {
+      alert('onCOLLECTION_CLEAR_CATALOG_REQUEST not implemented');
+    });
+    this.addListener('COLLECTION_GET_CATALOG_DESCRIPTORS_REQUEST', (_arg) => {
+      this.onCOLLECTION_GET_CATALOG_DESCRIPTORS_REQUEST();
+    });
+    this.addListener('COLLECTION_GET_CATALOG_CONTENT_REQUEST', (arg) => {
+      this.onCOLLECTION_GET_CATALOG_REQUEST(arg.catalogId);
+    });
+    this.addListener('COLLECTION_CREATE_CATALOG_REQUEST', (arg) => {
+      this.onCOLLECTION_CREATE_CATALOG_REQUEST(
+        arg.catalogType,
+        arg.catalogDescriptor,
+        arg.elements,
+      );
+    });
   }
 
   private onCOLLECTION_CREATE_CATALOG_REQUEST(
+    catalogType: string,
     catalogDescriptor: CatalogDescriptor,
     elements: CatalogElement[],
   ) {
+    if (catalogType !== this.getCatalogType()) return;
+
     const cat: Catalog<CatalogElement> = this.createNewCatalog(
       catalogDescriptor.name,
       elements,
@@ -259,6 +261,14 @@ export class CatalogEngine<
         elementIds: addedElementsIds,
       });
     }
+  }
+
+  /**
+   * Type of elements managed by this catalog
+   * @returns
+   */
+  public getCatalogType(): string {
+    return this._catalogType;
   }
 
   /**
@@ -368,7 +378,7 @@ export class CatalogEngine<
     return cat?.getElements();
   }
 
-  public createNewCatalog(
+  private createNewCatalog(
     catalogName: string,
     elements: CatalogElement[],
   ): Catalog<CatalogElement> {

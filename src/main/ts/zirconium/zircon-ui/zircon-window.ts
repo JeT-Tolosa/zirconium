@@ -356,7 +356,10 @@ export class ZirconWindow<
     return this.getApplication()
       .getInstance(this._vizId)
       .then((instance) => {
-        if (!instance || !(instance instanceof ZirconViz)) return null;
+        if (!instance || !(instance instanceof ZirconViz))
+          throw new Error(
+            `Unable to retrieve Visualizer Id ${this._vizId} in window ${this.getId()}`,
+          );
         this.__viz = instance;
         return this.__viz;
       });
@@ -364,11 +367,16 @@ export class ZirconWindow<
 
   private displayVisualizer(): void {
     if (!this.__panel) return;
-    this.getVisualizer().then((viz: ZirconViz) => {
-      if (viz) {
-        viz.displayIn(this);
-      }
-    });
+    this.getVisualizer()
+      .then((viz: ZirconViz) => {
+        if (viz) {
+          viz.displayIn(this);
+        }
+      })
+      .catch((error) => {
+        this.__panel.content.innerHTML = `<p>${error.toString()}</p>`;
+        this.__panel.content.style.background = `red`;
+      });
   }
 
   public getContainer(): HTMLElement {

@@ -67,7 +67,6 @@ export class VizGroundStationLoader<
   public static readonly VIZ_GROUND_STATION_LOADER_TYPE =
     'VIZ_GROUND_STATION_LOADER_TYPE';
   private _div: HTMLDivElement = null;
-  private _satCatLoaderDiv: HTMLDivElement = null;
   private _fetchButton: HTMLButtonElement = null;
   private _dataSelector: HTMLSelectElement = null;
 
@@ -76,6 +75,10 @@ export class VizGroundStationLoader<
    */
   constructor(state?: VizGroundStationLoaderState) {
     super(state);
+  }
+
+  public override getType(): string {
+    return VizGroundStationLoader.VIZ_GROUND_STATION_LOADER_TYPE;
   }
 
   public updateData(): boolean {
@@ -143,7 +146,7 @@ export class VizGroundStationLoader<
   public getFetchButton(): HTMLButtonElement {
     if (this._fetchButton) return this._fetchButton;
     this._fetchButton = document.createElement('button');
-    this._fetchButton.classList.add('satcat-button');
+    this._fetchButton.classList.add('groundstation-button');
     this._fetchButton.innerText = 'Load Data';
     this._fetchButton.addEventListener('click', () => {
       const dataDescriptorId: string =
@@ -181,7 +184,7 @@ export class VizGroundStationLoader<
     if (this._div) return this._div;
     this._div = document.createElement('div');
     this._div.id = uuid();
-    this._div.classList.add('satcat-container');
+    this._div.classList.add('groundstation-container');
     this._div.appendChild(this.getFetchButton());
     // this._div.appendChild(this.getSatCatDiv());
     this._div.appendChild(this.getDataSelector());
@@ -190,7 +193,7 @@ export class VizGroundStationLoader<
   }
 
   public override updateResize(): boolean {
-    // console.log(`update resize satcat ${this.getName()}`);
+    // console.log(`update resize groundstation ${this.getName()}`);
     return true;
   }
 }

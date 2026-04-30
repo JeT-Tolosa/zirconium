@@ -116,6 +116,9 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
       this.getCatalogType(),
       indexationMethod,
     );
+  }
+
+  protected override listenToEvents(): void {
     this.addListener('COLLECTION_CREATE_CATALOG_DONE', (arg) => {
       if (arg.catalogDescriptor?.type !== this.getCatalogType()) return;
       this.onCOLLECTION_CREATE_CATALOG_DONE(
@@ -458,7 +461,7 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
     this._div.classList.add('catalog-container');
     this._div.appendChild(this.getCatalogCollectionComponent().getUI());
     this._div.appendChild(this.getSatCatDiv());
-    document.body.appendChild(this.getContextMenuDiv());
+    // document.body.appendChild(this.getContextMenuDiv());
 
     return this._div;
   }

@@ -34,6 +34,7 @@ import { ZirconObjectFactory } from '../zircon-object-factory';
 import { Zircon } from '../zircon';
 import { ZirconWindowFactory } from '../zircon-ui/zircon-window-factory';
 import { ZirconDesktopFactory } from '../zircon-ui/zircon-desktop-factory';
+import { ZirconEngine, ZirconEngineState } from './zircon-engine';
 
 /**
  * Composition of this application UI
@@ -56,11 +57,8 @@ export type ZirconApplicationEvents = {
   APPLICATION_START_REQUEST: { applicationId: string };
   APPLICATION_STARTED: { applicationId: string };
   SET_OBJECT_STATE_REQUEST: { objectId: string; state: ZirconObjectState };
-  OBJECT_STATE_REGISTERED: {
-    objectId: string;
-    objectType: string;
-    state: ZirconObjectState;
-  };
+  OBJECT_STATE_REGISTERED: { state: ZirconObjectState };
+  ENGINE_STATE_REGISTERED: { state: ZirconEngineState };
 };
 
 export type ZirconApplicationEventRegistry = MergeZirconRegistries<
@@ -85,6 +83,7 @@ export type ZirconApplicationEventRegistry = MergeZirconRegistries<
           | 'APPLICATION_START_REQUEST'
           | 'APPLICATION_STARTED'
           | 'OBJECT_STATE_REGISTERED'
+          | 'ENGINE_STATE_REGISTERED'
           | 'SET_OBJECT_STATE_REQUEST'
         >,
         PickEvents<
@@ -118,8 +117,11 @@ export class ZirconApplication<
 
   private _desktopManager: ZirconDesktopManager = null;
 
-  private __registeredStates: { [id: string]: ZirconObjectState } = {};
-  private __instances: { [id: string]: ZirconObject } = {};
+  private __registeredObjectStates: { [id: string]: ZirconObjectState } = {};
+  private __registeredEngineStates: { [id: string]: ZirconEngineState } = {};
+
+  private __objectInstances: { [id: string]: ZirconObject } = {};
+  private __engineInstances: { [id: string]: ZirconEngine } = {};
   private __factories: { [type: string]: ZirconObjectFactory } = {};
 
   /**
@@ -173,7 +175,7 @@ export class ZirconApplication<
     state: ZirconObjectState,
   ): void {
     if (objectId !== state.id) throw new Error('Object ID mismatch');
-    this.registerState(state);
+    this.registerObjectState(state);
   }
 
   public getId(): string {
@@ -195,7 +197,11 @@ export class ZirconApplication<
     const factory: ZirconObjectFactory = this.__factories[state.type];
     if (!factory)
       Promise.reject(`No valid factory for object type ${state.type}`);
-    return factory.createInstance(state);
+    return factory.createInstance(state).then((instance: ZirconObject) => {
+      // link dispatchers
+      instance.setEventDispatcher(this.getEventDispatcher());
+      return instance;
+    });
   }
 
   // public getWindow(id: string): ZirconWindow {
@@ -208,15 +214,15 @@ export class ZirconApplication<
 
   private addInstance(obj: ZirconObject): ZirconObject {
     if (!obj) return null;
-    if (this.__instances[obj.getId()] === obj) return obj;
-    this.__instances[obj.getId()] = obj;
+    if (this.__objectInstances[obj.getId()] === obj) return obj;
+    this.__objectInstances[obj.getId()] = obj;
     return obj;
   }
 
   public getInstance(objId: string): Promise<ZirconObject> {
-    const instance = this.__instances[objId];
+    const instance = this.__objectInstances[objId];
     if (instance) return Promise.resolve(instance);
-    const state = this.__registeredStates[objId];
+    const state = this.__registeredObjectStates[objId];
     if (state)
       return this.createObject(state).then((instance: ZirconObject) => {
         return this.addInstance(instance);
@@ -225,13 +231,13 @@ export class ZirconApplication<
   }
 
   public getExistingWindow(id: string): ZirconWindow {
-    const instance = this.__instances[id];
+    const instance = this.__objectInstances[id];
     if (instance && instance instanceof ZirconWindow) return instance;
     return null;
   }
 
   public getExistingDesktop(id: string): ZirconDesktop {
-    const instance = this.__instances[id];
+    const instance = this.__objectInstances[id];
     if (instance && instance instanceof ZirconDesktop) return instance;
     return null;
   }
@@ -241,27 +247,25 @@ export class ZirconApplication<
    * @param state
    * @returns
    */
-  public registerState(state: ZirconObjectState): boolean {
+  public registerObjectState(state: ZirconObjectState): boolean {
     if (!state) return false;
-    if (!state.id) return false;
+    if (!state.id) throw new Error('Object state must have an id');
+    if (!state.type)
+      throw new Error(`Object ${state.id} state must have a type`);
     // Special case for dekstop manager which is unique
     if (state.type === ZIRCON_DESKTOP_MANAGER_TYPE) {
       this.getDesktopManager().setState(Zircon.asDesktopManagerState(state));
-      this.__registeredStates[state.id] = state;
+      this.__registeredObjectStates[state.id] = state;
       return;
     }
-    // add new state
-    this.__registeredStates[state.id] = state;
-    this.emit('OBJECT_STATE_REGISTERED', {
-      objectId: state.id,
-      objectType: state.type,
-      state: state,
-    });
+    // add or update state
+    this.__registeredObjectStates[state.id] = state;
+    this.emit('OBJECT_STATE_REGISTERED', { state: state });
     return true;
   }
 
-  public getRegisteredState(id: string): ZirconObjectState {
-    return this.__registeredStates[id];
+  public getRegisteredObjectState(id: string): ZirconObjectState {
+    return this.__registeredObjectStates[id];
   }
 
   public getContextMenuFactoryRegistry(): ZirconContextMenuFactoryRegistry {
@@ -284,11 +288,7 @@ export class ZirconApplication<
     eventName: K,
     arg: R['outgoing'][K],
   ): boolean {
-    if (!this._eventEmitter)
-      throw new Error(
-        `Cannot emit events before event Bus is set[call ::connectToApplication() method]`,
-      );
-    return this._eventEmitter.emit(eventName as string, arg);
+    return this._eventEmitter?.emit(eventName as string, arg);
   }
 
   /**
@@ -301,11 +301,7 @@ export class ZirconApplication<
     eventName: K,
     cb: (arg: R['incoming'][K]) => void,
   ): this {
-    if (!this._eventEmitter)
-      throw new Error(
-        `Cannot add Event Listener before event Bus is set[call ::connectToApplication() method]`,
-      );
-    this._eventEmitter.addListener(eventName as string, cb);
+    this._eventEmitter?.addListener(eventName as string, cb);
     return this;
   }
 
@@ -366,7 +362,58 @@ export class ZirconApplication<
     return true;
   }
 
+  public registerEngineState(state: ZirconEngineState): boolean {
+    if (!state) return false;
+    if (!state.id) throw new Error('Engine state must have an id');
+    if (!state.type)
+      throw new Error(`Engine ${state.id} state must have a type`);
+    this.__registeredEngineStates[state.id] = state;
+    this.emit('ENGINE_STATE_REGISTERED', { state: state });
+    return true;
+  }
+
+  private getEngineStates(): ZirconEngineState[] {
+    return Object.values(this.__registeredEngineStates);
+  }
+
+  private startEngines(): Promise<void> {
+    return Promise.all(
+      this.getEngineStates().map((state) => {
+        return this.getEngineInstance(state.id).then((engine) => {
+          return this.startEngine(engine);
+        });
+      }),
+    ).then(() => {});
+  }
+
+  private startEngine(engine: ZirconEngine): void {
+    engine?.start();
+  }
+
+  public getEngineInstance(engineId: string): Promise<ZirconEngine> {
+    const instance = this.__engineInstances[engineId];
+    if (instance) return Promise.resolve(instance);
+    const state = this.__registeredEngineStates[engineId];
+    if (state)
+      return this.createObject(state).then((instance: ZirconObject) => {
+        if (!(instance instanceof ZirconEngine))
+          throw new Error(`Object with id ${engineId} is not an engine`);
+        return this.addEngineInstance(instance);
+      });
+    return Promise.resolve(null);
+  }
+
+  private addEngineInstance(engine: ZirconEngine): ZirconEngine {
+    if (!engine) return null;
+    this.__engineInstances[engine.getId()] = engine;
+    return engine;
+  }
+
+  /**
+   * start application UI by displaying it in the body and starting engines
+   */
   public start(): void {
+    this.startEngines();
     this.displayUIIn(document.body);
   }
 

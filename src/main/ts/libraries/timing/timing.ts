@@ -1,13 +1,3 @@
-import {
-  MergePickEvents,
-  MergeZirconRegistries,
-  PickEvents,
-} from '../../../zirconium/zircon-event';
-import {
-  ZirconEngine,
-  ZirconEngineEventRegistry,
-} from '../../../zirconium/zircon-core/zircon-engine';
-
 /**
  * Time Descriptor describes a time span and its speed in a simulated environment
  */
@@ -35,23 +25,6 @@ export class TimingHelper {
   }
 }
 
-export type TimeManagerEvents = {
-  SIMULATED_TIME_CHANGED: { timeDescriptor: TimeDescriptor };
-  SIMULATED_TIME_CHANGE_REQUEST: { timeDescriptor: TimeDescriptor };
-};
-
-export type TimeManagerEventRegistry = MergeZirconRegistries<
-  {
-    incoming: MergePickEvents<
-      [PickEvents<TimeManagerEvents, 'SIMULATED_TIME_CHANGE_REQUEST'>]
-    >;
-    outgoing: MergePickEvents<
-      [PickEvents<TimeManagerEvents, 'SIMULATED_TIME_CHANGED'>]
-    >;
-  },
-  ZirconEngineEventRegistry
->;
-
 /**
  * A Time Runner is a class taking a TimeDescriptor and running simulated time
  * according to the descriptor.
@@ -63,15 +36,24 @@ export class TimeRunner {
   private _timeChangeCallbacks: Array<(runner: TimeRunner) => void> = [];
   private _intervalId: NodeJS.Timeout = null;
 
-  constructor() {}
+  /**
+   * Constructor
+   * @param timeDescriptor
+   */
+  constructor(timeDescriptor?: TimeDescriptor) {
+    this.setTimeDescriptor(timeDescriptor);
+  }
 
   /**
    * Set Time Descriptor
    * @param timeDescriptor
+   * @return true if the time descriptor was changed, false otherwise
    */
-  public setTimeDescriptor(timeDescriptor: TimeDescriptor): void {
+  public setTimeDescriptor(timeDescriptor: TimeDescriptor): boolean {
+    if (timeDescriptor === this._timeDescriptor) return false;
     this._timeDescriptor = timeDescriptor;
     this.run();
+    return true;
   }
 
   /**
@@ -116,7 +98,7 @@ export class TimeRunner {
   /**
    * Stop time runner
    */
-  private stop(): void {
+  public stop(): void {
     if (!this._intervalId) return;
     clearInterval(this._intervalId);
     this._intervalId = null;
@@ -139,6 +121,7 @@ export class TimeRunner {
   private run(): void {
     if (this._intervalId) this.stop();
 
+    if (!this._timeDescriptor) return;
     this._intervalId = setInterval(() => {
       // launch all callbacks
       this._timeChangeCallbacks.forEach((callback) => callback(this));
@@ -147,43 +130,5 @@ export class TimeRunner {
       // check if we reached the end of the simulation
       if (this.isSimulatedTimeReached()) this.stop();
     }, 100);
-  }
-}
-
-/**
- * A Time Manager is a class managing a Time Descriptor and a Time Runner
- * It emits a TIME_CHANGED event when the time descriptor is changed
- * It receives TIME_CHANGE_REQUEST events and change the time descriptor accordingly
- */
-export class TimeManager<
-  R extends TimeManagerEventRegistry = TimeManagerEventRegistry,
-> extends ZirconEngine<R> {
-  private _timeRunner: TimeRunner = null;
-
-  constructor() {
-    super();
-    this._timeRunner = new TimeRunner();
-  }
-
-  protected override listenToEvents(): void {
-    super.listenToEvents();
-    this.getEventDispatcher().on(
-      'SIMULATED_TIME_CHANGE_REQUEST',
-      (td: TimeDescriptor) => {
-        this.setTimeDescriptor(td);
-      },
-    );
-  }
-
-  private setTimeDescriptor(timeDescriptor: TimeDescriptor): void {
-    this._timeRunner.setTimeDescriptor(timeDescriptor);
-    this.emitTimeChanged();
-  }
-
-  private emitTimeChanged(): void {
-    this.getEventDispatcher().emit(
-      'SIMULATED_TIME_CHANGED',
-      this._timeRunner.getTimeDescriptor(),
-    );
   }
 }

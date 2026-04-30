@@ -85,15 +85,12 @@ export abstract class ZirconObject<
 
   protected listenToEvents(): void {
     this.addListener('OBJECT_STATE_REGISTERED', (arg) => {
-      this.onOBJECT_STATE_REGISTERED(arg.objectId, arg.state);
+      this.onOBJECT_STATE_REGISTERED(arg.state);
     });
   }
 
-  private onOBJECT_STATE_REGISTERED(
-    objectId: string,
-    state: ZirconObjectState,
-  ): void {
-    if (objectId === this.getId()) {
+  private onOBJECT_STATE_REGISTERED(state: ZirconObjectState): void {
+    if (state?.id === this.getId()) {
       this.setState(state);
     }
   }

@@ -61,12 +61,17 @@ export abstract class ZirconEngine<
     super(state);
   }
 
+  /**
+   * Listen to events coming from the event dispatcher
+   * This method is called by the ZirconObject constructor, so it is called after the object is created and its id is set
+   * It listens to ENGINE_START_REQUEST and ENGINE_STOP_REQUEST events and calls the corresponding methods
+   */
   protected override listenToEvents(): void {
     super.listenToEvents();
-    this.getEventDispatcher().addListener('ENGINE_START_REQUEST', (arg) => {
+    this.addListener('ENGINE_START_REQUEST', (arg) => {
       this.onENGINE_START_REQUEST(arg.engineId);
     });
-    this.getEventDispatcher().addListener('ENGINE_STOP_REQUEST', (arg) => {
+    this.addListener('ENGINE_STOP_REQUEST', (arg) => {
       this.onENGINE_STOP_REQUEST(arg.engineId);
     });
   }
