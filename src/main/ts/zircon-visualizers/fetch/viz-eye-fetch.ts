@@ -1,4 +1,4 @@
-import { ZirconViz } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import { ZirconViz } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { v4 as uuid } from 'uuid';
 
 import './viz-eye-fetch.css';

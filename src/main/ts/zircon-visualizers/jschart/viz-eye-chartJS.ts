@@ -2,7 +2,7 @@ import { Chart, ChartData, ChartTypeRegistry, ChartOptions } from 'chart.js';
 import {
   ZirconViz,
   ZirconVizState,
-} from '../../zirconium/zircon-ui/zircon-viz-ui';
+} from '../../zirconium/zircon-ui/zircon-visualizer';
 import { v4 as uuid } from 'uuid';
 import { DataSeries } from '../../libraries/data-series/data-series';
 

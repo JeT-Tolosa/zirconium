@@ -4,7 +4,7 @@ import {
   ZirconObjectEventRegistry,
 } from '../zircon-object';
 import { MergeZirconRegistries, PickEvents } from '../zircon-event';
-import { ZirconWindow } from './zircon-window';
+import { ZirconVizWindow } from './zircon-viz-window';
 
 /**
  * Base state for all zircon objects UI
@@ -34,7 +34,7 @@ export type ZirconVizEventRegistry = MergeZirconRegistries<
 export abstract class ZirconViz<
   R extends ZirconVizEventRegistry = ZirconVizEventRegistry,
 > extends ZirconObject<R> {
-  private __parentWindow: ZirconWindow = null;
+  private __parentWindow: ZirconVizWindow = null;
   /**
    * constructor
    * @param appUI the application this object belongs to
@@ -79,7 +79,7 @@ export abstract class ZirconViz<
   /**
    * @returns   true if chart was created and docked, false otherwise
    */
-  public displayIn(parentWindow: ZirconWindow): boolean {
+  public displayIn(parentWindow: ZirconVizWindow): boolean {
     if (this.__parentWindow === parentWindow) return false;
     if (this.__parentWindow) {
       this.__parentWindow.getWindowContent()?.removeChild(this.getMainDiv());

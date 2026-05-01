@@ -1,7 +1,7 @@
 import {
   ZirconViz,
   ZirconVizState,
-} from '../../zirconium/zircon-ui/zircon-viz-ui';
+} from '../../zirconium/zircon-ui/zircon-visualizer';
 import { v4 as uuid } from 'uuid';
 import * as Leaflet from 'leaflet';
 import 'leaflet/dist/leaflet.css';

@@ -1,5 +1,5 @@
 import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
-import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { VizEventLogger } from './viz-eye-event-logger';
 
 export class VizEventLoggerFactory extends ZirconObjectFactory {

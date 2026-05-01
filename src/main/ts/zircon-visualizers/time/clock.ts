@@ -16,7 +16,7 @@ import {
   ZirconViz,
   ZirconVizEventRegistry,
   ZirconVizState,
-} from '../../zirconium/zircon-ui/zircon-viz-ui';
+} from '../../zirconium/zircon-ui/zircon-visualizer';
 
 export type AbstractClockEventRegistry = MergeZirconRegistries<
   {

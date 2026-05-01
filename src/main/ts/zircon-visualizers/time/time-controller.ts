@@ -10,7 +10,7 @@ import { defineCustomElements } from '@ionic/core/loader';
 import {
   ZirconViz,
   ZirconVizEventRegistry,
-} from '../../zirconium/zircon-ui/zircon-viz-ui';
+} from '../../zirconium/zircon-ui/zircon-visualizer';
 import {
   MergePickEvents,
   MergeZirconRegistries,

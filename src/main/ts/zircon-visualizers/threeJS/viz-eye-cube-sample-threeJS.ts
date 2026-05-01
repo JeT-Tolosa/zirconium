@@ -1,4 +1,4 @@
-import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { VizThreeJS } from './viz-eye-threeJS';
 import * as THREE from 'three';
 

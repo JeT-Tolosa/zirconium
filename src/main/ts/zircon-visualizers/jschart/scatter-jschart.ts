@@ -10,7 +10,7 @@ import {
 } from 'chart.js';
 import { VizJSChart } from './viz-eye-chartJS';
 import { DataSeries } from '../../libraries/data-series/data-series';
-import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
 
 export interface VizScatterJSChartState extends ZirconVizState {
   series?: DataSeries<ChartData<'scatter'>>;

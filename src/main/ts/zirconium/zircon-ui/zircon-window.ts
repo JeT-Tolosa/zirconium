@@ -17,11 +17,9 @@ import {
 } from '../zircon-event';
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
 import { ZirconContextMenuItem } from '../zircon-menu/zircon-context-menu';
-import { ZirconViz } from './zircon-viz-ui';
 import { ZirconDesktop } from './zircon-desktop';
 import { ZirconHelper } from '../zircon-helper';
-
-export const ZIRCON_WINDOW_TYPE: string = 'zircon-window';
+import { ZirconVizWindow } from './zircon-viz-window';
 
 export type ZirconWindowEvents = {
   WINDOW_SET_PARENT_DESKTOP_DONE: {
@@ -51,7 +49,6 @@ export type ZirconWindowEvents = {
   WINDOW_TITLE_CHANGED: { windowId: string; title: string };
   WINDOW_POSITION_CHANGED: { windowId: string; x: number; y: number };
   WINDOW_DIMENSION_CHANGED: { windowId: string; width: number; height: number };
-  WINDOW_VISUALIZER_CHANGED: { windowId: string; vizId: string };
 };
 
 export type ZirconWindowEventRegistry = MergeZirconRegistries<
@@ -83,7 +80,6 @@ export type ZirconWindowEventRegistry = MergeZirconRegistries<
           | 'WINDOW_TITLE_CHANGED'
           | 'WINDOW_DIMENSION_CHANGED'
           | 'WINDOW_POSITION_CHANGED'
-          | 'WINDOW_VISUALIZER_CHANGED'
         >,
       ]
     >;
@@ -92,7 +88,6 @@ export type ZirconWindowEventRegistry = MergeZirconRegistries<
 >;
 
 export interface ZirconWindowState extends ZirconObjectState {
-  type: typeof ZIRCON_WINDOW_TYPE;
   title?: string;
   left?: number;
   top?: number;
@@ -101,19 +96,10 @@ export interface ZirconWindowState extends ZirconObjectState {
   vizId?: string;
 }
 
-export const DEFAULT_WINDOW_STATE: ZirconWindowState = {
-  type: ZIRCON_WINDOW_TYPE,
-  title: 'unnamed',
-  left: 0,
-  top: 0,
-  width: 500,
-  height: 500,
-};
-
 /**
  * A Zircon Frame is a floating window which can be docked in a Zircon Desktop
  */
-export class ZirconWindow<
+export abstract class ZirconWindow<
   R extends ZirconWindowEventRegistry = ZirconWindowEventRegistry,
 > extends ZirconAppObject<R> {
   private __parentDesktop: ZirconDesktop = null;
@@ -123,11 +109,8 @@ export class ZirconWindow<
   private _top: number = 0;
   private _width: number = 500;
   private _height: number = 500;
-  private _vizId: string = null;
-  // private __parentDesktop: ZirconDesktop = null;
   private __dragSource: HTMLElement = null; // parent element when drag is initialized
   private __dragPosition: { x: number; y: number } = null; // window position when drag is initialized
-  private __viz: ZirconViz = null;
 
   constructor(app: ZirconApplication, state?: ZirconWindowState) {
     super(app, state);
@@ -165,17 +148,12 @@ export class ZirconWindow<
     if (this.getId() === windowId) this.__panel?.close();
   }
 
-  public override getType(): string {
-    return ZIRCON_WINDOW_TYPE;
-  }
-
   public override async setState(state: ZirconWindowState): Promise<void> {
     if (!state) return;
     await super.setState(state);
     this.setTitle(state.title);
     this.setPosition(state.left, state.top);
     this.setDimension(state.width, state.height);
-    this.setVisualizerId(state.vizId);
   }
 
   /**
@@ -190,8 +168,6 @@ export class ZirconWindow<
       top: this.__panel?.getBoundingClientRect().top,
       width: this.__panel?.offsetWidth,
       height: this.__panel?.offsetHeight,
-      vizId: this._vizId,
-      type: ZIRCON_WINDOW_TYPE,
     };
   }
 
@@ -330,14 +306,12 @@ export class ZirconWindow<
 
       callback: (panel: IJSPanelInstance) => {
         this.__panel = panel;
-        this.displayVisualizer();
+        this.onPanelCreated(panel);
         this.emit('WINDOW_DISPLAYED', { windowId: this.getId() });
       },
       theme: 'primary',
     });
-    this.__panel.header.addEventListener('click', () => {
-      this.displayParameters();
-    });
+
     this.__panel.setAttribute(
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
       this.getId(),
@@ -345,39 +319,7 @@ export class ZirconWindow<
     return this.__panel;
   }
 
-  public displayParameters(): boolean {
-    alert('Window::displayParameters() Not yet implemented');
-    return false;
-  }
-
-  public getVisualizer(): Promise<ZirconViz> {
-    if (this.__viz && this.__viz.getId() === this._vizId)
-      return Promise.resolve(this.__viz);
-    return this.getApplication()
-      .getInstance(this._vizId)
-      .then((instance) => {
-        if (!instance || !(instance instanceof ZirconViz))
-          throw new Error(
-            `Unable to retrieve Visualizer Id ${this._vizId} in window ${this.getId()}`,
-          );
-        this.__viz = instance;
-        return this.__viz;
-      });
-  }
-
-  private displayVisualizer(): void {
-    if (!this.__panel) return;
-    this.getVisualizer()
-      .then((viz: ZirconViz) => {
-        if (viz) {
-          viz.displayIn(this);
-        }
-      })
-      .catch((error) => {
-        this.__panel.content.innerHTML = `<p>${error.toString()}</p>`;
-        this.__panel.content.style.background = `red`;
-      });
-  }
+  protected abstract onPanelCreated(panel: IJSPanelInstance): void;
 
   public getContainer(): HTMLElement {
     if (this.__panel) return this.__panel;
@@ -390,6 +332,20 @@ export class ZirconWindow<
     this.createPanel();
     return this.__panel.content;
   }
+
+  public getLeft(): number {
+    return this._left;
+  }
+  public getTop(): number {
+    return this._top;
+  }
+  public getWidth(): number {
+    return this._width;
+  }
+  public getHeight(): number {
+    return this._height;
+  }
+
   /**
    *
    * @param x window position X
@@ -414,28 +370,6 @@ export class ZirconWindow<
       windowId: this.getId(),
       x: this._left,
       y: this._top,
-    });
-    return true;
-  }
-
-  public setVisualizerId(vizId: string): boolean {
-    if (this._vizId === vizId) return false;
-    this._vizId = vizId;
-    if (this.__panel && this.__panel.closest('body') !== null) {
-      if (this.__viz?.getId() === vizId) return false;
-      this.getApplication()
-        .getInstance(vizId)
-        .then((instance) => {
-          if (!instance) return false;
-          if (!(instance instanceof ZirconViz)) {
-            throw new Error(`Object with id ${vizId} is not a visualizer`);
-          }
-          this.displayVisualizer();
-        });
-    }
-    this.emit('WINDOW_VISUALIZER_CHANGED', {
-      windowId: this.getId(),
-      vizId: this._vizId,
     });
     return true;
   }
@@ -481,12 +415,12 @@ export class ZirconWindow<
 /**
  * Context Menu for Window
  */
-export class ZirconContextMenuFactoryWindow extends ZirconContextMenuFactory {
+export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory {
   constructor(app: ZirconApplication) {
     super(app);
   }
 
-  private getAssociatedZirconWindow(element: Element): ZirconWindow {
+  private getAssociatedZirconWindow(element: Element): ZirconVizWindow {
     if (!element) return null;
     if (!(element instanceof HTMLElement)) return null;
     const htmlElement: HTMLElement = element;
@@ -494,8 +428,8 @@ export class ZirconContextMenuFactoryWindow extends ZirconContextMenuFactory {
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
     );
     if (!zirconObjectId) return null;
-    const obj: ZirconWindow =
-      this.getApplication().getExistingWindow(zirconObjectId);
+    const obj: ZirconVizWindow =
+      this.getApplication().getExistingVizWindow(zirconObjectId);
     if (!obj) return;
     return obj;
   }
@@ -505,12 +439,18 @@ export class ZirconContextMenuFactoryWindow extends ZirconContextMenuFactory {
   }
 
   public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
-    const window: ZirconWindow = this.getAssociatedZirconWindow(element);
+    const window: ZirconVizWindow = this.getAssociatedZirconWindow(element);
     if (!window) return null;
     return [
       {
         label: 'window',
         children: [
+          {
+            label: 'parameters',
+            action: () => {
+              window.displayParameters();
+            },
+          },
           {
             label: 'normalize',
             action: () => {

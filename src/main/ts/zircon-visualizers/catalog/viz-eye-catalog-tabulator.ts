@@ -22,7 +22,7 @@ import { CatalogEngineEvents } from '../../sharp-eye/engines/catalog-engine';
 import {
   ZirconViz,
   ZirconVizEventRegistry,
-} from '../../zirconium/zircon-ui/zircon-viz-ui';
+} from '../../zirconium/zircon-ui/zircon-visualizer';
 import { ZirconObjectState } from '../../zirconium/zircon-object';
 
 /**

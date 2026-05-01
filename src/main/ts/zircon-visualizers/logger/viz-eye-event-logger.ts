@@ -3,7 +3,7 @@ import './viz-eye-logger.css';
 import {
   ZirconViz,
   ZirconVizState,
-} from '../../zirconium/zircon-ui/zircon-viz-ui';
+} from '../../zirconium/zircon-ui/zircon-visualizer';
 
 interface EventDescriptor {
   event: string;

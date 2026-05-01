@@ -1,5 +1,5 @@
 import { DataSeries } from '../../libraries/data-series/data-series';
-import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-viz-ui';
+import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { VizJSChart } from './viz-eye-chartJS';
 import {
   Chart,

@@ -1,7 +1,7 @@
 import {
   ZirconViz,
   ZirconVizState,
-} from '../../zirconium/zircon-ui/zircon-viz-ui';
+} from '../../zirconium/zircon-ui/zircon-visualizer';
 //import * as THREE from 'three';
 import { v4 as uuid } from 'uuid';
 

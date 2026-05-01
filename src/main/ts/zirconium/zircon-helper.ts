@@ -14,7 +14,7 @@ export class ZirconHelper {
     windowId: string,
     targetDesktopId: string,
   ): Promise<void> {
-    const window: ZirconWindow = application.getExistingWindow(windowId);
+    const window: ZirconWindow = application.getExistingVizWindow(windowId);
     const sourceDesktop: ZirconDesktop = window.getParentDesktop();
     const targetDesktop: ZirconDesktop =
       application.getExistingDesktop(targetDesktopId);

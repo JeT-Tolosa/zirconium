@@ -1,8 +1,5 @@
 import './sharp-eye.css';
-import {
-  ZIRCON_WINDOW_TYPE,
-  ZirconWindowState,
-} from '../zirconium/zircon-ui/zircon-window';
+import { ZirconWindowState } from '../zirconium/zircon-ui/zircon-window';
 import { v4 as uuid } from 'uuid';
 import {
   ZIRCON_DESKTOP_TYPE,
@@ -86,6 +83,7 @@ import {
   TimeManagerEngine,
   TimeManagerEngineState,
 } from './engines/time-manager/time-manager-engine';
+import { ZIRCON_VISUALIZER_WINDOW_TYPE } from '../zirconium/zircon-ui/zircon-viz-window';
 
 export class SharpEyedApp extends ZirconApplication {
   /**
@@ -288,7 +286,7 @@ export class SharpEyedApp extends ZirconApplication {
    */
   public createDesktops1(): ZirconDesktopState {
     const barChartState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Bar Chart',
       left: 10,
@@ -299,7 +297,7 @@ export class SharpEyedApp extends ZirconApplication {
     };
     this.registerObjectState(barChartState);
     const helmetState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Helmet 3D',
       left: 350,
@@ -310,7 +308,7 @@ export class SharpEyedApp extends ZirconApplication {
     };
     this.registerObjectState(helmetState);
     const cubeState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Cube3D',
       left: 700,
@@ -321,7 +319,7 @@ export class SharpEyedApp extends ZirconApplication {
     };
     this.registerObjectState(cubeState);
     const globusState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Globus',
       left: 510,
@@ -333,7 +331,7 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(globusState);
 
     const clock2State: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Clock2',
       left: 50,
@@ -365,7 +363,7 @@ export class SharpEyedApp extends ZirconApplication {
    */
   public createDesktops2(): ZirconDesktopState {
     const lineChartState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Line Chart',
       left: 10,
@@ -377,7 +375,7 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(lineChartState);
 
     const leafletState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Leaflet',
       left: 350,
@@ -390,7 +388,7 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(leafletState);
 
     const fetchState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'fetch',
       left: 350,
@@ -403,7 +401,7 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(fetchState);
 
     const loggerState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Logger',
       left: 710,
@@ -416,7 +414,7 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(loggerState);
 
     const clock1State: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Clock 1',
       left: 100,
@@ -429,7 +427,7 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(clock1State);
 
     const timeControllerState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Time Controller',
       left: 50,
@@ -463,7 +461,7 @@ export class SharpEyedApp extends ZirconApplication {
    */
   public createDesktops3(): ZirconDesktopState {
     const satcat1WindowState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Satellite Catalog 1',
       left: 100,
@@ -476,7 +474,7 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(satcat1WindowState);
 
     const satcat2WindowState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Satellite Catalog 2',
       left: 710,
@@ -489,7 +487,7 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(satcat2WindowState);
 
     const satelliteLoaderWindowState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Satellite Loader',
       left: 1320,
@@ -520,7 +518,7 @@ export class SharpEyedApp extends ZirconApplication {
    */
   public createDesktops4(): ZirconDesktopState {
     const groundStationLoaderWindowState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Ground Station Loader',
       left: 1320,
@@ -533,7 +531,7 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(groundStationLoaderWindowState);
 
     const groundStationCatalog1WindowState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Ground Station Catalog 1',
       left: 100,
@@ -546,7 +544,7 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(groundStationCatalog1WindowState);
 
     const groundStationCatalog2WindowState: ZirconWindowState = {
-      type: ZIRCON_WINDOW_TYPE,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Ground Station Catalog 2',
       left: 710,

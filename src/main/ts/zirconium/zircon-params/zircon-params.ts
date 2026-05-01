@@ -1,10 +1,5 @@
 import { ZirconObject, ZirconObjectEventRegistry } from '../zircon-object';
-import { ZirconWindowState } from '../zircon-ui/zircon-window';
 import { MergeZirconRegistries } from '../zircon-event';
-
-export const ZIRCON_WINDOW_PARAMETERS_TYPE: string = 'zircon-window-parameters';
-
-export interface ZirconWindowParametersState extends ZirconWindowState {}
 
 export type ZirconParametersEvents = {};
 

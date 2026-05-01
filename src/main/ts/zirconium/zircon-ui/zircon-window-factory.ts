@@ -1,12 +1,12 @@
 import { ZirconApplication } from '../zircon-core/zircon-app';
 import { ZirconObjectFactory } from '../zircon-object-factory';
 import {
-  ZIRCON_WINDOW_TYPE,
-  ZirconWindow,
-  ZirconWindowState,
-} from './zircon-window';
+  ZIRCON_VISUALIZER_WINDOW_TYPE,
+  ZirconVizWindow,
+  ZirconVizWindowState,
+} from './zircon-viz-window';
 
-export class ZirconWindowFactory extends ZirconObjectFactory {
+export class ZirconVizWindowFactory extends ZirconObjectFactory {
   private _app: ZirconApplication = null;
 
   constructor(app: ZirconApplication) {
@@ -15,13 +15,13 @@ export class ZirconWindowFactory extends ZirconObjectFactory {
   }
 
   public override getType(): string {
-    return ZIRCON_WINDOW_TYPE;
+    return ZIRCON_VISUALIZER_WINDOW_TYPE;
   }
   public override createInstance(
-    state: ZirconWindowState,
-  ): Promise<ZirconWindow> {
+    state: ZirconVizWindowState,
+  ): Promise<ZirconVizWindow> {
     return Promise.resolve().then(() => {
-      return new ZirconWindow(this._app, state);
+      return new ZirconVizWindow(this._app, state);
     });
   }
 }

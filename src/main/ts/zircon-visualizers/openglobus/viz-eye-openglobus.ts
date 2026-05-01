@@ -1,7 +1,7 @@
 import {
   ZirconViz,
   ZirconVizState,
-} from '../../zirconium/zircon-ui/zircon-viz-ui';
+} from '../../zirconium/zircon-ui/zircon-visualizer';
 import { v4 as uuid } from 'uuid';
 import * as OG from '@openglobus/og';
 
@@ -37,6 +37,10 @@ export class VizOpenGlobus extends ZirconViz {
 
   public override getType(): string {
     return VizOpenGlobus.OPENGLOBUS_VISUALIZER_TYPE;
+  }
+
+  public override onDisplay(): void {
+    this.createGlobeRoutes();
   }
 
   public createGlobe(): void {

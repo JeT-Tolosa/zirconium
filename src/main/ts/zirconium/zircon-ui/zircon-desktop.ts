@@ -14,6 +14,7 @@ import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-fac
 import { ZirconContextMenuItem } from '../zircon-menu/zircon-context-menu';
 import { ArrayComparisonResult, Zircon } from '../zircon';
 import { ACTIVE_DESKTOP_CLASS } from './zircon-desktop-manager';
+import { ZirconParamWindow } from '../zircon-params/zircon-param-window';
 
 export const ZIRCON_DESKTOP_TYPE: string = 'ZirconDesktop';
 
@@ -247,6 +248,11 @@ export class ZirconDesktop<
     });
   }
 
+  public displayParamWindow(paramWindow: ZirconParamWindow): void {
+    this.getContainer().appendChild(paramWindow.getContainer());
+    paramWindow.setParentDesktop(this);
+  }
+
   private displayWindow(windowId: string): Promise<void> {
     if (!windowId) return Promise.resolve();
     const ui: ZirconDesktopUI = this.__displayedWindows[windowId];
@@ -273,7 +279,9 @@ export class ZirconDesktop<
     if (!ui) return false;
     this.getContainer().removeChild(ui.panel);
     delete this.__displayedWindows[windowId];
-    this.getApplication().getExistingWindow(windowId)?.setParentDesktop(null);
+    this.getApplication()
+      .getExistingVizWindow(windowId)
+      ?.setParentDesktop(null);
     return true;
   }
 

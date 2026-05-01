@@ -10,8 +10,7 @@ import { v4 as uuid } from 'uuid';
 
 import 'jspanel4/dist/jspanel.min.css';
 import {
-  ZirconContextMenuFactoryWindow,
-  ZirconWindow,
+  ZirconContextMenuFactoryVizWindow,
   ZirconWindowEvents,
 } from '../zircon-ui/zircon-window';
 import {
@@ -32,9 +31,10 @@ import {
 } from '../zircon-object';
 import { ZirconObjectFactory } from '../zircon-object-factory';
 import { Zircon } from '../zircon';
-import { ZirconWindowFactory } from '../zircon-ui/zircon-window-factory';
+import { ZirconVizWindowFactory } from '../zircon-ui/zircon-window-factory';
 import { ZirconDesktopFactory } from '../zircon-ui/zircon-desktop-factory';
 import { ZirconEngine, ZirconEngineState } from './zircon-engine';
+import { ZirconVizWindow } from '../zircon-ui/zircon-viz-window';
 
 /**
  * Composition of this application UI
@@ -117,10 +117,10 @@ export class ZirconApplication<
 
   private _desktopManager: ZirconDesktopManager = null;
 
-  private __registeredObjectStates: { [id: string]: ZirconObjectState } = {};
+  private __registeredObjectStates: { [id: string]: ZirconObjectState } = {}; // TODO: UI Object
   private __registeredEngineStates: { [id: string]: ZirconEngineState } = {};
 
-  private __objectInstances: { [id: string]: ZirconObject } = {};
+  private __objectInstances: { [id: string]: ZirconObject } = {}; // TODO: UI Object
   private __engineInstances: { [id: string]: ZirconEngine } = {};
   private __factories: { [type: string]: ZirconObjectFactory } = {};
 
@@ -132,14 +132,14 @@ export class ZirconApplication<
     this._eventEmitter = new EventEmitter2();
     this._eventEmitter.setMaxListeners(1000);
 
-    this.registerObjectFactory(new ZirconWindowFactory(this));
+    this.registerObjectFactory(new ZirconVizWindowFactory(this));
     this.registerObjectFactory(new ZirconDesktopFactory(this));
 
     this._contextMenuFactoryRegistry = new ZirconContextMenuFactoryRegistry(
       this,
     );
     this._contextMenuFactoryRegistry.registerFactory(
-      new ZirconContextMenuFactoryWindow(this),
+      new ZirconContextMenuFactoryVizWindow(this),
     );
     this._contextMenuFactoryRegistry.registerFactory(
       new ZirconContextMenuFactoryDesktop(this),
@@ -230,9 +230,9 @@ export class ZirconApplication<
     return Promise.resolve(null);
   }
 
-  public getExistingWindow(id: string): ZirconWindow {
+  public getExistingVizWindow(id: string): ZirconVizWindow {
     const instance = this.__objectInstances[id];
-    if (instance && instance instanceof ZirconWindow) return instance;
+    if (instance && instance instanceof ZirconVizWindow) return instance;
     return null;
   }
 

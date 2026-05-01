@@ -1,11 +1,6 @@
-// import { ZirconApplication } from './zircon-core/zircon-app';
-// import { ZirconContextMenu } from './zircon-menu/zircon-context-menu';
-// import { ZirconDesktop } from './zircon-ui/zircon-desktop';
-// import { ZirconDesktopManager } from './zircon-ui/zircon-desktop-manager';
-// import { ZirconWindow } from './zircon-ui/zircon-window';
-
 import { ZirconApplication } from './zircon-core/zircon-app';
 import { ZirconObject, ZirconObjectState } from './zircon-object';
+import { ZIRCON_PARAMETERS_WINDOW_TYPE } from './zircon-params/zircon-param-window';
 import {
   ZIRCON_DESKTOP_TYPE,
   ZirconDesktop,
@@ -17,11 +12,12 @@ import {
   ZirconDesktopManagerState,
 } from './zircon-ui/zircon-desktop-manager';
 import {
-  DEFAULT_WINDOW_STATE,
-  ZIRCON_WINDOW_TYPE,
-  ZirconWindow,
-  ZirconWindowState,
-} from './zircon-ui/zircon-window';
+  DEFAULT_VISUALIZER_WINDOW_STATE,
+  ZIRCON_VISUALIZER_WINDOW_TYPE,
+  ZirconVizWindow,
+  ZirconVizWindowState,
+} from './zircon-ui/zircon-viz-window';
+import { ZirconWindow, ZirconWindowState } from './zircon-ui/zircon-window';
 
 // export type InstancesMap = {
 //   DesktopManager: ZirconDesktopManager;
@@ -56,9 +52,9 @@ export class Zircon {
    */
   public static createWindowInstance(
     app: ZirconApplication,
-    state: ZirconWindowState = DEFAULT_WINDOW_STATE,
+    state: ZirconVizWindowState = DEFAULT_VISUALIZER_WINDOW_STATE,
   ): ZirconWindow {
-    const window = new ZirconWindow(app, state);
+    const window = new ZirconVizWindow(app, state);
     return window;
   }
 
@@ -90,7 +86,11 @@ export class Zircon {
 
   public static asWindowState(state: ZirconObjectState): ZirconWindowState {
     if (!state) return null;
-    if (state.type !== ZIRCON_WINDOW_TYPE) return null;
+    if (
+      state.type !== ZIRCON_VISUALIZER_WINDOW_TYPE &&
+      state.type !== ZIRCON_PARAMETERS_WINDOW_TYPE
+    )
+      return null;
     return state as ZirconWindowState;
   }
 
@@ -104,19 +104,19 @@ export class Zircon {
 
   public static asDesktop(obj: ZirconObject): ZirconDesktop {
     if (!obj) return null;
-    if (obj.getType() !== ZIRCON_DESKTOP_TYPE) return null;
+    if (!(obj instanceof ZirconDesktop)) return null;
     return obj as ZirconDesktop;
   }
 
   public static asDesktopManager(obj: ZirconObject): ZirconDesktopManager {
     if (!obj) return null;
-    if (obj.getType() !== ZIRCON_DESKTOP_MANAGER_TYPE) return null;
+    if (!(obj instanceof ZirconDesktopManager)) return null;
     return obj as ZirconDesktopManager;
   }
 
   public static asWindow(obj: ZirconObject): ZirconWindow {
     if (!obj) return null;
-    if (obj.getType() !== ZIRCON_WINDOW_TYPE) return null;
+    if (!(obj instanceof ZirconWindow)) return null;
     return obj as ZirconWindow;
   }
 
