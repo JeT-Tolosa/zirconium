@@ -15,11 +15,8 @@ import {
   MergeZirconRegistries,
   PickEvents,
 } from '../zircon-event';
-import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
-import { ZirconContextMenuItem } from '../zircon-menu/zircon-context-menu';
 import { ZirconDesktop } from './zircon-desktop';
 import { ZirconHelper } from '../zircon-helper';
-import { ZirconVizWindow } from './zircon-viz-window';
 
 export type ZirconWindowEvents = {
   WINDOW_SET_PARENT_DESKTOP_DONE: {
@@ -93,7 +90,6 @@ export interface ZirconWindowState extends ZirconObjectState {
   top?: number;
   width?: number;
   height?: number;
-  vizId?: string;
 }
 
 /**
@@ -148,7 +144,7 @@ export abstract class ZirconWindow<
     if (this.getId() === windowId) this.__panel?.close();
   }
 
-  public override async setState(state: ZirconWindowState): Promise<void> {
+  protected override async setState(state: ZirconWindowState): Promise<void> {
     if (!state) return;
     await super.setState(state);
     this.setTitle(state.title);
@@ -410,79 +406,8 @@ export abstract class ZirconWindow<
     });
     return true;
   }
-}
 
-/**
- * Context Menu for Window
- */
-export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory {
-  constructor(app: ZirconApplication) {
-    super(app);
-  }
-
-  private getAssociatedZirconWindow(element: Element): ZirconVizWindow {
-    if (!element) return null;
-    if (!(element instanceof HTMLElement)) return null;
-    const htmlElement: HTMLElement = element;
-    const zirconObjectId = htmlElement.getAttribute(
-      ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
-    );
-    if (!zirconObjectId) return null;
-    const obj: ZirconVizWindow =
-      this.getApplication().getExistingVizWindow(zirconObjectId);
-    if (!obj) return;
-    return obj;
-  }
-
-  public handledThisElement(element: Element): boolean {
-    return this.getAssociatedZirconWindow(element) !== null;
-  }
-
-  public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
-    const window: ZirconVizWindow = this.getAssociatedZirconWindow(element);
-    if (!window) return null;
-    return [
-      {
-        label: 'window',
-        children: [
-          {
-            label: 'parameters',
-            action: () => {
-              window.displayParameters();
-            },
-          },
-          {
-            label: 'normalize',
-            action: () => {
-              window.emit('WINDOW_NORMALIZE_REQUEST', {
-                windowId: window.getId(),
-              });
-            },
-          },
-          {
-            label: 'minimize',
-            action: () => {
-              window.emit('WINDOW_MINIMIZE_REQUEST', {
-                windowId: window.getId(),
-              });
-            },
-          },
-          {
-            label: 'maximize',
-            action: () => {
-              window.emit('WINDOW_MAXIMIZE_REQUEST', {
-                windowId: window.getId(),
-              });
-            },
-          },
-          {
-            label: 'close',
-            action: () => {
-              window.emit('WINDOW_CLOSE_REQUEST', { windowId: window.getId() });
-            },
-          },
-        ],
-      },
-    ];
+  public displayParameters(_container: HTMLElement) {
+    return;
   }
 }

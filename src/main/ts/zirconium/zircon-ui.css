@@ -136,12 +136,24 @@ body {
   color: black;
 }
 
-.zircon-ui .jsPanel {
-  border: 1px solid #2a3967;
+/** Add a pulse animation to elements with the "updated" class when they are updated
+  * This can be used to visually indicate that a component has been updated with new data */
+
+.highlight {
+  text-shadow: 0px 0px 30px white;
+}
+
+/***********************************************
+ *           ZIRCON COMMON WINDOW              *
+ ***********************************************/
+
+.zircon-ui .jsPanel-content {
+  color: white;
 }
 
 .zircon-ui .jsPanel,
-.zircon-ui .jsPanel-hdr {
+.zircon-ui .jsPanel-hdr,
+.zircon-ui .jsPanel-headerbar {
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }
@@ -167,7 +179,19 @@ body {
   width: 25px;
 }
 
-.zircon-ui .jsPanel-content {
+/***********************************************
+ *        ZIRCON VISULAIZER WINDOW             *
+ ***********************************************/
+
+.zircon-viz .jsPanel {
+  border: 1px solid #2a3967;
+}
+
+.zircon-viz .jsPanel-headerbar {
+  background: #32488b;
+}
+
+.zircon-viz .jsPanel-content {
   box-shadow: inset 0 8px 32px rgba(0, 0, 0, 0.4);
   border: 1px solid rgba(255, 255, 255, 0);
   background: linear-gradient(135deg, #13131c 0%, #0d121d 100%);
@@ -177,9 +201,53 @@ body {
   color: inherit;
 }
 
-/** Add a pulse animation to elements with the "updated" class when they are updated
-  * This can be used to visually indicate that a component has been updated with new data */
+.zircon-viz .jsPanel {
+  border: 1px solid #2a3967;
+}
 
-.highlight {
-  text-shadow: 0px 0px 30px white;
+.zircon-viz .jsPanel,
+.zircon-viz .jsPanel-hdr {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.zircon-viz .jsPanel-hdr::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 32px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffffffee, transparent);
+  opacity: 0.7;
+}
+
+.zircon-viz .jsPanel-controlbar button {
+  scale: 0.7;
+  width: 20px;
+}
+
+.zircon-viz .jsPanel-headerlogo img {
+  scale: 0.9;
+  width: 25px;
+}
+
+/***********************************************
+ *        ZIRCON PARAMETER WINDOW              *
+ ***********************************************/
+
+.zircon-param .jsPanel-headerbar {
+  background: #328b3e;
+}
+.zircon-param .jsPanel-content {
+  background: linear-gradient(135deg, #21562e 0%, #273b2b 100%);
+}
+
+.zircon-param .jsPanel-hdr {
+  background-color: green;
+  background: green;
+}
+
+.zircon-param .jsPanel-content .jsoneditor {
+  color: black;
 }

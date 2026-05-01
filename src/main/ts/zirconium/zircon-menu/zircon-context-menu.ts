@@ -149,8 +149,11 @@ export class ZirconContextMenu<
     return ul;
   }
 
+  // TODO: we should stop using a factory type when it already handles an element
+  // -> we want window AND visualizers handled if they are over
+  // -> we dont want two windows handled is they are over
   /**
-   * Create ContextMenu depending on UI visible elements under pointer
+   * Create ContextMenu depending on FIRST UI visible elements under pointer
    * @param elements
    */
   private createMenu(elements: Element[]): void {
@@ -160,13 +163,21 @@ export class ZirconContextMenu<
       { label: 'Common', action: () => console.log('Action') },
     ];
 
-    elements.forEach((element: Element) => {
+    // Stop at FIRST element handled by a context menu factory
+    let handledbyAtLeastOneFactory: boolean = false;
+    for (
+      let elementIndex = 0;
+      elementIndex < elements.length && !handledbyAtLeastOneFactory;
+      elementIndex++
+    ) {
+      const element: Element = elements[elementIndex];
       const factories: ZirconContextMenuFactory[] = this.getApplication()
         .getContextMenuFactoryRegistry()
         .getFactories();
 
       factories?.forEach((factory) => {
         if (!factory.handledThisElement(element)) return;
+        handledbyAtLeastOneFactory = true;
         const objItems: ZirconContextMenuItem[] =
           factory.getContextMenuElements(element);
         if (!objItems) return;
@@ -174,8 +185,38 @@ export class ZirconContextMenu<
           if (objItem) menuItems.push(objItem);
         });
       });
-    });
+    }
 
     this._menu.appendChild(this.buildMenuElements(menuItems));
   }
+
+  // /**
+  //  * Create ContextMenu depending on UI visible elements under pointer
+  //  * @param elements
+  //  */
+  // private createMenu(elements: Element[]): void {
+  //   this._menu.innerHTML = '';
+
+  //   const menuItems: ZirconContextMenuItem[] = [
+  //     { label: 'Common', action: () => console.log('Action') },
+  //   ];
+
+  //   elements.forEach((element: Element) => {
+  //     const factories: ZirconContextMenuFactory[] = this.getApplication()
+  //       .getContextMenuFactoryRegistry()
+  //       .getFactories();
+
+  //     factories?.forEach((factory) => {
+  //       if (!factory.handledThisElement(element)) return;
+  //       const objItems: ZirconContextMenuItem[] =
+  //         factory.getContextMenuElements(element);
+  //       if (!objItems) return;
+  //       objItems.forEach((objItem) => {
+  //         if (objItem) menuItems.push(objItem);
+  //       });
+  //     });
+  //   });
+
+  //   this._menu.appendChild(this.buildMenuElements(menuItems));
+  // }
 }

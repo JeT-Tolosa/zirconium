@@ -4,8 +4,8 @@ import {
   TimingHelper,
 } from '../../libraries/timing/timing';
 import {
-  TimeManagerEngine,
   TimeManagerEngineEvents,
+  TimeManagerEngine,
 } from '../../sharp-eye/engines/time-manager/time-manager-engine';
 import {
   MergePickEvents,

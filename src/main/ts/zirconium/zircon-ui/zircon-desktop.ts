@@ -10,10 +10,8 @@ import {
 } from '../zircon-core/zircon-app-object';
 import { MergeZirconRegistries, PickEvents } from '../zircon-event';
 import { ZirconObject } from '../zircon-object';
-import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
-import { ZirconContextMenuItem } from '../zircon-menu/zircon-context-menu';
 import { ArrayComparisonResult, Zircon } from '../zircon';
-import { ACTIVE_DESKTOP_CLASS } from './zircon-desktop-manager';
+import { ACTIVE_DESKTOP_CLASS } from '../zircon-core/zircon-desktop-manager';
 import { ZirconParamWindow } from '../zircon-params/zircon-param-window';
 
 export const ZIRCON_DESKTOP_TYPE: string = 'ZirconDesktop';
@@ -152,7 +150,7 @@ export class ZirconDesktop<
     }
   }
 
-  public override async setState(state: ZirconDesktopState): Promise<void> {
+  protected override async setState(state: ZirconDesktopState): Promise<void> {
     if (!state) return;
     await super.setState(state);
     this.setWindowIds(state.windowIds);
@@ -290,74 +288,4 @@ export class ZirconDesktop<
       this._windowIds.map((id) => this.displayWindow(id)),
     ).then(null);
   }
-}
-
-/**
- * Context Menu for Window
- */
-export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
-  constructor(appUI: ZirconApplication) {
-    super(appUI);
-  }
-
-  private getAssociatedZirconDesktop(element: Element): ZirconDesktop {
-    if (!element) return null;
-    if (!(element instanceof HTMLElement)) return null;
-    const htmlElement: HTMLElement = element;
-    const zirconObjectId = htmlElement.getAttribute(
-      ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
-    );
-    if (!zirconObjectId) return null;
-    const obj: ZirconDesktop =
-      this.getApplication().getExistingDesktop(zirconObjectId);
-    if (!obj) return;
-    return obj;
-  }
-
-  public handledThisElement(element: Element): boolean {
-    return this.getAssociatedZirconDesktop(element) !== null;
-  }
-
-  public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
-    const desktop: ZirconDesktop = this.getAssociatedZirconDesktop(element);
-    if (!desktop) return null;
-    return [
-      {
-        label: `Desktop ${desktop.getName()}`,
-        children: [],
-      },
-    ];
-  }
-
-  // /**
-  //  * callbacks
-  //  * @param args
-  //  */
-  // private onWINDOW_SET_PARENT_DESKTOP_REQUEST(
-  //   windowId: string,
-  //   desktopTargetId: string,
-  //   _: { x: number; y: number },
-  // ): void {
-  //   const window: ZirconWindow = this.getWindowById(windowId);
-  //   const desktop: ZirconDesktop = this.getDesktopById(desktopTargetId);
-  //   // TODO: Throw event
-  //   if (!window) {
-  //     this.emit('WINDOW_SET_PARENT_DESKTOP_ERROR', {
-  //       windowId: windowId,
-  //       desktopTargetId: desktopTargetId,
-  //       error: `window::plugInto Cannot find window ${windowId}`,
-  //     });
-  //     return;
-  //   }
-  //   if (!desktop) {
-  //     this.emit('WINDOW_SET_PARENT_DESKTOP_ERROR', {
-  //       windowId: windowId,
-  //       desktopTargetId: desktopTargetId,
-  //       error: `window::plugInto Cannot find desktop ${desktopTargetId}`,
-  //     });
-  //     return;
-  //   }
-  //   // TODO: Throw event
-  //   desktop.addWindow(window);
-  // }
 }

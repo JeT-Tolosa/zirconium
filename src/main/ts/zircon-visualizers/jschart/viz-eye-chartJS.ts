@@ -52,7 +52,9 @@ export abstract class VizJSChart<
 
   public abstract getChartType(): TType;
 
-  public override async setState(state: VizJSChartState<TType>): Promise<void> {
+  protected override async setState(
+    state: VizJSChartState<TType>,
+  ): Promise<void> {
     await super.setState(state);
     if (!state) return;
     if (state.chartType && state.chartType !== this.getChartType())

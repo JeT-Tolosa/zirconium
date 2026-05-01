@@ -2,8 +2,12 @@ import {
   ZIRCON_DROPPABLE_CLASS,
   ZIRCON_TARGET_DESKTOP_ID,
   ZirconApplication,
-} from '../zircon-core/zircon-app';
-import { ZirconDesktop, ZirconDesktopEvents } from './zircon-desktop';
+  ZirconApplicationEvents,
+} from './zircon-app';
+import {
+  ZirconDesktop,
+  ZirconDesktopEvents,
+} from '../zircon-ui/zircon-desktop';
 import {
   ZirconObject,
   ZirconObjectEvents,
@@ -12,7 +16,7 @@ import {
 import {
   ZirconAppObject,
   ZirconAppObjectEventRegistry,
-} from '../zircon-core/zircon-app-object';
+} from './zircon-app-object';
 import {
   MergePickEvents,
   MergeZirconRegistries,
@@ -21,7 +25,7 @@ import {
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
 import { ZirconContextMenuItem } from '../zircon-menu/zircon-context-menu';
 import { ArrayComparisonResult, Zircon } from '../zircon';
-import { ZirconWindow } from './zircon-window';
+import { ZirconWindow } from '../zircon-ui/zircon-window';
 
 export const ZIRCON_DESKTOP_MANAGER_TYPE: string = 'zircon-desktop-manager';
 export const DESKTOPS_MANAGER_CLASS = 'desktop-manager';
@@ -37,8 +41,8 @@ export interface ZirconDesktopManagerState extends ZirconObjectState {
 }
 
 export type ZirconDesktopManagerEvents = {
-  DESKTOP_MANAGER_STATE_REQUEST: { desktopManagerId: string };
-  DESKTOP_MANAGER_STATE: { state: ZirconDesktopManagerState };
+  // DESKTOP_MANAGER_STATE_REQUEST: { desktopManagerId: string };
+  // DESKTOP_MANAGER_STATE: { state: ZirconDesktopManagerState };
   DESKTOP_MANAGER_DESKTOP_IDS_CHANGED: {
     desktopManagerId: string;
     desktopIds: string[];
@@ -55,8 +59,9 @@ export type ZirconDesktopManagerEventRegistry = MergeZirconRegistries<
           ZirconDesktopEvents,
           'DESKTOP_ACTIVATED' | 'DESKTOP_DEACTIVATED'
         >,
-        PickEvents<ZirconDesktopManagerEvents, 'DESKTOP_MANAGER_STATE'>,
+        // PickEvents<ZirconDesktopManagerEvents, 'DESKTOP_MANAGER_STATE'>,
         PickEvents<ZirconObjectEvents, 'OBJECT_NAME_CHANGED'>,
+        PickEvents<ZirconApplicationEvents, 'OBJECT_STATE_REGISTERED'>,
       ]
     >;
     outgoing: MergePickEvents<
@@ -67,9 +72,9 @@ export type ZirconDesktopManagerEventRegistry = MergeZirconRegistries<
         >,
         PickEvents<
           ZirconDesktopManagerEvents,
-          | 'DESKTOP_MANAGER_STATE_REQUEST'
-          | 'DESKTOP_MANAGER_STATE_REQUEST'
-          | 'DESKTOP_MANAGER_DESKTOP_IDS_CHANGED'
+          // | 'DESKTOP_MANAGER_STATE_REQUEST'
+          // | 'DESKTOP_MANAGER_STATE_REQUEST'
+          'DESKTOP_MANAGER_DESKTOP_IDS_CHANGED'
         >,
       ]
     >;
@@ -132,8 +137,8 @@ export class ZirconDesktopManager<
       this.onOBJECT_NAME_CHANGED(arg.id, arg.name),
     );
 
-    this.addListener('DESKTOP_MANAGER_STATE', (arg) =>
-      this.onDESKTOP_MANAGER_STATE(arg.state),
+    this.addListener('OBJECT_STATE_REGISTERED', (arg) =>
+      this.onOBJECT_DESKTOP_MANAGER_STATE_REGISTERED(arg.state),
     );
   }
 
@@ -151,6 +156,18 @@ export class ZirconDesktopManager<
    */
   private onDESKTOP_DEACTIVATE_REQUEST(_desktopId: string): void {
     //this.deactivateDesktop(desktopId);
+  }
+
+  /**
+   * Check if the state registration is the desktop manager
+   */
+  private onOBJECT_DESKTOP_MANAGER_STATE_REGISTERED(
+    state: ZirconObjectState,
+  ): void {
+    if (state.type === ZIRCON_DESKTOP_MANAGER_TYPE) {
+      this.setState(Zircon.asDesktopManagerState(state));
+      return;
+    }
   }
 
   /**
@@ -187,7 +204,7 @@ export class ZirconDesktopManager<
    * @param state The new state to apply
    * @returns A promise that resolves when the state is set
    */
-  public override async setState(
+  protected override async setState(
     state: ZirconDesktopManagerState,
   ): Promise<void> {
     if (!state) return;

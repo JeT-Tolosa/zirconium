@@ -15,12 +15,16 @@ export const DEFAULT_ZIRCON_VIZ_STATE: ZirconVizState = {};
 export type ZirconVizEvents = {
   VISUALIZER_DISPLAY_REQUEST: { vizId: string };
   VISUALIZER_DISPLAYED: { vizId: string; timestamp: number };
+  VISUALIZER_REMOVED_FROM_WINDOW: { windowId: string; vizId: string };
 };
 
 export type ZirconVizEventRegistry = MergeZirconRegistries<
   {
     incoming: PickEvents<ZirconVizEvents, 'VISUALIZER_DISPLAY_REQUEST'>;
-    outgoing: PickEvents<ZirconVizEvents, 'VISUALIZER_DISPLAYED'>;
+    outgoing: PickEvents<
+      ZirconVizEvents,
+      'VISUALIZER_DISPLAYED' | 'VISUALIZER_REMOVED_FROM_WINDOW'
+    >;
   },
   ZirconObjectEventRegistry
 >;
@@ -82,14 +86,37 @@ export abstract class ZirconViz<
   public displayIn(parentWindow: ZirconVizWindow): boolean {
     if (this.__parentWindow === parentWindow) return false;
     if (this.__parentWindow) {
-      this.__parentWindow.getWindowContent()?.removeChild(this.getMainDiv());
+      this.removeFromParent();
     }
     this.__parentWindow = parentWindow;
-    if (!parent) return false;
     if (!this.__parentWindow?.getWindowContent()) return false;
     this.__parentWindow?.getWindowContent().appendChild(this.getMainDiv());
     this.onDisplay();
     return true;
+  }
+
+  /**
+   * Remove visualizer from Parent (Visualizer not stopped)
+   * @returns
+   */
+  public removeFromParent(): boolean {
+    if (!this.__parentWindow) return false;
+    this.__parentWindow.getWindowContent()?.removeChild(this.getMainDiv());
+    const windowState = this.__parentWindow.generateCurrentState();
+    windowState.vizId = null;
+    this.emit('VISUALIZER_REMOVED_FROM_WINDOW', {
+      windowId: this.__parentWindow.getId(),
+      vizId: this.__parentWindow.getVisualizerId(),
+    });
+    this.__parentWindow = null;
+  }
+
+  /**
+   * get Parent Window if
+   * @returns
+   */
+  public getParentWindow(): ZirconVizWindow {
+    return this.__parentWindow;
   }
 
   /**

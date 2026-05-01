@@ -124,7 +124,7 @@ export abstract class ZirconObject<
    * set object state.
    * @param state *
    */
-  public async setState(state: ZirconObjectState): Promise<void> {
+  protected async setState(state: ZirconObjectState): Promise<void> {
     if (!state) return;
     this.setId(state.id);
     this.setName(state.name);

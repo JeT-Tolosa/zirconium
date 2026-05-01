@@ -1,21 +1,16 @@
 import '../zircon-ui.css';
 import EventEmitter2 from 'eventemitter2';
 import {
-  ZIRCON_DESKTOP_MANAGER_TYPE,
   ZirconContextMenuFactoryDesktopManager,
   ZirconDesktopManager,
-  ZirconDesktopManagerState,
-} from '../zircon-ui/zircon-desktop-manager';
+} from './zircon-desktop-manager';
 import { v4 as uuid } from 'uuid';
 
 import 'jspanel4/dist/jspanel.min.css';
+import { ZirconWindow, ZirconWindowEvents } from '../zircon-ui/zircon-window';
 import {
-  ZirconContextMenuFactoryVizWindow,
-  ZirconWindowEvents,
-} from '../zircon-ui/zircon-window';
-import {
-  ZirconContextMenuFactoryDesktop,
   ZirconDesktop,
+  ZirconDesktopEvents,
 } from '../zircon-ui/zircon-desktop';
 import {
   MergeZirconRegistries,
@@ -30,11 +25,24 @@ import {
   ZirconObjectState,
 } from '../zircon-object';
 import { ZirconObjectFactory } from '../zircon-object-factory';
-import { Zircon } from '../zircon';
 import { ZirconVizWindowFactory } from '../zircon-ui/zircon-window-factory';
 import { ZirconDesktopFactory } from '../zircon-ui/zircon-desktop-factory';
-import { ZirconEngine, ZirconEngineState } from './zircon-engine';
-import { ZirconVizWindow } from '../zircon-ui/zircon-viz-window';
+import {
+  ZirconEngine,
+  ZirconEngineEvents,
+  ZirconEngineState,
+} from './zircon-engine';
+import {
+  ZirconVizWindow,
+  ZirconVizWindowEvents,
+} from '../zircon-ui/zircon-viz-window';
+import { ZirconContextMenuFactoryVizWindow } from '../zircon-menu/zircon-viz-window-context-menu';
+import { ZirconContextMenuFactoryWindow } from '../zircon-menu/zircon-window-context-menu';
+import { ZirconContextMenuFactoryDesktop } from '../zircon-menu/zircon-desktop-context-menu-factory';
+import { ZirconParamWindowEvents } from '../zircon-params/zircon-param-window';
+import { ZirconViz } from '../zircon-ui/zircon-visualizer';
+import { Zircon } from '../zircon';
+import { ZirconDesktopManagerFactory } from './zircon-desktop-manager-factory';
 
 /**
  * Composition of this application UI
@@ -42,7 +50,7 @@ import { ZirconVizWindow } from '../zircon-ui/zircon-viz-window';
 export interface ZirconApplicationState {
   applicationId?: string;
   uiClass?: string;
-  desktopManager?: ZirconDesktopManagerState;
+  desktopManagerId: string;
 }
 
 export const ZIRCON_DROPPABLE_CLASS: string = 'drop-window-target';
@@ -78,18 +86,12 @@ export type ZirconApplicationEventRegistry = MergeZirconRegistries<
     >;
     outgoing: MergePickEvents<
       [
-        PickEvents<
-          ZirconApplicationEvents,
-          | 'APPLICATION_START_REQUEST'
-          | 'APPLICATION_STARTED'
-          | 'OBJECT_STATE_REGISTERED'
-          | 'ENGINE_STATE_REGISTERED'
-          | 'SET_OBJECT_STATE_REQUEST'
-        >,
-        PickEvents<
-          ZirconWindowEvents,
-          'WINDOW_SET_PARENT_DESKTOP_DONE' | 'WINDOW_SET_PARENT_DESKTOP_ERROR'
-        >,
+        ZirconApplicationEvents,
+        ZirconWindowEvents,
+        ZirconDesktopEvents,
+        ZirconParamWindowEvents,
+        ZirconVizWindowEvents,
+        ZirconEngineEvents,
       ]
     >;
   },
@@ -114,7 +116,7 @@ export class ZirconApplication<
   private __mainDiv: HTMLDivElement = null;
   private __contextMenu: ZirconContextMenu = null;
   private _contextMenuFactoryRegistry: ZirconContextMenuFactoryRegistry = null;
-
+  private _desktopManagerId: string = 'application-desktop-manager';
   private _desktopManager: ZirconDesktopManager = null;
 
   private __registeredObjectStates: { [id: string]: ZirconObjectState } = {}; // TODO: UI Object
@@ -132,6 +134,7 @@ export class ZirconApplication<
     this._eventEmitter = new EventEmitter2();
     this._eventEmitter.setMaxListeners(1000);
 
+    this.registerObjectFactory(new ZirconDesktopManagerFactory(this));
     this.registerObjectFactory(new ZirconVizWindowFactory(this));
     this.registerObjectFactory(new ZirconDesktopFactory(this));
 
@@ -140,6 +143,9 @@ export class ZirconApplication<
     );
     this._contextMenuFactoryRegistry.registerFactory(
       new ZirconContextMenuFactoryVizWindow(this),
+    );
+    this._contextMenuFactoryRegistry.registerFactory(
+      new ZirconContextMenuFactoryWindow(this),
     );
     this._contextMenuFactoryRegistry.registerFactory(
       new ZirconContextMenuFactoryDesktop(this),
@@ -230,15 +236,35 @@ export class ZirconApplication<
     return Promise.resolve(null);
   }
 
+  // TODO: faire une methode generique getExisting et donner le type d'objet
+
+  public getExistingViz(id: string): ZirconViz {
+    const instance = this.__objectInstances[id];
+    if (instance && instance instanceof ZirconViz) return instance;
+    return null;
+  }
+
   public getExistingVizWindow(id: string): ZirconVizWindow {
     const instance = this.__objectInstances[id];
     if (instance && instance instanceof ZirconVizWindow) return instance;
     return null;
   }
 
+  public getExistingWindow(id: string): ZirconWindow {
+    const instance = this.__objectInstances[id];
+    if (instance && instance instanceof ZirconWindow) return instance;
+    return null;
+  }
+
   public getExistingDesktop(id: string): ZirconDesktop {
     const instance = this.__objectInstances[id];
     if (instance && instance instanceof ZirconDesktop) return instance;
+    return null;
+  }
+
+  public getExistingObject(id: string): ZirconObject {
+    const instance = this.__objectInstances[id];
+    if (instance && instance instanceof ZirconObject) return instance;
     return null;
   }
 
@@ -253,11 +279,6 @@ export class ZirconApplication<
     if (!state.type)
       throw new Error(`Object ${state.id} state must have a type`);
     // Special case for dekstop manager which is unique
-    if (state.type === ZIRCON_DESKTOP_MANAGER_TYPE) {
-      this.getDesktopManager().setState(Zircon.asDesktopManagerState(state));
-      this.__registeredObjectStates[state.id] = state;
-      return;
-    }
     // add or update state
     this.__registeredObjectStates[state.id] = state;
     this.emit('OBJECT_STATE_REGISTERED', { state: state });
@@ -266,6 +287,10 @@ export class ZirconApplication<
 
   public getRegisteredObjectState(id: string): ZirconObjectState {
     return this.__registeredObjectStates[id];
+  }
+
+  public getRegisteredObjectStates(): { [id: string]: ZirconObjectState } {
+    return this.__registeredObjectStates;
   }
 
   public getContextMenuFactoryRegistry(): ZirconContextMenuFactoryRegistry {
@@ -412,9 +437,20 @@ export class ZirconApplication<
   /**
    * start application UI by displaying it in the body and starting engines
    */
-  public start(): void {
-    this.startEngines();
+  public async start(): Promise<void> {
+    await this.createDesktopManager();
+    await this.startEngines();
     this.displayUIIn(document.body);
+  }
+
+  private async createDesktopManager(): Promise<ZirconDesktopManager> {
+    if (this._desktopManager) return Promise.resolve(this._desktopManager);
+    return this.getInstance(this._desktopManagerId).then(
+      (instance: ZirconObject) => {
+        this._desktopManager = Zircon.asDesktopManager(instance);
+        return this._desktopManager;
+      },
+    );
   }
 
   /**
@@ -435,15 +471,17 @@ export class ZirconApplication<
    * The direct first zircon app object is the DesktopManager
    */
   public getDesktopManager(): ZirconDesktopManager {
-    if (this._desktopManager) return this._desktopManager;
-    this._desktopManager = new ZirconDesktopManager(this);
     return this._desktopManager;
+  }
+
+  public getDesktopManagerId(): string {
+    return this._desktopManagerId;
   }
 
   public getCurrentState(): ZirconApplicationState {
     return {
       applicationId: this._applicationName,
-      desktopManager: this._desktopManager?.generateCurrentState(),
+      desktopManagerId: this._desktopManagerId,
       uiClass: this.getUIClass(),
     } as ZirconApplicationState;
   }

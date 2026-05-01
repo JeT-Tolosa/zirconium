@@ -151,7 +151,9 @@ export class TimeManagerEngine<
     this.setTimeDescriptor(timeSource, timeDescriptor);
   }
 
-  public override async setState(state: TimeManagerEngineState): Promise<void> {
+  protected override async setState(
+    state: TimeManagerEngineState,
+  ): Promise<void> {
     if (!state) return;
     await super.setState(state);
     this.setTimeDescriptors(state?.timeDescriptors);

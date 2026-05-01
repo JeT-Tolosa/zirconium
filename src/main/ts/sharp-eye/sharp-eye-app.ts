@@ -1,5 +1,4 @@
 import './sharp-eye.css';
-import { ZirconWindowState } from '../zirconium/zircon-ui/zircon-window';
 import { v4 as uuid } from 'uuid';
 import {
   ZIRCON_DESKTOP_TYPE,
@@ -19,7 +18,7 @@ import { VizFetchFactory } from '../zircon-visualizers/fetch/viz-eye-fetch-facto
 import {
   ZIRCON_DESKTOP_MANAGER_TYPE,
   ZirconDesktopManagerState,
-} from '../zirconium/zircon-ui/zircon-desktop-manager';
+} from '../zirconium/zircon-core/zircon-desktop-manager';
 
 // 3D Visualizers
 import { VizCesiumFactory } from '../zircon-visualizers/cesium/viz-eye-cesium-factory';
@@ -83,7 +82,10 @@ import {
   TimeManagerEngine,
   TimeManagerEngineState,
 } from './engines/time-manager/time-manager-engine';
-import { ZIRCON_VISUALIZER_WINDOW_TYPE } from '../zirconium/zircon-ui/zircon-viz-window';
+import {
+  ZIRCON_VISUALIZER_WINDOW_TYPE,
+  ZirconVizWindowState,
+} from '../zirconium/zircon-ui/zircon-viz-window';
 
 export class SharpEyedApp extends ZirconApplication {
   /**
@@ -123,7 +125,7 @@ export class SharpEyedApp extends ZirconApplication {
 
     const desktopManagerState: ZirconDesktopManagerState = {
       type: ZIRCON_DESKTOP_MANAGER_TYPE,
-      id: `window-${uuid()}`,
+      id: this.getDesktopManagerId(),
       desktopIds: [
         this.createDesktops1().id,
         this.createDesktops2().id,
@@ -285,7 +287,7 @@ export class SharpEyedApp extends ZirconApplication {
    * DESKTOP1
    */
   public createDesktops1(): ZirconDesktopState {
-    const barChartState: ZirconWindowState = {
+    const barChartState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Bar Chart',
@@ -296,7 +298,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'barChartVizId',
     };
     this.registerObjectState(barChartState);
-    const helmetState: ZirconWindowState = {
+    const helmetState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Helmet 3D',
@@ -307,7 +309,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'helmetVizId',
     };
     this.registerObjectState(helmetState);
-    const cubeState: ZirconWindowState = {
+    const cubeState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Cube3D',
@@ -318,7 +320,7 @@ export class SharpEyedApp extends ZirconApplication {
       vizId: 'cubeVizId',
     };
     this.registerObjectState(cubeState);
-    const globusState: ZirconWindowState = {
+    const globusState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Globus',
@@ -330,7 +332,7 @@ export class SharpEyedApp extends ZirconApplication {
     };
     this.registerObjectState(globusState);
 
-    const clock2State: ZirconWindowState = {
+    const clock2State: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Clock2',
@@ -362,7 +364,7 @@ export class SharpEyedApp extends ZirconApplication {
    * DESKTOP2
    */
   public createDesktops2(): ZirconDesktopState {
-    const lineChartState: ZirconWindowState = {
+    const lineChartState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Line Chart',
@@ -374,7 +376,7 @@ export class SharpEyedApp extends ZirconApplication {
     };
     this.registerObjectState(lineChartState);
 
-    const leafletState: ZirconWindowState = {
+    const leafletState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Leaflet',
@@ -387,7 +389,7 @@ export class SharpEyedApp extends ZirconApplication {
     // createVisualizerLeafletJS(),
     this.registerObjectState(leafletState);
 
-    const fetchState: ZirconWindowState = {
+    const fetchState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'fetch',
@@ -400,7 +402,7 @@ export class SharpEyedApp extends ZirconApplication {
     // createVisualizerFetch(),
     this.registerObjectState(fetchState);
 
-    const loggerState: ZirconWindowState = {
+    const loggerState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Logger',
@@ -413,7 +415,7 @@ export class SharpEyedApp extends ZirconApplication {
     // createVisualizerLogger(),
     this.registerObjectState(loggerState);
 
-    const clock1State: ZirconWindowState = {
+    const clock1State: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Clock 1',
@@ -426,7 +428,7 @@ export class SharpEyedApp extends ZirconApplication {
     // window.setContentObject(digitalClock);
     this.registerObjectState(clock1State);
 
-    const timeControllerState: ZirconWindowState = {
+    const timeControllerState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Time Controller',
@@ -460,7 +462,7 @@ export class SharpEyedApp extends ZirconApplication {
    * DESKTOP3
    */
   public createDesktops3(): ZirconDesktopState {
-    const satcat1WindowState: ZirconWindowState = {
+    const satcat1WindowState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Satellite Catalog 1',
@@ -473,7 +475,7 @@ export class SharpEyedApp extends ZirconApplication {
     //const timeController = new TimeController();
     this.registerObjectState(satcat1WindowState);
 
-    const satcat2WindowState: ZirconWindowState = {
+    const satcat2WindowState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Satellite Catalog 2',
@@ -486,7 +488,7 @@ export class SharpEyedApp extends ZirconApplication {
     // createVisualizerSatelliteCatalog(),
     this.registerObjectState(satcat2WindowState);
 
-    const satelliteLoaderWindowState: ZirconWindowState = {
+    const satelliteLoaderWindowState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Satellite Loader',
@@ -517,7 +519,7 @@ export class SharpEyedApp extends ZirconApplication {
    * DESKTOP4
    */
   public createDesktops4(): ZirconDesktopState {
-    const groundStationLoaderWindowState: ZirconWindowState = {
+    const groundStationLoaderWindowState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Ground Station Loader',
@@ -530,7 +532,7 @@ export class SharpEyedApp extends ZirconApplication {
     // window5.setContentObject(new VizGroundStationLoader());
     this.registerObjectState(groundStationLoaderWindowState);
 
-    const groundStationCatalog1WindowState: ZirconWindowState = {
+    const groundStationCatalog1WindowState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Ground Station Catalog 1',
@@ -543,7 +545,7 @@ export class SharpEyedApp extends ZirconApplication {
     // createVisualizerGroundStationCatalog(),
     this.registerObjectState(groundStationCatalog1WindowState);
 
-    const groundStationCatalog2WindowState: ZirconWindowState = {
+    const groundStationCatalog2WindowState: ZirconVizWindowState = {
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
       id: `window-${uuid()}`,
       title: 'Ground Station Catalog 2',

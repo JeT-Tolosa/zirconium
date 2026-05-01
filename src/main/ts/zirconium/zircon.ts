@@ -1,6 +1,6 @@
 import { ZirconApplication } from './zircon-core/zircon-app';
 import { ZirconObject, ZirconObjectState } from './zircon-object';
-import { ZIRCON_PARAMETERS_WINDOW_TYPE } from './zircon-params/zircon-param-window';
+import { ZIRCON_PARAMETER_WINDOW_TYPE } from './zircon-params/zircon-param-window';
 import {
   ZIRCON_DESKTOP_TYPE,
   ZirconDesktop,
@@ -10,7 +10,7 @@ import {
   ZIRCON_DESKTOP_MANAGER_TYPE,
   ZirconDesktopManager,
   ZirconDesktopManagerState,
-} from './zircon-ui/zircon-desktop-manager';
+} from './zircon-core/zircon-desktop-manager';
 import {
   DEFAULT_VISUALIZER_WINDOW_STATE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
@@ -88,7 +88,7 @@ export class Zircon {
     if (!state) return null;
     if (
       state.type !== ZIRCON_VISUALIZER_WINDOW_TYPE &&
-      state.type !== ZIRCON_PARAMETERS_WINDOW_TYPE
+      state.type !== ZIRCON_PARAMETER_WINDOW_TYPE
     )
       return null;
     return state as ZirconWindowState;

@@ -7,7 +7,8 @@ import {
 } from '../zircon-ui/zircon-window';
 import { IJSPanelInstance } from 'jspanel4';
 
-export const ZIRCON_PARAMETERS_WINDOW_TYPE = 'zircon-window-parameters';
+export const ZIRCON_PARAMETER_WINDOW_TYPE = 'zircon-parameter-window';
+export const ZIRCON_PARAMETER_WINDOW_CLASS = 'zircon-param';
 
 // export interface ZirconParamWindowState extends ZirconWindowState {}
 
@@ -43,7 +44,7 @@ export class ZirconParamWindow<
   }
 
   public override getType(): string {
-    return ZIRCON_PARAMETERS_WINDOW_TYPE;
+    return ZIRCON_PARAMETER_WINDOW_TYPE;
   }
 
   protected override onPanelCreated(panel: IJSPanelInstance): void {
@@ -51,10 +52,7 @@ export class ZirconParamWindow<
       throw new Error(
         `panel should not be null in Param window Creation ID: ${this.getId()}`,
       );
-    const container: HTMLElement = super.getContainer();
-    container.classList.add(ZIRCON_PARAMETERS_WINDOW_TYPE);
-    // container.setAttribute( ZirconParamWindow.ZIRCON_WINDOW_PARAMETERS_TYPE);
-    super.getWindowContent().innerHTML = '<p>Parameters</p>';
-    super.getWindowContent().style.backgroundColor = 'green';
+    panel.classList.add(ZIRCON_PARAMETER_WINDOW_CLASS);
+    this._window?.displayParameters(panel.content);
   }
 }
