@@ -212,6 +212,9 @@ export class ZirconDesktopManager<
     this.setDesktopIds(state.desktopIds);
   }
 
+  public isDisplayed(): boolean {
+    return this.__dekstopContainer !== null;
+  }
   /**
    * Sets the desktop IDs managed by this desktop manager
    * @param desktopIds Array of desktop IDs to manage
@@ -222,12 +225,14 @@ export class ZirconDesktopManager<
       desktopIds,
     );
     this._desktopIds = desktopIds;
-    res.inserted?.forEach((desktopId) => {
-      this.displayDesktop(desktopId);
-    });
-    res.deleted?.forEach((desktopId) => {
-      this.undisplayDesktop(desktopId);
-    });
+    if (this.isDisplayed()) {
+      res.inserted?.forEach((desktopId) => {
+        this.displayDesktop(desktopId);
+      });
+      res.deleted?.forEach((desktopId) => {
+        this.undisplayDesktop(desktopId);
+      });
+    }
     this.emit('DESKTOP_MANAGER_DESKTOP_IDS_CHANGED', {
       desktopManagerId: this.getId(),
       desktopIds: desktopIds,
