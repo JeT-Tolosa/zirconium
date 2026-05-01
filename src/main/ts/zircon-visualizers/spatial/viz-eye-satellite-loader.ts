@@ -1,3 +1,4 @@
+import './viz-eye-satellite-loader.css';
 import { v4 as uuid } from 'uuid';
 import gpsJson from '../../../../../assets/orbital-data/celestrak/gps-celestrak.json';
 import starlinkJson from '../../../../../assets/orbital-data/celestrak/starlink-celestrak.json';
@@ -15,7 +16,8 @@ import { CatalogEngineEvents } from '../../sharp-eye/engines/catalog-engine';
 import {
   ZirconViz,
   ZirconVizEventRegistry,
-} from '../../zirconium/zircon-ui/zircon-viz-ui';
+} from '../../zirconium/zircon-ui/zircon-visualizer';
+import { IonButton } from '@ionic/core/components/ion-button';
 
 const celestrakLoader: SatelliteLoaderCelestrakJson =
   new SatelliteLoaderCelestrakJson('Celestrak Loader');
@@ -74,7 +76,7 @@ export class VizSatCatLoader<
 > extends ZirconViz<R> {
   public static readonly VIZ_SAT_CAT_LOADER_TYPE = 'VIZ_SAT_CAT_LOADER_TYPE';
   private _div: HTMLDivElement = null;
-  private _fetchButton: HTMLButtonElement = null;
+  private _fetchButton: IonButton = null;
   private _dataSelector: HTMLSelectElement = null;
 
   /**
@@ -220,11 +222,12 @@ export class VizSatCatLoader<
   //   const selectedRows = table.rows({ selected: true }).data();
   // console.log(selectedRows);
 
-  public getFetchButton(): HTMLButtonElement {
+  public getFetchButton(): HTMLElement {
     if (this._fetchButton) return this._fetchButton;
-    this._fetchButton = document.createElement('button');
+    this._fetchButton = document.createElement('ion-button');
     this._fetchButton.classList.add('satcat-button');
     this._fetchButton.innerText = 'Load Data';
+
     this._fetchButton.addEventListener('click', () => {
       const dataDescriptorId: string =
         this.getDataSelector().options[this.getDataSelector().selectedIndex]
@@ -260,9 +263,14 @@ export class VizSatCatLoader<
     this._div = document.createElement('div');
     this._div.id = uuid();
     this._div.classList.add('satcat-container');
-    this._div.appendChild(this.getFetchButton());
-    // this._div.appendChild(this.getSatCatDiv());
-    this._div.appendChild(this.getDataSelector());
+
+    const div1: HTMLDivElement = document.createElement('div');
+    div1.appendChild(this.getDataSelector());
+    this._div.appendChild(div1);
+
+    const div2: HTMLDivElement = document.createElement('div');
+    div2.appendChild(this.getFetchButton());
+    this._div.appendChild(div2);
 
     return this._div;
   }
