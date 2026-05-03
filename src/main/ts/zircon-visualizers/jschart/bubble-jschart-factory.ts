@@ -2,8 +2,12 @@ import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
 import { VizBubbleJSChart, VizBubbleJSChartState } from './bubble-jschart';
 
 export class VizBubbleJSChartFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizBubbleJSChart.BUBBLE_JSCHART_VISUALIZER_TYPE;
+  constructor() {
+    super('VizBubbleJSChartFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [VizBubbleJSChart.BUBBLE_JSCHART_VISUALIZER_TYPE];
   }
 
   public override createInstance(

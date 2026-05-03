@@ -5,12 +5,14 @@ import {
 } from '../zircon-object';
 import { ZirconApplication } from './zircon-app';
 import { MergeZirconRegistries } from '../zircon-event';
+import { ZIRCON_APP_OBJECT_TYPE } from './zircon-types';
 
 /**
  * Base state for all zircon objects UI
  */
-export type ZirconAppObjectState = ZirconObjectState;
-export const DEFAULT_ZIRCON_APP_OBJECT_STATE: ZirconAppObjectState = {};
+export interface ZirconAppObjectState extends ZirconObjectState {
+  type?: typeof ZIRCON_APP_OBJECT_TYPE;
+}
 
 export type ZirconAppObjectEvents = {};
 

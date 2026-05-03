@@ -6,11 +6,11 @@ import {
   ZirconWindowState,
 } from '../zircon-ui/zircon-window';
 import { IJSPanelInstance } from 'jspanel4';
+import { ZIRCON_PARAMETER_WINDOW_TYPE } from '../zircon-core/zircon-types';
 
-export const ZIRCON_PARAMETER_WINDOW_TYPE = 'zircon-parameter-window';
 export const ZIRCON_PARAMETER_WINDOW_CLASS = 'zircon-param';
 
-// export interface ZirconParamWindowState extends ZirconWindowState {}
+export interface ZirconParamWindowState extends ZirconWindowState {}
 
 export type ZirconParamWindowEvents = {};
 

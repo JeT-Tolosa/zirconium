@@ -5,8 +5,12 @@ import {
 } from './viz-eye-ground-station-loader';
 
 export class VizGroundStationLoaderFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizGroundStationLoader.VIZ_GROUND_STATION_LOADER_TYPE;
+  constructor() {
+    super('VizGroundStationLoaderFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [VizGroundStationLoader.VIZ_GROUND_STATION_LOADER_TYPE];
   }
 
   public override createInstance(

@@ -2,8 +2,12 @@ import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
 import { TimeController, TimeControllerState } from './time-controller';
 
 export class TimeControllerFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return TimeController.TIME_CONTROLLER_VISUALIZER_TYPE;
+  constructor() {
+    super('TimeControllerFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [TimeController.TIME_CONTROLLER_VISUALIZER_TYPE];
   }
 
   public override createInstance(

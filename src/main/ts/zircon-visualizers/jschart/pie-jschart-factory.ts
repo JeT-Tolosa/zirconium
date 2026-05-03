@@ -2,8 +2,12 @@ import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
 import { VizPieJSChart, VizPieJSChartState } from './pie-jschart';
 
 export class VizPieJSChartFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizPieJSChart.PIE_JSCHART_VISUALIZER_TYPE;
+  constructor() {
+    super('VizPieJSChartFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [VizPieJSChart.PIE_JSCHART_VISUALIZER_TYPE];
   }
 
   public override createInstance(

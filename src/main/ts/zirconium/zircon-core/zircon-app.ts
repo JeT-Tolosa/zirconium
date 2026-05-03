@@ -41,8 +41,8 @@ import { ZirconContextMenuFactoryWindow } from '../zircon-menu/zircon-window-con
 import { ZirconContextMenuFactoryDesktop } from '../zircon-menu/zircon-desktop-context-menu-factory';
 import { ZirconParamWindowEvents } from '../zircon-params/zircon-param-window';
 import { ZirconViz } from '../zircon-ui/zircon-visualizer';
-import { Zircon } from '../zircon';
 import { ZirconDesktopManagerFactory } from './zircon-desktop-manager-factory';
+import { ZirconTypes } from './zircon-types';
 
 /**
  * Composition of this application UI
@@ -190,7 +190,16 @@ export class ZirconApplication<
 
   public registerObjectFactory(factory: ZirconObjectFactory): boolean {
     if (!factory) return false;
-    this.__factories[factory.getType()] = factory;
+    if (
+      factory.getHandledTypes() == null ||
+      factory.getHandledTypes().length == 0
+    )
+      throw new Error(
+        `It's illegal to register an empty factory name = ${factory.getName()}`,
+      );
+    factory.getHandledTypes().forEach((type) => {
+      this.__factories[type] = factory;
+    });
     return true;
   }
 
@@ -447,7 +456,7 @@ export class ZirconApplication<
     if (this._desktopManager) return Promise.resolve(this._desktopManager);
     return this.getInstance(this._desktopManagerId).then(
       (instance: ZirconObject) => {
-        this._desktopManager = Zircon.asDesktopManager(instance);
+        this._desktopManager = ZirconTypes.asDesktopManager(instance);
         return this._desktopManager;
       },
     );

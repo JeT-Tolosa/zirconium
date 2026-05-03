@@ -3,8 +3,12 @@ import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { VizEventLogger } from './viz-eye-event-logger';
 
 export class VizEventLoggerFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizEventLogger.EVENT_LOGGER_VISUALIZER_TYPE;
+  constructor() {
+    super('VizEventLoggerFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [VizEventLogger.EVENT_LOGGER_VISUALIZER_TYPE];
   }
 
   public override createInstance(

@@ -8,8 +8,8 @@ import {
 } from '../zircon-event';
 import { ZirconViz, ZirconVizEvents } from './zircon-visualizer';
 import {
-  ZIRCON_PARAMETER_WINDOW_TYPE,
   ZirconParamWindow,
+  ZirconParamWindowState,
 } from '../zircon-params/zircon-param-window';
 import {
   ZirconWindow,
@@ -18,8 +18,11 @@ import {
 } from './zircon-window';
 import { IJSPanelInstance } from 'jspanel4';
 import JSONEditor, { JSONEditorOptions } from 'jsoneditor';
+import {
+  ZIRCON_PARAMETER_WINDOW_TYPE,
+  ZIRCON_VISUALIZER_WINDOW_TYPE,
+} from '../zircon-core/zircon-types';
 
-export const ZIRCON_VISUALIZER_WINDOW_TYPE: string = 'zircon-viz-window';
 export const ZIRCON_VISUALIZER_WINDOW_CLASS: string = 'zircon-viz';
 
 export type ZirconVizWindowEvents = {
@@ -129,7 +132,7 @@ export class ZirconVizWindow<
   }
 
   public displayParameterWindow(): boolean {
-    const paramWindowState = {
+    const paramWindowState: ZirconParamWindowState = {
       type: ZIRCON_PARAMETER_WINDOW_TYPE,
       name: `${this.getName()}-param`,
       title: `${this.getName()} Parameters`,

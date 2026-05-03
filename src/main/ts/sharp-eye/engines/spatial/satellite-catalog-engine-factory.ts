@@ -9,11 +9,11 @@ import {
  */
 export class SatelliteCatalogEngineFactory extends ZirconObjectFactory {
   constructor() {
-    super();
+    super('SatelliteCatalogEngineFactory');
   }
 
-  public override getType(): string {
-    return SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE;
+  public override getHandledTypes(): string[] {
+    return [SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE];
   }
 
   public override createInstance(

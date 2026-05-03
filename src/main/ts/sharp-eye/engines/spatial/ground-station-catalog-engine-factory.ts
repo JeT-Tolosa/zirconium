@@ -9,11 +9,11 @@ import {
  */
 export class GroundStationCatalogEngineFactory extends ZirconObjectFactory {
   constructor() {
-    super();
+    super('GroundStationCatalogEngineFactory');
   }
 
-  public override getType(): string {
-    return GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE;
+  public override getHandledTypes(): string[] {
+    return [GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE];
   }
 
   public override createInstance(

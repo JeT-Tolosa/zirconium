@@ -2,8 +2,12 @@ import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
 import { VizLineJSChart, VizLineJSChartState } from './line-jschart';
 
 export class VizLineJSChartFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizLineJSChart.LINE_JSCHART_VISUALIZER_TYPE;
+  constructor() {
+    super('VizLineJSChartFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [VizLineJSChart.LINE_JSCHART_VISUALIZER_TYPE];
   }
 
   public override createInstance(

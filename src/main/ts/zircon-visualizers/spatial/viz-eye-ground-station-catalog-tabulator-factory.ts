@@ -5,8 +5,14 @@ import {
 } from './viz-eye-ground-station-catalog-tabulator';
 
 export class VizGroundStationCatalogTabulatorFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE;
+  constructor() {
+    super('VizGroundStationCatalogTabulatorFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [
+      VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE,
+    ];
   }
 
   public override createInstance(

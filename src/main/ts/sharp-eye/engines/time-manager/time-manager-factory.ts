@@ -9,11 +9,11 @@ import {
  */
 export class TimeManagerEngineFactory extends ZirconObjectFactory {
   constructor() {
-    super();
+    super('TimeManagerEngineFactory');
   }
 
-  public override getType(): string {
-    return TimeManagerEngine.TIME_MANAGER_ENGINE_TYPE;
+  public override getHandledTypes(): string[] {
+    return [TimeManagerEngine.TIME_MANAGER_ENGINE_TYPE];
   }
 
   public override createInstance(

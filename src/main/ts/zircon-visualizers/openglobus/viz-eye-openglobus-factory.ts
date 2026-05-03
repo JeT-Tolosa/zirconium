@@ -2,8 +2,12 @@ import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
 import { VizOpenGlobus, VizOpenGlobusState } from './viz-eye-openglobus';
 
 export class VizOpenGlobusFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizOpenGlobus.OPENGLOBUS_VISUALIZER_TYPE;
+  constructor() {
+    super('VizOpenGlobusFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [VizOpenGlobus.OPENGLOBUS_VISUALIZER_TYPE];
   }
 
   public override createInstance(

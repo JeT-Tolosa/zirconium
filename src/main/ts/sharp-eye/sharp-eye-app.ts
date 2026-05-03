@@ -1,9 +1,6 @@
 import './sharp-eye.css';
 import { v4 as uuid } from 'uuid';
-import {
-  ZIRCON_DESKTOP_TYPE,
-  ZirconDesktopState,
-} from '../zirconium/zircon-ui/zircon-desktop';
+import { ZirconDesktopState } from '../zirconium/zircon-ui/zircon-desktop';
 import { ZirconApplication } from '../zirconium/zircon-core/zircon-app';
 import {
   SatelliteCatalogEngine,
@@ -15,10 +12,7 @@ import {
 } from './engines/spatial/ground-station-catalog-engine';
 import { TimingHelper } from '../libraries/timing/timing';
 import { VizFetchFactory } from '../zircon-visualizers/fetch/viz-eye-fetch-factory';
-import {
-  ZIRCON_DESKTOP_MANAGER_TYPE,
-  ZirconDesktopManagerState,
-} from '../zirconium/zircon-core/zircon-desktop-manager';
+import { ZirconDesktopManagerState } from '../zirconium/zircon-core/zircon-desktop-manager';
 
 // 3D Visualizers
 import { VizCesiumFactory } from '../zircon-visualizers/cesium/viz-eye-cesium-factory';
@@ -82,10 +76,12 @@ import {
   TimeManagerEngine,
   TimeManagerEngineState,
 } from './engines/time-manager/time-manager-engine';
+import { ZirconVizWindowState } from '../zirconium/zircon-ui/zircon-viz-window';
 import {
+  ZIRCON_DESKTOP_MANAGER_TYPE,
+  ZIRCON_DESKTOP_TYPE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
-  ZirconVizWindowState,
-} from '../zirconium/zircon-ui/zircon-viz-window';
+} from '../zirconium/zircon-core/zircon-types';
 
 export class SharpEyedApp extends ZirconApplication {
   /**

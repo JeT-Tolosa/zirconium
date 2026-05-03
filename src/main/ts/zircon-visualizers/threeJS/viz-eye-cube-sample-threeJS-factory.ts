@@ -5,8 +5,12 @@ import {
 } from './viz-eye-cube-sample-threeJS';
 
 export class VizCubeSampleThreeJSFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizCubeSampleThreeJS.CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE;
+  constructor() {
+    super('VizCubeSampleThreeJSFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [VizCubeSampleThreeJS.CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE];
   }
 
   public override createInstance(

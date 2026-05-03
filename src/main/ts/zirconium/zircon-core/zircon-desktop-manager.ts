@@ -26,14 +26,15 @@ import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-fac
 import { ZirconContextMenuItem } from '../zircon-menu/zircon-context-menu';
 import { ArrayComparisonResult, Zircon } from '../zircon';
 import { ZirconWindow } from '../zircon-ui/zircon-window';
-
-export const ZIRCON_DESKTOP_MANAGER_TYPE: string = 'zircon-desktop-manager';
-export const DESKTOPS_MANAGER_CLASS = 'desktop-manager';
-export const DESKTOPS_CONTAINER_CLASS = `desktops-container`;
-export const DESKTOPS_SELECTOR_CLASS = `desktops-selector`;
-export const DESKTOP_CONTAINER_CLASS = `desktop-container`;
-export const DESKTOP_SELECTOR_CLASS = `desktop-selector`;
-export const ACTIVE_DESKTOP_CLASS = 'active';
+import {
+  ACTIVE_DESKTOP_CLASS,
+  DESKTOP_SELECTOR_CLASS,
+  DESKTOPS_CONTAINER_CLASS,
+  DESKTOPS_MANAGER_CLASS,
+  DESKTOPS_SELECTOR_CLASS,
+  ZIRCON_DESKTOP_MANAGER_TYPE,
+  ZirconTypes,
+} from './zircon-types';
 
 export interface ZirconDesktopManagerState extends ZirconObjectState {
   type?: typeof ZIRCON_DESKTOP_MANAGER_TYPE;
@@ -165,7 +166,7 @@ export class ZirconDesktopManager<
     state: ZirconObjectState,
   ): void {
     if (state.type === ZIRCON_DESKTOP_MANAGER_TYPE) {
-      this.setState(Zircon.asDesktopManagerState(state));
+      this.setState(ZirconTypes.asDesktopManagerState(state));
       return;
     }
   }
@@ -251,7 +252,7 @@ export class ZirconDesktopManager<
     return this.getApplication()
       .getInstance(desktopId)
       .then((obj: ZirconObject) => {
-        const desktop: ZirconDesktop = Zircon.asDesktop(obj);
+        const desktop: ZirconDesktop = ZirconTypes.asDesktop(obj);
         if (!desktop)
           return Promise.reject(
             `Cannot display desktop with id ${desktopId} object is not a desktop: type ${obj.getType()}`,

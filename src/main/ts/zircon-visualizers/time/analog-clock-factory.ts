@@ -2,8 +2,12 @@ import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
 import { AnalogClock, AnalogClockState } from './analog-clock';
 
 export class AnalogClockFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return AnalogClock.ANALOG_CLOCK_VISUALIZER_TYPE;
+  constructor() {
+    super('AnalogClockFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [AnalogClock.ANALOG_CLOCK_VISUALIZER_TYPE];
   }
 
   public override createInstance(

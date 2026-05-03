@@ -8,6 +8,7 @@ import {
   MergeZirconRegistries,
   PickEvents,
 } from '../zircon-event';
+import { ZIRCON_ENGINE_TYPE } from './zircon-types';
 
 export type ZirconEngineEvents = {
   ENGINE_START_REQUEST: { engineId: string };
@@ -43,7 +44,6 @@ export type ZirconEngineEventRegistry = MergeZirconRegistries<
   ZirconObjectEventRegistry
 >;
 
-export const ZIRCON_ENGINE_TYPE: string = 'zircon-engine';
 export interface ZirconEngineState extends ZirconObjectState {
   type: typeof ZIRCON_ENGINE_TYPE;
 }

@@ -1,22 +1,23 @@
 import { ZirconApplication } from './zircon-app';
 import { ZirconObjectFactory } from '../zircon-object-factory';
 import {
-  ZIRCON_DESKTOP_MANAGER_TYPE,
   ZirconDesktopManager,
   ZirconDesktopManagerState,
 } from './zircon-desktop-manager';
+import { ZIRCON_DESKTOP_MANAGER_TYPE } from './zircon-types';
 
 export class ZirconDesktopManagerFactory extends ZirconObjectFactory {
   private _app: ZirconApplication = null;
 
   constructor(app: ZirconApplication) {
-    super();
+    super('ZirconDesktopManagerFactory');
     this._app = app;
   }
 
-  public override getType(): string {
-    return ZIRCON_DESKTOP_MANAGER_TYPE;
+  public override getHandledTypes(): string[] {
+    return [ZIRCON_DESKTOP_MANAGER_TYPE];
   }
+
   public override createInstance(
     state: ZirconDesktopManagerState,
   ): Promise<ZirconDesktopManager> {

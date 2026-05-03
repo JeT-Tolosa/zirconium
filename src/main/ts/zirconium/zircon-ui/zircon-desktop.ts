@@ -11,10 +11,9 @@ import {
 import { MergeZirconRegistries, PickEvents } from '../zircon-event';
 import { ZirconObject } from '../zircon-object';
 import { ArrayComparisonResult, Zircon } from '../zircon';
-import { ACTIVE_DESKTOP_CLASS } from '../zircon-core/zircon-desktop-manager';
+import { ACTIVE_DESKTOP_CLASS, ZirconTypes } from '../zircon-core/zircon-types';
 import { ZirconParamWindow } from '../zircon-params/zircon-param-window';
-
-export const ZIRCON_DESKTOP_TYPE: string = 'ZirconDesktop';
+import { ZIRCON_DESKTOP_TYPE } from '../zircon-core/zircon-types';
 
 export type ZirconDesktopEvents = {
   DESKTOP_ACTIVATE_REQUEST: { desktopId: string };
@@ -61,11 +60,6 @@ export interface ZirconDesktopState extends ZirconAppObjectState {
   name?: string;
   windowIds?: string[];
 }
-
-export const DEFAULT_DESKTOP_STATE: ZirconDesktopState = {
-  type: ZIRCON_DESKTOP_TYPE,
-  name: 'Zircon Desktop',
-};
 
 interface ZirconDesktopUI {
   window: ZirconWindow;
@@ -229,6 +223,7 @@ export class ZirconDesktop<
       this.getId(),
     );
     this.__container.setAttribute(ZIRCON_TARGET_DESKTOP_ID, this.getId());
+    this.displayWindows();
     return this.__container;
   }
 
@@ -258,7 +253,7 @@ export class ZirconDesktop<
     return this.getApplication()
       .getInstance(windowId)
       .then((obj: ZirconObject) => {
-        const window: ZirconWindow = Zircon.asWindow(obj);
+        const window: ZirconWindow = ZirconTypes.asWindow(obj);
         if (!window)
           return Promise.reject(
             `Cannot display Window with id ${windowId} object is not a Window: type ${obj.getType()}`,

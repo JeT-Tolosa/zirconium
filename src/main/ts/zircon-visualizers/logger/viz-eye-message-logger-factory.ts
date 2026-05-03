@@ -3,8 +3,12 @@ import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { VizMessageLogger } from './viz-eye-message-logger';
 
 export class VizMessageLoggerFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizMessageLogger.MESSAGE_LOGGER_VISUALIZER_TYPE;
+  constructor() {
+    super('VizMessageLoggerFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [VizMessageLogger.MESSAGE_LOGGER_VISUALIZER_TYPE];
   }
 
   public override createInstance(

@@ -5,8 +5,12 @@ import {
 } from './viz-eye-satellite-loader';
 
 export class VizSatCatLoaderFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizSatCatLoader.VIZ_SAT_CAT_LOADER_TYPE;
+  constructor() {
+    super('VizSatCatLoaderFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [VizSatCatLoader.VIZ_SAT_CAT_LOADER_TYPE];
   }
 
   public override createInstance(

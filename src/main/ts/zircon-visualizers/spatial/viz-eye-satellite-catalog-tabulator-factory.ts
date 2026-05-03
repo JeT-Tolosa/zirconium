@@ -5,8 +5,12 @@ import {
 } from './viz-eye-satellite-catalog-tabulator';
 
 export class VizSatelliteCatalogTabulatorFactory extends ZirconObjectFactory {
-  public getType(): string {
-    return VizSatelliteCatalogTabulator.VIZ_SATELLITE_CATALOG_TABULATOR_TYPE;
+  constructor() {
+    super('VizSatelliteCatalogTabulatorFactory');
+  }
+
+  public getHandledTypes(): string[] {
+    return [VizSatelliteCatalogTabulator.VIZ_SATELLITE_CATALOG_TABULATOR_TYPE];
   }
 
   public override createInstance(
