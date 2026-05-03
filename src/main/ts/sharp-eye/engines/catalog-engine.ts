@@ -263,6 +263,13 @@ export class CatalogEngine<
     }
   }
 
+  protected override onStart(): Promise<void> {
+    return Promise.resolve();
+  }
+  protected override onStop(): Promise<void> {
+    return Promise.resolve();
+  }
+
   /**
    * Type of elements managed by this catalog
    * @returns

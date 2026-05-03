@@ -5,6 +5,7 @@ import {
   ZirconDesktopManager,
   ZirconDesktopManagerState,
 } from './zircon-desktop-manager';
+import { ZirconEngineManagerState } from './zircon-engine-manager';
 
 export const ZIRCON_OBJECT_TYPE: string = 'zircon-object';
 export const ZIRCON_APP_OBJECT_TYPE: string = 'zircon-app-object';
@@ -14,6 +15,7 @@ export const ZIRCON_WINDOW_TYPE: string = 'zircon-window';
 export const ZIRCON_VISUALIZER_WINDOW_TYPE: string = 'zircon-viz-window';
 export const ZIRCON_PARAMETER_WINDOW_TYPE: string = 'zircon-param-window';
 export const ZIRCON_ENGINE_TYPE: string = 'zircon-engine';
+export const ZIRCON_ENGINE_MANAGER_TYPE: string = 'zircon-engin-manager';
 
 export const DESKTOPS_MANAGER_CLASS = 'desktop-manager';
 export const DESKTOPS_CONTAINER_CLASS = `desktops-container`;
@@ -51,6 +53,14 @@ export class ZirconTypes {
     if (!state) return null;
     if (state.type !== ZIRCON_DESKTOP_MANAGER_TYPE) return null;
     return state as ZirconDesktopManagerState;
+  }
+
+  public static asEngineManagerState(
+    state: ZirconObjectState,
+  ): ZirconEngineManagerState {
+    if (!state) return null;
+    if (state.type !== ZIRCON_ENGINE_MANAGER_TYPE) return null;
+    return state as ZirconEngineManagerState;
   }
 
   public static asDesktop(obj: ZirconObject): ZirconDesktop {

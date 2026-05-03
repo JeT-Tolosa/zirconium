@@ -43,6 +43,7 @@ import { ZirconParamWindowEvents } from '../zircon-params/zircon-param-window';
 import { ZirconViz } from '../zircon-ui/zircon-visualizer';
 import { ZirconDesktopManagerFactory } from './zircon-desktop-manager-factory';
 import { ZirconTypes } from './zircon-types';
+import { ZirconEngineManager } from './zircon-engine-manager';
 
 /**
  * Composition of this application UI
@@ -51,6 +52,7 @@ export interface ZirconApplicationState {
   applicationId?: string;
   uiClass?: string;
   desktopManagerId: string;
+  engineManagerId: string;
 }
 
 export const ZIRCON_DROPPABLE_CLASS: string = 'drop-window-target';
@@ -118,6 +120,8 @@ export class ZirconApplication<
   private _contextMenuFactoryRegistry: ZirconContextMenuFactoryRegistry = null;
   private _desktopManagerId: string = 'application-desktop-manager';
   private _desktopManager: ZirconDesktopManager = null;
+  private _engineManagerId: string = 'application-engine-manager';
+  private _engineManager: ZirconEngineManager = null;
 
   private __registeredObjectStates: { [id: string]: ZirconObjectState } = {}; // TODO: UI Object
   private __registeredEngineStates: { [id: string]: ZirconEngineState } = {};
@@ -262,6 +266,12 @@ export class ZirconApplication<
   public getExistingWindow(id: string): ZirconWindow {
     const instance = this.__objectInstances[id];
     if (instance && instance instanceof ZirconWindow) return instance;
+    return null;
+  }
+
+  public getExistingEngine(id: string): ZirconEngine {
+    const instance = this.__objectInstances[id];
+    if (instance && instance instanceof ZirconEngine) return instance;
     return null;
   }
 
@@ -474,6 +484,17 @@ export class ZirconApplication<
     this.__mainDiv.classList.add(this.getUIClass());
     this.getContextMenu().addContextMenu(this.__mainDiv);
     return this.__mainDiv;
+  }
+
+  /**
+   * The direct first zircon app object is the DesktopManager
+   */
+  public getEngineManager(): ZirconEngineManager {
+    return this._engineManager;
+  }
+
+  public getEngineManagerId(): string {
+    return this._engineManagerId;
   }
 
   /**

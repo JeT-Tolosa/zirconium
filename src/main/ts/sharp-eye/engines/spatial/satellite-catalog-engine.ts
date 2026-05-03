@@ -24,4 +24,10 @@ export class SatelliteCatalogEngine extends CatalogEngine<Satellite> {
   public override getType(): string {
     return SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE;
   }
+  protected override onStart(): Promise<void> {
+    return Promise.resolve();
+  }
+  protected override onStop(): Promise<void> {
+    return Promise.resolve();
+  }
 }

@@ -54,6 +54,8 @@ export interface ZirconEngineState extends ZirconObjectState {
 export abstract class ZirconEngine<
   R extends ZirconEngineEventRegistry = ZirconEngineEventRegistry,
 > extends ZirconObject<R> {
+  private _started: boolean = false;
+
   /**
    * Constructor
    */
@@ -106,10 +108,23 @@ export abstract class ZirconEngine<
     }
   }
 
+  public isStarted(): boolean {
+    return this._started;
+  }
+
   public start(): Promise<void> {
-    return Promise.resolve();
+    return this.onStart().then(() => {
+      this._started = true;
+    });
   }
+
   public stop(): Promise<void> {
-    return Promise.resolve();
+    return this.onStop().then(() => {
+      this._started = false;
+    });
   }
+
+  protected abstract onStart(): Promise<void>;
+
+  protected abstract onStop(): Promise<void>;
 }

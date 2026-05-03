@@ -24,4 +24,11 @@ export class GroundStationCatalogEngine extends CatalogEngine<GroundStation> {
   public override getType(): string {
     return GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE;
   }
+
+  protected override onStart(): Promise<void> {
+    return Promise.resolve();
+  }
+  protected override onStop(): Promise<void> {
+    return Promise.resolve();
+  }
 }

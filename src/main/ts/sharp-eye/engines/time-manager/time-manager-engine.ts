@@ -203,6 +203,13 @@ export class TimeManagerEngine<
     };
   }
 
+  protected override onStart(): Promise<void> {
+    return Promise.resolve();
+  }
+  protected override onStop(): Promise<void> {
+    return Promise.resolve();
+  }
+
   private setTimeDescriptor(
     timeSource: string,
     timeDescriptor: TimeDescriptor,
