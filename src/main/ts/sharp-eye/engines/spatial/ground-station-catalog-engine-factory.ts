@@ -1,26 +1,21 @@
-import { ZirconObjectFactory } from '../../../zirconium/zircon-object-factory';
+import { SimpleZirconObjectFactory } from '../../../zirconium/zircon-core/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye-app';
 import {
   GroundStationCatalogEngine,
   GroundStationCatalogEngineState,
 } from './ground-station-catalog-engine';
 
-/**
- * GroundStation Catalog Zircon Core object
- */
-export class GroundStationCatalogEngineFactory extends ZirconObjectFactory {
+export class GroundStationCatalogEngineFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('GroundStationCatalogEngineFactory');
+    super(
+      GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE,
+      SHARP_EYE_VIZ_TYPE,
+    );
   }
 
-  public override getHandledTypes(): string[] {
-    return [GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: GroundStationCatalogEngineState,
   ): Promise<GroundStationCatalogEngine> {
-    return Promise.resolve().then(() => {
-      return new GroundStationCatalogEngine(state.name);
-    });
+    return new GroundStationCatalogEngine(state?.name);
   }
 }

@@ -4,9 +4,8 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   ZirconRegistry,
-} from './zircon-event';
-import { ZirconContextMenuItem } from './zircon-menu/zircon-context-menu';
-import { ZirconApplicationEvents } from './zircon-core/zircon-app';
+} from '../zircon-event';
+import { ZirconApplicationEvents } from './zircon-app';
 
 type PickEvents<E, K extends keyof E> = {
   [P in K]: E[P];
@@ -20,7 +19,6 @@ export type ZirconObjectEvents = {
   };
   OBJECT_ID_CHANGED: { oldId: string; newId: string };
   OBJECT_NAME_CHANGED: { id: string; name: string };
-  UNCAUGHT_EXCEPTION: { error: string };
 };
 
 export type ZirconObjectEventRegistry = MergeZirconRegistries<
@@ -33,7 +31,7 @@ export type ZirconObjectEventRegistry = MergeZirconRegistries<
           ZirconObjectEvents,
           'ZIRCON_OBJECT_CREATED' | 'OBJECT_ID_CHANGED' | 'OBJECT_NAME_CHANGED'
         >,
-        PickEvents<ZirconObjectEvents, 'UNCAUGHT_EXCEPTION'>,
+        PickEvents<ZirconApplicationEvents, 'UNCAUGHT_EXCEPTION'>,
       ]
     >;
   },
@@ -68,7 +66,7 @@ export abstract class ZirconObject<
    * constructor
    */
   constructor(state?: ZirconObjectState) {
-    this._eventEmitter = null;
+    this._eventEmitter = new EventEmitter2();
     this._id = uuid();
     this.setState(state);
   }
@@ -153,10 +151,6 @@ export abstract class ZirconObject<
     return this._name;
   }
 
-  public getContextMenuElements(): ZirconContextMenuItem[] {
-    return null;
-  }
-
   /**
    * emit an event
    * @param event
@@ -188,9 +182,7 @@ export abstract class ZirconObject<
    * get the object type
    * @returns
    */
-  public getType(): string {
-    return this.constructor.name;
-  }
+  public abstract getType(): string;
 
   /**
    * Get the id of this window

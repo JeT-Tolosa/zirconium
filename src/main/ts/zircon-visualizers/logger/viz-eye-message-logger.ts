@@ -21,6 +21,8 @@ interface MessageDescriptor {
   date: string;
 }
 
+export type VizMessageLoggerState = ZirconVizState;
+
 export class VizMessageLogger extends ZirconViz {
   public static readonly MESSAGE_LOGGER_VISUALIZER_TYPE =
     'MESSAGE_LOGGER_VISUALIZER_TYPE';

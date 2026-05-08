@@ -1,26 +1,22 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
+
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
 import {
   VizGroundStationCatalogTabulator,
   VizGroundStationCatalogTabulatorState,
 } from './viz-eye-ground-station-catalog-tabulator';
 
-export class VizGroundStationCatalogTabulatorFactory extends ZirconObjectFactory {
+export class VizGroundStationCatalogTabulatorFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizGroundStationCatalogTabulatorFactory');
-  }
-
-  public getHandledTypes(): string[] {
-    return [
+    super(
       VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE,
-    ];
+      SHARP_EYE_VIZ_TYPE,
+    );
   }
 
-  public override createInstance(
+  public override async createObject(
     state: VizGroundStationCatalogTabulatorState,
   ): Promise<VizGroundStationCatalogTabulator> {
-    return Promise.resolve().then(() => {
-      const viz = new VizGroundStationCatalogTabulator(state);
-      return viz;
-    });
+    return new VizGroundStationCatalogTabulator(state);
   }
 }

@@ -1,26 +1,18 @@
-import { ZirconObjectFactory } from '../../../zirconium/zircon-object-factory';
+import { SimpleZirconObjectFactory } from '../../../zirconium/zircon-core/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye-app';
 import {
   TimeManagerEngine,
   TimeManagerEngineState,
 } from './time-manager-engine';
 
-/**
- * Time Manager Engine Factory
- */
-export class TimeManagerEngineFactory extends ZirconObjectFactory {
+export class TimeManagerEngineFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('TimeManagerEngineFactory');
+    super(TimeManagerEngine.TIME_MANAGER_ENGINE_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public override getHandledTypes(): string[] {
-    return [TimeManagerEngine.TIME_MANAGER_ENGINE_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: TimeManagerEngineState,
   ): Promise<TimeManagerEngine> {
-    return Promise.resolve().then(() => {
-      return new TimeManagerEngine(state);
-    });
+    return new TimeManagerEngine(state);
   }
 }

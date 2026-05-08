@@ -17,7 +17,9 @@ export class SatelliteCatalogEngine extends CatalogEngine<Satellite> {
   public static readonly SATELLITE_CATALOG_ENGINE_TYPE =
     'satellite-catalog-engine';
 
-  constructor(name: string) {
+  constructor(
+    name: string = SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE,
+  ) {
     super(name, SATELLITE_TYPE, satelliteIndexationMethod);
   }
 

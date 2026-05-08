@@ -1,21 +1,15 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
 import { TimeController, TimeControllerState } from './time-controller';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 
-export class TimeControllerFactory extends ZirconObjectFactory {
+export class TimeControllerFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('TimeControllerFactory');
+    super(TimeController.TIME_CONTROLLER_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [TimeController.TIME_CONTROLLER_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: TimeControllerState,
   ): Promise<TimeController> {
-    return Promise.resolve().then(() => {
-      const viz = new TimeController(state);
-      return viz;
-    });
+    return new TimeController(state);
   }
 }

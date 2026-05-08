@@ -1,21 +1,15 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 import { DigitalClock, DigitalClockState } from './digital-clock';
 
-export class DigitalClockFactory extends ZirconObjectFactory {
+export class DigitalClockFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('DigitalClockFactory');
+    super(DigitalClock.DIGITAL_CLOCK_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [DigitalClock.DIGITAL_CLOCK_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: DigitalClockState,
   ): Promise<DigitalClock> {
-    return Promise.resolve().then(() => {
-      const viz = new DigitalClock(state);
-      return viz;
-    });
+    return new DigitalClock(state);
   }
 }

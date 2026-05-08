@@ -1,21 +1,15 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 import { VizRadarJSChart, VizRadarJSChartState } from './radar-jschart';
 
-export class VizRadarJSChartFactory extends ZirconObjectFactory {
+export class VizRadarJSChartFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizRadarJSChartFactory');
+    super(VizRadarJSChart.RADAR_JSCHART_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [VizRadarJSChart.RADAR_JSCHART_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: VizRadarJSChartState,
   ): Promise<VizRadarJSChart> {
-    return Promise.resolve().then(() => {
-      const viz = new VizRadarJSChart(state);
-      return viz;
-    });
+    return new VizRadarJSChart(state);
   }
 }

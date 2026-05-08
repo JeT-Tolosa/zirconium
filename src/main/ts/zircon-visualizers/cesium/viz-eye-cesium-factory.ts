@@ -1,19 +1,15 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 import { VizCesium, VizCesiumState } from './viz-eye-cesium';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
 
-export class VizCesiumFactory extends ZirconObjectFactory {
+export class VizCesiumFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizCesiumFactory');
+    super(VizCesium.CESIUM_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [VizCesium.CESIUM_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(state: VizCesiumState): Promise<VizCesium> {
-    return Promise.resolve().then(() => {
-      const viz = new VizCesium(state);
-      return viz;
-    });
+  public override async createObject(
+    state: VizCesiumState,
+  ): Promise<VizCesium> {
+    return new VizCesium(state);
   }
 }

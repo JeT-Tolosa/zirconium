@@ -2,7 +2,7 @@ import {
   ZirconObject,
   ZirconObjectEventRegistry,
   ZirconObjectState,
-} from '../zircon-object';
+} from './zircon-object';
 import {
   MergePickEvents,
   MergeZirconRegistries,
@@ -78,33 +78,29 @@ export abstract class ZirconEngine<
     });
   }
 
-  private onENGINE_START_REQUEST(engineId: string): void {
-    if (engineId === this.getId()) {
-      this.start()
-        .then(() => {
-          this.emit('ENGINE_STARTED', { engineId: engineId });
-        })
-        .catch((error: string) => {
-          this.emit('ENGINE_START_ERROR', {
-            engineId: engineId,
-            error: error,
-          });
-        });
+  private async onENGINE_START_REQUEST(engineId: string) {
+    if (engineId !== this.getId()) return;
+    try {
+      await this.stop();
+      this.emit('ENGINE_STARTED', { engineId: engineId });
+    } catch (error) {
+      this.emit('ENGINE_START_ERROR', {
+        engineId: engineId,
+        error: error.toString(),
+      });
     }
   }
 
-  private onENGINE_STOP_REQUEST(engineId: string): void {
-    if (engineId === this.getId()) {
-      this.stop()
-        .then(() => {
-          this.emit('ENGINE_STOPPED', { engineId: engineId });
-        })
-        .catch((error: string) => {
-          this.emit('ENGINE_STOP_ERROR', {
-            engineId: engineId,
-            error: error,
-          });
-        });
+  private async onENGINE_STOP_REQUEST(engineId: string) {
+    if (engineId !== this.getId()) return;
+    try {
+      await this.stop();
+      this.emit('ENGINE_STOPPED', { engineId: engineId });
+    } catch (error) {
+      this.emit('ENGINE_STOP_ERROR', {
+        engineId: engineId,
+        error: error.toString(),
+      });
     }
   }
 
@@ -112,16 +108,14 @@ export abstract class ZirconEngine<
     return this._started;
   }
 
-  public start(): Promise<void> {
-    return this.onStart().then(() => {
-      this._started = true;
-    });
+  public async start(): Promise<void> {
+    await this.onStart();
+    this._started = true;
   }
 
-  public stop(): Promise<void> {
-    return this.onStop().then(() => {
-      this._started = false;
-    });
+  public async stop(): Promise<void> {
+    await this.onStop();
+    this._started = false;
   }
 
   protected abstract onStart(): Promise<void>;

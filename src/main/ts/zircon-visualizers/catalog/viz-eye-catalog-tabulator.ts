@@ -23,7 +23,7 @@ import {
   ZirconViz,
   ZirconVizEventRegistry,
 } from '../../zirconium/zircon-ui/zircon-visualizer';
-import { ZirconObjectState } from '../../zirconium/zircon-object';
+import { ZirconObjectState } from '../../zirconium/zircon-core/zircon-object';
 
 /**
  * Events definition for Catalog Tabulator

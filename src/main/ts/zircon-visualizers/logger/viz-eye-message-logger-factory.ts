@@ -1,22 +1,18 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
-import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
-import { VizMessageLogger } from './viz-eye-message-logger';
+import {
+  VizMessageLogger,
+  VizMessageLoggerState,
+} from './viz-eye-message-logger';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 
-export class VizMessageLoggerFactory extends ZirconObjectFactory {
+export class VizMessageLoggerFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizMessageLoggerFactory');
+    super(VizMessageLogger.MESSAGE_LOGGER_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [VizMessageLogger.MESSAGE_LOGGER_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(
-    state: ZirconVizState,
+  public override async createObject(
+    state: VizMessageLoggerState,
   ): Promise<VizMessageLogger> {
-    return Promise.resolve().then(() => {
-      const viz = new VizMessageLogger(state);
-      return viz;
-    });
+    return new VizMessageLogger(state);
   }
 }

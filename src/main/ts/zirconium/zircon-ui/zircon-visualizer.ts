@@ -2,9 +2,10 @@ import {
   ZirconObject,
   ZirconObjectState,
   ZirconObjectEventRegistry,
-} from '../zircon-object';
+} from '../zircon-core/zircon-object';
 import { MergeZirconRegistries, PickEvents } from '../zircon-event';
 import { ZirconVizWindow } from './zircon-viz-window';
+import { ZIRCON_VISUALIZER_TYPE } from '../zircon-core/zircon-types';
 
 /**
  * Base state for all zircon objects UI
@@ -109,6 +110,10 @@ export abstract class ZirconViz<
       vizId: this.__parentWindow.getVisualizerId(),
     });
     this.__parentWindow = null;
+  }
+
+  public override getType(): string {
+    return ZIRCON_VISUALIZER_TYPE;
   }
 
   /**

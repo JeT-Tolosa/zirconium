@@ -2,10 +2,11 @@ import {
   ZirconObject,
   ZirconObjectState,
   ZirconObjectEventRegistry,
-} from '../zircon-object';
+} from './zircon-object';
 import { ZirconApplication } from './zircon-app';
 import { MergeZirconRegistries } from '../zircon-event';
 import { ZIRCON_APP_OBJECT_TYPE } from './zircon-types';
+import pino from 'pino';
 
 /**
  * Base state for all zircon objects UI
@@ -43,6 +44,14 @@ export abstract class ZirconAppObject<
     super(state);
     this._application = app;
     this.setEventDispatcher(app.getEventDispatcher());
+  }
+
+  public override getType(): string {
+    return ZIRCON_APP_OBJECT_TYPE;
+  }
+
+  public getLogger(): pino.Logger {
+    return this.getApplication().getLogger();
   }
 
   protected override listenToEvents(): void {

@@ -9,11 +9,13 @@ import {
   ZirconAppObjectEventRegistry,
 } from '../zircon-core/zircon-app-object';
 import { MergeZirconRegistries, PickEvents } from '../zircon-event';
-import { ZirconObject } from '../zircon-object';
+import { ZirconObject } from '../zircon-core/zircon-object';
 import { ArrayComparisonResult, Zircon } from '../zircon';
-import { ACTIVE_DESKTOP_CLASS, ZirconTypes } from '../zircon-core/zircon-types';
+import {
+  ACTIVE_DESKTOP_CLASS,
+  ZIRCON_DESKTOP_TYPE,
+} from '../zircon-core/zircon-types';
 import { ZirconParamWindow } from '../zircon-params/zircon-param-window';
-import { ZIRCON_DESKTOP_TYPE } from '../zircon-core/zircon-types';
 
 export type ZirconDesktopEvents = {
   DESKTOP_ACTIVATE_REQUEST: { desktopId: string };
@@ -83,6 +85,10 @@ export class ZirconDesktop<
    */
   constructor(app: ZirconApplication, state?: ZirconDesktopState) {
     super(app, state);
+  }
+
+  public override getType(): string {
+    return ZIRCON_DESKTOP_TYPE;
   }
 
   protected override listenToEvents(): void {
@@ -246,24 +252,21 @@ export class ZirconDesktop<
     paramWindow.setParentDesktop(this);
   }
 
-  private displayWindow(windowId: string): Promise<void> {
+  private async displayWindow(windowId: string): Promise<void> {
     if (!windowId) return Promise.resolve();
     const ui: ZirconDesktopUI = this.__displayedWindows[windowId];
     if (ui) return Promise.resolve();
-    return this.getApplication()
-      .getInstance(windowId)
-      .then((obj: ZirconObject) => {
-        const window: ZirconWindow = ZirconTypes.asWindow(obj);
-        if (!window)
-          return Promise.reject(
-            `Cannot display Window with id ${windowId} object is not a Window: type ${obj.getType()}`,
-          );
-        // add Window in desktop
-        const panel: HTMLElement = window.getContainer();
-        this.getContainer().appendChild(panel);
-        window.setParentDesktop(this);
-        this.__displayedWindows[windowId] = { window: window, panel: panel };
-      });
+    const window: ZirconObject =
+      await this.getApplication().getInstance(windowId);
+    if (!(window instanceof ZirconWindow))
+      throw new Error(
+        `Cannot display Window with id ${windowId} object is not a Window: type ${window.getType()}`,
+      );
+    // add Window in desktop
+    const panel: HTMLElement = window.getContainer();
+    this.getContainer().appendChild(panel);
+    window.setParentDesktop(this);
+    this.__displayedWindows[windowId] = { window: window, panel: panel };
   }
 
   private undisplayWindow(windowId: string): boolean {

@@ -1,24 +1,21 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
 import {
   VizGroundStationLoader,
   VizGroundStationLoaderState,
 } from './viz-eye-ground-station-loader';
 
-export class VizGroundStationLoaderFactory extends ZirconObjectFactory {
+export class VizGroundStationLoaderFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizGroundStationLoaderFactory');
+    super(
+      VizGroundStationLoader.VIZ_GROUND_STATION_LOADER_TYPE,
+      SHARP_EYE_VIZ_TYPE,
+    );
   }
 
-  public getHandledTypes(): string[] {
-    return [VizGroundStationLoader.VIZ_GROUND_STATION_LOADER_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: VizGroundStationLoaderState,
   ): Promise<VizGroundStationLoader> {
-    return Promise.resolve().then(() => {
-      const viz = new VizGroundStationLoader(state);
-      return viz;
-    });
+    return new VizGroundStationLoader(state);
   }
 }

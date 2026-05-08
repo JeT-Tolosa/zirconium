@@ -1,19 +1,15 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
 import { VizLeaflet, VizLeafletState } from './viz-eye-leaflet';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 
-export class VizLeafletFactory extends ZirconObjectFactory {
+export class VizLeafletFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizLeafletFactory');
+    super(VizLeaflet.LEAFLET_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [VizLeaflet.LEAFLET_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(state: VizLeafletState): Promise<VizLeaflet> {
-    return Promise.resolve().then(() => {
-      const viz = new VizLeaflet(state);
-      return viz;
-    });
+  public override async createObject(
+    state: VizLeafletState,
+  ): Promise<VizLeaflet> {
+    return new VizLeaflet(state);
   }
 }

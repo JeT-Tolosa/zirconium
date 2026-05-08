@@ -5,6 +5,8 @@ import {
   ZirconVizState,
 } from '../../zirconium/zircon-ui/zircon-visualizer';
 
+export type VizEventLoggerState = ZirconVizState;
+
 interface EventDescriptor {
   event: string;
   args: unknown[];
@@ -22,7 +24,7 @@ export class VizEventLogger extends ZirconViz {
   /**
    * constructor
    */
-  constructor(state?: ZirconVizState) {
+  constructor(state?: VizEventLoggerState) {
     super(state);
   }
 

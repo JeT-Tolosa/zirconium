@@ -12,7 +12,7 @@ import {
   ZirconObject,
   ZirconObjectEvents,
   ZirconObjectState,
-} from '../zircon-object';
+} from './zircon-object';
 import {
   ZirconAppObject,
   ZirconAppObjectEventRegistry,
@@ -33,7 +33,6 @@ import {
   DESKTOPS_MANAGER_CLASS,
   DESKTOPS_SELECTOR_CLASS,
   ZIRCON_DESKTOP_MANAGER_TYPE,
-  ZirconTypes,
 } from './zircon-types';
 
 export interface ZirconDesktopManagerState extends ZirconObjectState {
@@ -166,7 +165,7 @@ export class ZirconDesktopManager<
     state: ZirconObjectState,
   ): void {
     if (state.type === ZIRCON_DESKTOP_MANAGER_TYPE) {
-      this.setState(ZirconTypes.asDesktopManagerState(state));
+      this.setState(state as ZirconDesktopManagerState);
       return;
     }
   }
@@ -252,11 +251,12 @@ export class ZirconDesktopManager<
     return this.getApplication()
       .getInstance(desktopId)
       .then((obj: ZirconObject) => {
-        const desktop: ZirconDesktop = ZirconTypes.asDesktop(obj);
-        if (!desktop)
-          return Promise.reject(
+        if (!(obj instanceof ZirconDesktop)) {
+          throw new Error(
             `Cannot display desktop with id ${desktopId} object is not a desktop: type ${obj.getType()}`,
           );
+        }
+        const desktop: ZirconDesktop = obj;
         // add desktop in desktop container
         const desktopElement = desktop.getContainer();
         this.getDesktopsContainer().appendChild(desktopElement);

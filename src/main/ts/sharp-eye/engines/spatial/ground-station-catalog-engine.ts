@@ -17,7 +17,9 @@ export class GroundStationCatalogEngine extends CatalogEngine<GroundStation> {
   public static readonly GROUND_STATION_CATALOG_ENGINE_TYPE =
     'ground-station-catalog-engine';
 
-  constructor(name: string) {
+  constructor(
+    name: string = GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE,
+  ) {
     super(name, GROUND_STATION_TYPE, groundStationIndexationMethod);
   }
 

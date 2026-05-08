@@ -1,24 +1,18 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 import {
   VizSatCatLoader,
   VizSatCatLoaderState,
 } from './viz-eye-satellite-loader';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
 
-export class VizSatCatLoaderFactory extends ZirconObjectFactory {
+export class VizSatCatLoaderFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizSatCatLoaderFactory');
+    super(VizSatCatLoader.VIZ_SAT_CAT_LOADER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [VizSatCatLoader.VIZ_SAT_CAT_LOADER_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: VizSatCatLoaderState,
   ): Promise<VizSatCatLoader> {
-    return Promise.resolve().then(() => {
-      const viz = new VizSatCatLoader(state);
-      return viz;
-    });
+    return new VizSatCatLoader(state);
   }
 }

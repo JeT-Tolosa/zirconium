@@ -1,21 +1,15 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 import { AnalogClock, AnalogClockState } from './analog-clock';
 
-export class AnalogClockFactory extends ZirconObjectFactory {
+export class AnalogClockFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('AnalogClockFactory');
+    super(AnalogClock.ANALOG_CLOCK_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [AnalogClock.ANALOG_CLOCK_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: AnalogClockState,
   ): Promise<AnalogClock> {
-    return Promise.resolve().then(() => {
-      const viz = new AnalogClock(state);
-      return viz;
-    });
+    return new AnalogClock(state);
   }
 }

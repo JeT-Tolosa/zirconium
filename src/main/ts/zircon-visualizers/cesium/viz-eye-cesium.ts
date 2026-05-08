@@ -25,7 +25,7 @@ const CESIUM_TOKEN: string =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MTQ3MzJjOS1jY2MwLTRiOGUtYTU5Ny1kNTMxNTQ2MDIxOGIiLCJpZCI6Mzk2Mzc0LCJpYXQiOjE3NzI0MTE2OTB9.O-0_Gu3rYf-7ijUGGlWZtrybQ3OhKMtx0mjBidAcBIw';
 
 export class VizCesium extends ZirconViz {
-  public static readonly CESIUM_VISUALIZER_TYPE = 'CESIUM_VISUALIZER_TYPE';
+  public static readonly CESIUM_VISUALIZER_TYPE = 'cesium-visualizer';
   private _mainDiv: HTMLDivElement = null;
   private _token: string = CESIUM_TOKEN;
   private _viewer: Cesium.Viewer = null;

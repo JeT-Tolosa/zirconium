@@ -1,19 +1,13 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 import { VizFetch, VizFetchState } from './viz-eye-fetch';
 
-export class VizFetchFactory extends ZirconObjectFactory {
+export class VizFetchFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizFetchFactory');
+    super(VizFetch.FETCH_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [VizFetch.FETCH_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(state: VizFetchState): Promise<VizFetch> {
-    return Promise.resolve().then(() => {
-      const viz = new VizFetch(state);
-      return viz;
-    });
+  public override async createObject(state: VizFetchState): Promise<VizFetch> {
+    return new VizFetch(state);
   }
 }

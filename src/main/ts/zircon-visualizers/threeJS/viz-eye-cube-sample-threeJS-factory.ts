@@ -1,24 +1,21 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
 import {
   VizCubeSampleThreeJS,
   VizCubeSampleThreeJSState,
 } from './viz-eye-cube-sample-threeJS';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 
-export class VizCubeSampleThreeJSFactory extends ZirconObjectFactory {
+export class VizCubeSampleThreeJSFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizCubeSampleThreeJSFactory');
+    super(
+      VizCubeSampleThreeJS.CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE,
+      SHARP_EYE_VIZ_TYPE,
+    );
   }
 
-  public getHandledTypes(): string[] {
-    return [VizCubeSampleThreeJS.CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: VizCubeSampleThreeJSState,
   ): Promise<VizCubeSampleThreeJS> {
-    return Promise.resolve().then(() => {
-      const viz = new VizCubeSampleThreeJS(state);
-      return viz;
-    });
+    return new VizCubeSampleThreeJS(state);
   }
 }

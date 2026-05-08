@@ -8,6 +8,8 @@ import {
 import { ZirconContextMenuFactory } from './zircon-context-menu-factory';
 import { ZirconApplication } from '../zircon-core/zircon-app';
 
+const ZIRCON_CONTEXT_MENU_TYPE: string = 'zircon-context-menu';
+
 export type ZirconContextMenuItem = {
   label: string;
   action?: () => void;
@@ -34,6 +36,10 @@ export class ZirconContextMenu<
     this._menu.classList.add('zircon-context-menu');
     this._menu.id = `context-menu-${uuid()}`;
     document.body.appendChild(this._menu);
+  }
+
+  public override getType(): string {
+    return ZIRCON_CONTEXT_MENU_TYPE;
   }
 
   /**
@@ -172,8 +178,8 @@ export class ZirconContextMenu<
     ) {
       const element: Element = elements[elementIndex];
       const factories: ZirconContextMenuFactory[] = this.getApplication()
-        .getContextMenuFactoryRegistry()
-        .getFactories();
+        .getObjectManager()
+        .getContextMenuFactories();
 
       factories?.forEach((factory) => {
         if (!factory.handledThisElement(element)) return;

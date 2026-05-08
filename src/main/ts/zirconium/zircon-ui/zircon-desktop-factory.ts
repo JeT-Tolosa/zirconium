@@ -1,25 +1,27 @@
-import { ZIRCON_DESKTOP_TYPE } from '../zircon-core/zircon-types';
 import { ZirconApplication } from '../zircon-core/zircon-app';
-import { ZirconObjectFactory } from '../zircon-object-factory';
 import { ZirconDesktop, ZirconDesktopState } from './zircon-desktop';
+import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
+import { ZirconContextMenuFactoryDesktop } from '../zircon-menu/zircon-desktop-context-menu-factory';
+import {
+  ZIRCON_APP_OBJECT_TYPE,
+  ZIRCON_DESKTOP_TYPE,
+} from '../zircon-core/zircon-types';
+import { ZirconObjectFactory } from '../zircon-core/zircon-object-factory';
 
-export class ZirconDesktopFactory extends ZirconObjectFactory {
+export class ZirconDesktopFactory implements ZirconObjectFactory {
   private _app: ZirconApplication = null;
 
+  public name = `zircon-desktop-factory`;
+  public type = ZIRCON_DESKTOP_TYPE;
+  public ancestorType: string = ZIRCON_APP_OBJECT_TYPE;
+  public contextMenuFactory: ZirconContextMenuFactory =
+    new ZirconContextMenuFactoryDesktop(this._app);
+
   constructor(app: ZirconApplication) {
-    super('ZirconDesktopFactory');
     this._app = app;
   }
 
-  public override getHandledTypes(): string[] {
-    return [ZIRCON_DESKTOP_TYPE];
-  }
-
-  public override createInstance(
-    state: ZirconDesktopState,
-  ): Promise<ZirconDesktop> {
-    return Promise.resolve().then(() => {
-      return new ZirconDesktop(this._app, state);
-    });
+  public async create(state: ZirconDesktopState): Promise<ZirconDesktop> {
+    return new ZirconDesktop(this._app, state);
   }
 }

@@ -1,10 +1,11 @@
 import { v4 as uuid } from 'uuid';
 import { ZirconApplication } from '../zircon-core/zircon-app';
-import { ZirconObject } from '../zircon-object';
+import { ZirconObject } from '../zircon-core/zircon-object';
 import { ZirconDesktop, ZirconDesktopState } from '../zircon-ui/zircon-desktop';
 import { ZirconVizWindowState } from '../zircon-ui/zircon-viz-window';
 import { ZirconContextMenuItem } from './zircon-context-menu';
 import { ZirconContextMenuFactory } from './zircon-context-menu-factory';
+import { ZIRCON_VISUALIZER_WINDOW_TYPE } from '../zircon-core/zircon-types';
 
 /**
  *
@@ -45,7 +46,7 @@ export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
             action: () => {
               const windowState: ZirconVizWindowState = {
                 id: `user-window-${uuid()}`,
-                type: 'ZIRCON_VISUALIZER_WINDOW_TYPE',
+                type: ZIRCON_VISUALIZER_WINDOW_TYPE,
                 name: `user window`,
                 width: 300,
                 height: 300,

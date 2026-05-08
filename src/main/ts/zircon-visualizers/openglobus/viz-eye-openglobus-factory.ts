@@ -1,21 +1,15 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
 import { VizOpenGlobus, VizOpenGlobusState } from './viz-eye-openglobus';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 
-export class VizOpenGlobusFactory extends ZirconObjectFactory {
+export class VizOpenGlobusFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizOpenGlobusFactory');
+    super(VizOpenGlobus.OPENGLOBUS_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [VizOpenGlobus.OPENGLOBUS_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: VizOpenGlobusState,
   ): Promise<VizOpenGlobus> {
-    return Promise.resolve().then(() => {
-      const viz = new VizOpenGlobus(state);
-      return viz;
-    });
+    return new VizOpenGlobus(state);
   }
 }

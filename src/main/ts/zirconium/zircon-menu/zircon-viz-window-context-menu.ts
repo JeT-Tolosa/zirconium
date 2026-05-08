@@ -1,10 +1,7 @@
 import { ZirconApplication } from '../zircon-core/zircon-app';
-import { ZirconObject } from '../zircon-object';
-import { ZirconViz } from '../zircon-ui/zircon-visualizer';
-import {
-  ZirconVizWindow,
-  ZirconVizWindowState,
-} from '../zircon-ui/zircon-viz-window';
+import { ZIRCON_VISUALIZER_TYPE } from '../zircon-core/zircon-types';
+import { ZirconObject } from '../zircon-core/zircon-object';
+import { ZirconVizWindow } from '../zircon-ui/zircon-viz-window';
 import { ZirconContextMenuItem } from './zircon-context-menu';
 import { ZirconContextMenuFactory } from './zircon-context-menu-factory';
 
@@ -48,29 +45,45 @@ export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory 
             },
           },
 
+          // {
+          //   label: 'change visualizer',
+          //   children: Object.keys(
+          //     this.getApplication().getRegisteredObjectStates(),
+          //   ).map((objId: string) => {
+          //     const obj: ZirconViz =
+          //       this.getApplication().getExistingViz(objId);
+          //     return {
+          //       label: `${objId} (${obj == null ? 'not used' : `used in ${obj.getParentWindow()?.getId()}`})`,
+          //       action: () => {
+          //         this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
+          //           objectId: window.getId(),
+          //           state: {
+          //             ...window.generateCurrentState(),
+          //             vizId: objId,
+          //           } as ZirconVizWindowState,
+          //         });
+          //       },
+          //     };
+          //   }),
+          // },
           {
-            label: 'change visualizer',
+            label: 'new visualizer',
             children: Object.keys(
-              this.getApplication().getRegisteredObjectStates(),
-            ).map((objId: string) => {
-              const obj: ZirconViz =
-                this.getApplication().getExistingViz(objId);
-              return {
-                label: `${objId} (${obj == null ? 'not used' : `used in ${obj.getParentWindow()?.getId()}`})`,
-                action: () => {
-                  this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
-                    objectId: window.getId(),
-                    state: {
-                      ...window.generateCurrentState(),
-                      vizId: objId,
-                    } as ZirconVizWindowState,
-                  });
-                },
-              };
+              this.getApplication()
+                .getObjectManager()
+                .getChildrenObjectTypes(ZIRCON_VISUALIZER_TYPE),
+            ).map((vizType: string) => {
+              return this.createMenuElementNewViz(vizType);
             }),
           },
         ],
       },
     ];
+  }
+
+  private createMenuElementNewViz(vizType: string): ZirconContextMenuItem {
+    return {
+      label: `${vizType}`,
+    };
   }
 }

@@ -143,9 +143,9 @@ export class ZirconVizWindow<
     };
     const paramWindow = new ZirconParamWindow(
       this.getApplication(),
-      this,
       paramWindowState,
     );
+    paramWindow.setWindow(this);
     this.getParentDesktop().displayParamWindow(paramWindow);
     return false;
   }

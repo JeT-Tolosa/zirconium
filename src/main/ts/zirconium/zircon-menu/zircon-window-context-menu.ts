@@ -1,5 +1,5 @@
 import { ZirconApplication } from '../zircon-core/zircon-app';
-import { ZirconObject } from '../zircon-object';
+import { ZirconObject } from '../zircon-core/zircon-object';
 import { ZirconWindow } from '../zircon-ui/zircon-window';
 import { ZirconContextMenuItem } from './zircon-context-menu';
 import { ZirconContextMenuFactory } from './zircon-context-menu-factory';

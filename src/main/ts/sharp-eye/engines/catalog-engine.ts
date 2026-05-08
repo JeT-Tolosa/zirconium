@@ -142,7 +142,7 @@ export interface CatalogEngineState extends ZirconEngineState {
 /**
  * Element Catalog Zircon Core object
  */
-export class CatalogEngine<
+export abstract class CatalogEngine<
   CatalogElement,
   R extends CatalogEngineEventRegistry<CatalogElement> =
     CatalogEngineEventRegistry<CatalogElement>,

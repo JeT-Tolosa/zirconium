@@ -3,7 +3,7 @@ import {
   ZIRCON_TARGET_DESKTOP_ID,
   ZirconApplication,
 } from '../zircon-core/zircon-app';
-import { ZirconObject, ZirconObjectState } from '../zircon-object';
+import { ZirconObject, ZirconObjectState } from '../zircon-core/zircon-object';
 import {
   ZirconAppObjectEventRegistry,
   ZirconAppObject,
@@ -17,6 +17,7 @@ import {
 } from '../zircon-event';
 import { ZirconDesktop } from './zircon-desktop';
 import { ZirconHelper } from '../zircon-helper';
+import { ZIRCON_WINDOW_TYPE } from '../zircon-core/zircon-types';
 
 export type ZirconWindowEvents = {
   WINDOW_SET_PARENT_DESKTOP_DONE: {
@@ -110,6 +111,10 @@ export abstract class ZirconWindow<
 
   constructor(app: ZirconApplication, state?: ZirconWindowState) {
     super(app, state);
+  }
+
+  public override getType(): string {
+    return ZIRCON_WINDOW_TYPE;
   }
 
   protected override listenToEvents(): void {

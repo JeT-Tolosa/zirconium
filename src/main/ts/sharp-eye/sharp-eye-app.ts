@@ -80,8 +80,13 @@ import { ZirconVizWindowState } from '../zirconium/zircon-ui/zircon-viz-window';
 import {
   ZIRCON_DESKTOP_MANAGER_TYPE,
   ZIRCON_DESKTOP_TYPE,
+  ZIRCON_ENGINE_TYPE,
+  ZIRCON_VISUALIZER_TYPE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
 } from '../zirconium/zircon-core/zircon-types';
+
+export const SHARP_EYE_ENGINE_TYPE = ZIRCON_ENGINE_TYPE;
+export const SHARP_EYE_VIZ_TYPE = ZIRCON_VISUALIZER_TYPE;
 
 export class SharpEyedApp extends ZirconApplication {
   /**
@@ -92,33 +97,34 @@ export class SharpEyedApp extends ZirconApplication {
     this.setUIClass('sharp-eye-ui');
   }
 
-  private registerEngines(): void {
-    this.registerObjectFactory(new SatelliteCatalogEngineFactory());
-    this.registerObjectFactory(new GroundStationCatalogEngineFactory());
-    this.registerObjectFactory(new TimeManagerEngineFactory());
+  private async registerEngines(): Promise<void> {
+    await this.registerObjectFactory(new SatelliteCatalogEngineFactory());
+    await this.registerObjectFactory(new GroundStationCatalogEngineFactory());
+    await this.registerObjectFactory(new TimeManagerEngineFactory());
 
-    this.registerEngineState({
+    this.registerObjectState({
       id: `time-manager-${uuid()}`,
       type: TimeManagerEngine.TIME_MANAGER_ENGINE_TYPE,
       timeDescriptor: TimingHelper.createRealTimeDescriptor(),
     } as TimeManagerEngineState);
 
-    this.registerEngineState({
+    this.registerObjectState({
       id: `satellite-catalog-${uuid()}`,
       type: SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE,
     } as SatelliteCatalogEngineState);
 
-    this.registerEngineState({
+    this.registerObjectState({
       id: `gs-catalog-${uuid()}`,
       type: GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE,
     } as GroundStationCatalogEngineState);
   }
 
-  public create(): void {
-    this.registerEngines();
-    this.registerVisualizers();
+  public async create(): Promise<void> {
+    await this.registerEngines();
+    await this.registerVisualizers();
     this.registerVisualizerStates();
 
+    // TODO: la creation du DesktopManager n'a rien a foutre là. Il faut que ce soit dans ZirconApp
     const desktopManagerState: ZirconDesktopManagerState = {
       type: ZIRCON_DESKTOP_MANAGER_TYPE,
       id: this.getDesktopManagerId(),
@@ -132,43 +138,45 @@ export class SharpEyedApp extends ZirconApplication {
     this.registerObjectState(desktopManagerState);
   }
 
-  public registerVisualizers(): void {
+  public async registerVisualizers(): Promise<void> {
     // 3D Visualizers
-    this.registerObjectFactory(new VizCesiumFactory());
-    this.registerObjectFactory(new VizLeafletFactory());
-    this.registerObjectFactory(new VizOpenGlobusFactory());
+    await this.registerObjectFactory(new VizCesiumFactory());
+    await this.registerObjectFactory(new VizLeafletFactory());
+    await this.registerObjectFactory(new VizOpenGlobusFactory());
 
     // Three.js Visualizers
-    this.registerObjectFactory(new VizCubeSampleThreeJSFactory());
-    this.registerObjectFactory(new VizHelmetSampleThreeJSFactory());
+    await this.registerObjectFactory(new VizCubeSampleThreeJSFactory());
+    await this.registerObjectFactory(new VizHelmetSampleThreeJSFactory());
 
     // Chart.js Visualizers
-    this.registerObjectFactory(new VizBarJSChartFactory());
-    this.registerObjectFactory(new VizBubbleJSChartFactory());
-    this.registerObjectFactory(new VizLineJSChartFactory());
-    this.registerObjectFactory(new VizPieJSChartFactory());
-    this.registerObjectFactory(new VizRadarJSChartFactory());
-    this.registerObjectFactory(new VizScatterJSChartFactory());
+    await this.registerObjectFactory(new VizBarJSChartFactory());
+    await this.registerObjectFactory(new VizBubbleJSChartFactory());
+    await this.registerObjectFactory(new VizLineJSChartFactory());
+    await this.registerObjectFactory(new VizPieJSChartFactory());
+    await this.registerObjectFactory(new VizRadarJSChartFactory());
+    await this.registerObjectFactory(new VizScatterJSChartFactory());
 
     // Logger Visualizers
-    this.registerObjectFactory(new VizEventLoggerFactory());
-    this.registerObjectFactory(new VizMessageLoggerFactory());
+    await this.registerObjectFactory(new VizEventLoggerFactory());
+    await this.registerObjectFactory(new VizMessageLoggerFactory());
 
     // Time Visualizers
-    this.registerObjectFactory(new DigitalClockFactory());
-    this.registerObjectFactory(new AnalogClockFactory());
-    this.registerObjectFactory(new TimeControllerFactory());
+    await this.registerObjectFactory(new DigitalClockFactory());
+    await this.registerObjectFactory(new AnalogClockFactory());
+    await this.registerObjectFactory(new TimeControllerFactory());
 
     // Spatial Loaders
-    this.registerObjectFactory(new VizSatCatLoaderFactory());
-    this.registerObjectFactory(new VizGroundStationLoaderFactory());
+    await this.registerObjectFactory(new VizSatCatLoaderFactory());
+    await this.registerObjectFactory(new VizGroundStationLoaderFactory());
 
     // Spatial Catalogs
-    this.registerObjectFactory(new VizSatelliteCatalogTabulatorFactory());
-    this.registerObjectFactory(new VizGroundStationCatalogTabulatorFactory());
+    await this.registerObjectFactory(new VizSatelliteCatalogTabulatorFactory());
+    await this.registerObjectFactory(
+      new VizGroundStationCatalogTabulatorFactory(),
+    );
 
     // Existing Fetch Visualizer
-    this.registerObjectFactory(new VizFetchFactory());
+    await this.registerObjectFactory(new VizFetchFactory());
   }
 
   public registerVisualizerStates(): void {

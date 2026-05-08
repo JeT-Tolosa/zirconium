@@ -1,24 +1,21 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 import {
   VizHelmetSampleThreeJS,
   VizHelmetSampleThreeJSState,
 } from './viz-eye-helmet-sample-threeJS';
 
-export class VizHelmetSampleThreeJSFactory extends ZirconObjectFactory {
+export class VizHelmetSampleThreeJSFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizHelmetSampleThreeJSFactory');
+    super(
+      VizHelmetSampleThreeJS.HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE,
+      SHARP_EYE_VIZ_TYPE,
+    );
   }
 
-  public getHandledTypes(): string[] {
-    return [VizHelmetSampleThreeJS.HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: VizHelmetSampleThreeJSState,
   ): Promise<VizHelmetSampleThreeJS> {
-    return Promise.resolve().then(() => {
-      const viz = new VizHelmetSampleThreeJS(state);
-      return viz;
-    });
+    return new VizHelmetSampleThreeJS(state);
   }
 }

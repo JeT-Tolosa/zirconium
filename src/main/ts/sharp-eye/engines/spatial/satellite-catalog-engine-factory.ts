@@ -1,26 +1,21 @@
-import { ZirconObjectFactory } from '../../../zirconium/zircon-object-factory';
+import { SimpleZirconObjectFactory } from '../../../zirconium/zircon-core/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye-app';
 import {
   SatelliteCatalogEngine,
   SatelliteCatalogEngineState,
 } from './satellite-catalog-engine';
 
-/**
- * Satellite Catalog Zircon Core object Factory
- */
-export class SatelliteCatalogEngineFactory extends ZirconObjectFactory {
+export class SatelliteCatalogEngineFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('SatelliteCatalogEngineFactory');
+    super(
+      SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE,
+      SHARP_EYE_VIZ_TYPE,
+    );
   }
 
-  public override getHandledTypes(): string[] {
-    return [SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: SatelliteCatalogEngineState,
   ): Promise<SatelliteCatalogEngine> {
-    return Promise.resolve().then(() => {
-      return new SatelliteCatalogEngine(state.name);
-    });
+    return new SatelliteCatalogEngine(state?.name);
   }
 }

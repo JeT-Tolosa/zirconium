@@ -1,21 +1,15 @@
-import { ZirconObjectFactory } from '../../zirconium/zircon-object-factory';
+import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 import { VizPieJSChart, VizPieJSChartState } from './pie-jschart';
 
-export class VizPieJSChartFactory extends ZirconObjectFactory {
+export class VizPieJSChartFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super('VizPieJSChartFactory');
+    super(VizPieJSChart.PIE_JSCHART_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
   }
 
-  public getHandledTypes(): string[] {
-    return [VizPieJSChart.PIE_JSCHART_VISUALIZER_TYPE];
-  }
-
-  public override createInstance(
+  public override async createObject(
     state: VizPieJSChartState,
   ): Promise<VizPieJSChart> {
-    return Promise.resolve().then(() => {
-      const viz = new VizPieJSChart(state);
-      return viz;
-    });
+    return new VizPieJSChart(state);
   }
 }

@@ -25,22 +25,18 @@ export type ZirconParamWindowEventRegistry = MergeZirconRegistries<
 export class ZirconParamWindow<
   R extends ZirconWindowEventRegistry = ZirconWindowEventRegistry,
 > extends ZirconWindow<R> {
-  // TODO: uncomment next line
-  //   public static readonly ZIRCON_WINDOW_PARAMETERS_TYPE =
-  //     ZIRCON_WINDOW_PARAMETERS_TYPE;
   public _window: ZirconWindow = null;
+  public __windowPanel: IJSPanelInstance = null;
 
-  constructor(
-    app: ZirconApplication,
-    window: ZirconWindow,
-    state?: ZirconWindowState,
-  ) {
+  constructor(app: ZirconApplication, state?: ZirconWindowState) {
     super(app, state);
-    this._window = window;
   }
 
   public setWindow(window: ZirconWindow): void {
+    // TODO remove previous display if necessary
     this._window = window;
+    if (this.__windowPanel)
+      this._window.displayParameters(this.__windowPanel.content);
   }
 
   public override getType(): string {
@@ -53,6 +49,7 @@ export class ZirconParamWindow<
         `panel should not be null in Param window Creation ID: ${this.getId()}`,
       );
     panel.classList.add(ZIRCON_PARAMETER_WINDOW_CLASS);
+    this.__windowPanel = panel;
     this._window?.displayParameters(panel.content);
   }
 }
