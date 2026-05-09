@@ -1,4 +1,8 @@
 import { ZirconApplication } from './zircon-core/zircon-app';
+import {
+  ZIRCON_DESKTOP_TYPE,
+  ZIRCON_WINDOW_TYPE,
+} from './zircon-core/zircon-types';
 import { ZirconDesktop } from './zircon-ui/zircon-desktop';
 import { ZirconWindow } from './zircon-ui/zircon-window';
 
@@ -14,10 +18,16 @@ export class ZirconHelper {
     windowId: string,
     targetDesktopId: string,
   ): Promise<void> {
-    const window: ZirconWindow = application.getExistingVizWindow(windowId);
+    const window: ZirconWindow = application
+      .getObjectManager()
+      .getExistingInstance(windowId, ZIRCON_WINDOW_TYPE) as ZirconWindow;
     const sourceDesktop: ZirconDesktop = window.getParentDesktop();
-    const targetDesktop: ZirconDesktop =
-      application.getExistingDesktop(targetDesktopId);
+    const targetDesktop: ZirconDesktop = application
+      .getObjectManager()
+      .getExistingInstance(
+        targetDesktopId,
+        ZIRCON_DESKTOP_TYPE,
+      ) as ZirconDesktop;
     if (!window) {
       console.error(`Moving window: Window with ID ${windowId} not found.`);
       return;

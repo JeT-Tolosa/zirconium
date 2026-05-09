@@ -88,7 +88,7 @@ export abstract class VizJSChart<
     }
     this._chart = new Chart(canvas, {
       type: this.getChartType(),
-      data: this.getSeries().getData(),
+      data: this.getSeries()?.getData(),
       options: this.getChartOptions(),
     });
   }

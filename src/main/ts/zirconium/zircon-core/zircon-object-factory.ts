@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { jQueryFactory } from 'jquery/factory';
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
-import { ZirconObjectState } from './zircon-object';
+import { ZirconObject, ZirconObjectState } from './zircon-object';
 
 export interface ZirconObjectFactory {
   name: string;
   type: string;
   ancestorType: string;
-  create: (state: any) => Promise<any>;
+  create: (state: ZirconObjectState) => Promise<ZirconObject> | null;
   contextMenuFactory: ZirconContextMenuFactory;
 }
 
@@ -14,7 +15,7 @@ export function createObjectFactory(
   name: string,
   type: string,
   ancestorType: string,
-  create: (state: any) => Promise<any>,
+  create: (state: ZirconObjectState) => Promise<ZirconObject> | null = null,
   contextMenuFactory: ZirconContextMenuFactory = null,
 ) {
   return {
@@ -31,10 +32,14 @@ export class ZirconFactoriesRegistry {
 
   constructor() {}
 
-  public registerObjectFactory(record: ZirconObjectFactory): boolean {
-    if (!record) return false;
-    if (this._objectFactories[record.type]) return false;
-    this._objectFactories[record.type] = record;
+  public registerObjectFactory(factory: ZirconObjectFactory): boolean {
+    if (!factory) return false;
+    if (!factory.type)
+      throw new Error(
+        `Asked to register a valid factory with invalid type ... factory = ${jQueryFactory.name}`,
+      );
+    if (this._objectFactories[factory.type]) return false;
+    this._objectFactories[factory.type] = factory;
     return true;
   }
 
@@ -65,10 +70,9 @@ export class ZirconFactoriesRegistry {
     return Object.keys(this._objectFactories);
   }
 
-  public async createInstance(state: any): Promise<any> {
+  public createInstance(state: any): Promise<any> | null {
     if (!this.isHandled(state)) return null;
-    if (!this._objectFactories[state.type]?.create) return null;
-    return this._objectFactories[state.type]?.create(state);
+    return this._objectFactories[state.type].create(state);
   }
 
   public getContextMenuFactory(type: string): ZirconContextMenuFactory {
@@ -76,9 +80,13 @@ export class ZirconFactoriesRegistry {
   }
 
   public getContextMenuFactories(): ZirconContextMenuFactory[] {
-    return Object.values(this._objectFactories).map((record) => {
-      return record.contextMenuFactory;
-    });
+    return Object.values(this._objectFactories)
+      .map((factory) => {
+        return factory.contextMenuFactory;
+      })
+      .filter((factory) => {
+        return factory !== null;
+      });
   }
 }
 
@@ -93,13 +101,13 @@ export abstract class SimpleZirconObjectFactory implements ZirconObjectFactory {
     this.name = `${type}-factory`;
     this.type = type;
     this.ancestorType = ancestorType;
-    this.create = (state: any) => {
+    this.create = (state: ZirconObjectState) => {
       return this.createObject(state);
     };
-    this.contextMenuFactory = this.createContextMenu();
+    this.contextMenuFactory = null;
   }
 
-  public abstract createObject(state: any): Promise<any>;
+  public abstract createObject(state: ZirconObjectState): Promise<any> | null;
 
   /**
    * default context menu is null. override this method if necessary

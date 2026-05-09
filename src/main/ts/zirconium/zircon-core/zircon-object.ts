@@ -6,6 +6,7 @@ import {
   ZirconRegistry,
 } from '../zircon-event';
 import { ZirconApplicationEvents } from './zircon-app';
+import { ZIRCON_OBJECT_TYPE } from './zircon-types';
 
 type PickEvents<E, K extends keyof E> = {
   [P in K]: E[P];
@@ -44,7 +45,7 @@ export type ZirconObjectEventRegistry = MergeZirconRegistries<
 export interface ZirconObjectState {
   id?: string;
   name?: string;
-  type?: string;
+  type: string;
 }
 
 /**
@@ -144,6 +145,7 @@ export abstract class ZirconObject<
   public generateCurrentState(): ZirconObjectState {
     return {
       id: this._id,
+      type: ZIRCON_OBJECT_TYPE,
     };
   }
 

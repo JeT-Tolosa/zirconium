@@ -1,5 +1,6 @@
 import { ZirconApplication } from '../zircon-core/zircon-app';
 import { ZirconObject } from '../zircon-core/zircon-object';
+import { ZIRCON_WINDOW_TYPE } from '../zircon-core/zircon-types';
 import { ZirconWindow } from '../zircon-ui/zircon-window';
 import { ZirconContextMenuItem } from './zircon-context-menu';
 import { ZirconContextMenuFactory } from './zircon-context-menu-factory';
@@ -20,9 +21,18 @@ export class ZirconContextMenuFactoryWindow extends ZirconContextMenuFactory {
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
     );
     if (!zirconObjectId) return null;
-    const obj: ZirconWindow =
-      this.getApplication().getExistingWindow(zirconObjectId);
-    if (!obj) return;
+    const obj: ZirconObject = this.getApplication()
+      .getObjectManager()
+      .getExistingInstance(zirconObjectId);
+    if (!obj) return null;
+    if (
+      !this.getApplication()
+        .getObjectManager()
+        .isTypeOf(obj.getType(), ZIRCON_WINDOW_TYPE)
+    )
+      return null;
+    if (!(obj instanceof ZirconWindow)) return null;
+
     return obj;
   }
 
@@ -35,7 +45,7 @@ export class ZirconContextMenuFactoryWindow extends ZirconContextMenuFactory {
     if (!window) return null;
     return [
       {
-        label: 'window',
+        label: `window ${window.getName()}`,
         children: [
           {
             label: 'normalize',

@@ -22,8 +22,6 @@ import {
   MergeZirconRegistries,
   PickEvents,
 } from '../zircon-event';
-import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
-import { ZirconContextMenuItem } from '../zircon-menu/zircon-context-menu';
 import { ArrayComparisonResult, Zircon } from '../zircon';
 import { ZirconWindow } from '../zircon-ui/zircon-window';
 import {
@@ -36,7 +34,7 @@ import {
 } from './zircon-types';
 
 export interface ZirconDesktopManagerState extends ZirconObjectState {
-  type?: typeof ZIRCON_DESKTOP_MANAGER_TYPE;
+  type: typeof ZIRCON_DESKTOP_MANAGER_TYPE;
   desktopIds: string[];
 }
 
@@ -57,7 +55,9 @@ export type ZirconDesktopManagerEventRegistry = MergeZirconRegistries<
       [
         PickEvents<
           ZirconDesktopEvents,
-          'DESKTOP_ACTIVATED' | 'DESKTOP_DEACTIVATED'
+          | 'DESKTOP_ACTIVATED'
+          | 'DESKTOP_DEACTIVATED'
+          | 'DESKTOP_ACTIVATE_REQUEST'
         >,
         // PickEvents<ZirconDesktopManagerEvents, 'DESKTOP_MANAGER_STATE'>,
         PickEvents<ZirconObjectEvents, 'OBJECT_NAME_CHANGED'>,
@@ -96,8 +96,8 @@ export class ZirconDesktopManager<
 > extends ZirconAppObject<R> {
   // private __parent: HTMLElement = null;
   private __mainDiv: HTMLDivElement = null;
-  private __dekstopContainer: HTMLDivElement = null;
-  private __dekstopsSelectorContainer: HTMLDivElement = null;
+  private __desktopContainer: HTMLDivElement = null;
+  private __desktopsSelectorContainer: HTMLDivElement = null;
   private __desktopNameContainer: HTMLDivElement = null;
   private __desktopNameSpan: HTMLSpanElement = null;
   // private _currentD: { desktop: ZirconDesktop; button: HTMLElement } = null;
@@ -127,7 +127,7 @@ export class ZirconDesktopManager<
 
   protected override listenToEvents(): void {
     super.listenToEvents();
-    this.addListener('DESKTOP_ACTIVATED', (arg) =>
+    this.addListener('DESKTOP_ACTIVATE_REQUEST', (arg) =>
       this.onDESKTOP_ACTIVATE_REQUEST(arg.desktopId),
     );
     this.addListener('DESKTOP_DEACTIVATED', (arg) =>
@@ -213,7 +213,7 @@ export class ZirconDesktopManager<
   }
 
   public isDisplayed(): boolean {
-    return this.__dekstopContainer !== null;
+    return this.__desktopContainer !== null;
   }
   /**
    * Sets the desktop IDs managed by this desktop manager
@@ -307,6 +307,7 @@ export class ZirconDesktopManager<
     return {
       ...super.generateCurrentState(),
       desktopIds: [...this._desktopIds],
+      type: ZIRCON_DESKTOP_MANAGER_TYPE,
     };
   }
 
@@ -322,8 +323,8 @@ export class ZirconDesktopManager<
    * Gets the array of currently displayed desktops
    * @returns Array of displayed desktop UI objects
    */
-  public getDisplayedDesktops(): ZirconDesktopManagerUI[] {
-    return Object.values(this.__displayedDesktops);
+  public getDisplayedDesktops(): ZirconDesktop[] {
+    return Object.values(this.__displayedDesktops).map((ui) => ui.desktop);
   }
 
   public temporaryMoveWindowPanelToDesktopManager(window: ZirconWindow): void {
@@ -373,6 +374,10 @@ export class ZirconDesktopManager<
   private getMainDiv(): HTMLDivElement {
     if (this.__mainDiv) return this.__mainDiv;
     this.__mainDiv = document.createElement('div');
+    this.__mainDiv.setAttribute(
+      ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
+      this.getId(),
+    );
     this.__mainDiv.classList.add(DESKTOPS_MANAGER_CLASS);
     this.__mainDiv.appendChild(this.getDesktopsSelectorsContainer());
     this.__mainDiv.appendChild(this.getDesktopsContainer());
@@ -384,18 +389,18 @@ export class ZirconDesktopManager<
    * @returns The desktops container div element
    */
   private getDesktopsContainer(): HTMLDivElement {
-    if (this.__dekstopContainer) return this.__dekstopContainer;
-    this.__dekstopContainer = document.createElement('div');
-    this.__dekstopContainer.classList.add(DESKTOPS_CONTAINER_CLASS);
-    this.__dekstopContainer.id = `desktop-container-${this.getId()}`;
+    if (this.__desktopContainer) return this.__desktopContainer;
+    this.__desktopContainer = document.createElement('div');
+    this.__desktopContainer.classList.add(DESKTOPS_CONTAINER_CLASS);
+    this.__desktopContainer.id = `desktop-container-${this.getId()}`;
     this.__desktopNameContainer = document.createElement('div');
     this.__desktopNameContainer.classList.add('desktop-name-container');
     this.__desktopNameSpan = document.createElement('span');
     this.__desktopNameSpan.classList.add('desktop-name');
-    this.__dekstopContainer.appendChild(this.__desktopNameContainer);
+    this.__desktopContainer.appendChild(this.__desktopNameContainer);
     this.__desktopNameContainer.appendChild(this.__desktopNameSpan);
     this.__desktopNameSpan.innerHTML = 'Desktop Name';
-    return this.__dekstopContainer;
+    return this.__desktopContainer;
   }
 
   /**
@@ -403,17 +408,17 @@ export class ZirconDesktopManager<
    * @returns The desktop selectors container div element
    */
   private getDesktopsSelectorsContainer(): HTMLDivElement {
-    if (this.__dekstopsSelectorContainer)
-      return this.__dekstopsSelectorContainer;
-    this.__dekstopsSelectorContainer = document.createElement('div');
-    this.__dekstopsSelectorContainer.classList.add(DESKTOPS_SELECTOR_CLASS);
-    this.__dekstopsSelectorContainer.id = `desktop-selector-${this.getId()}`;
-    this.__dekstopsSelectorContainer.setAttribute(
+    if (this.__desktopsSelectorContainer)
+      return this.__desktopsSelectorContainer;
+    this.__desktopsSelectorContainer = document.createElement('div');
+    this.__desktopsSelectorContainer.classList.add(DESKTOPS_SELECTOR_CLASS);
+    this.__desktopsSelectorContainer.id = `desktop-selector-${this.getId()}`;
+    this.__desktopsSelectorContainer.setAttribute(
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
       this.getId(),
     );
 
-    return this.__dekstopsSelectorContainer;
+    return this.__desktopsSelectorContainer;
   }
 
   /**
@@ -513,73 +518,73 @@ export class ZirconDesktopManager<
   }
 }
 
-/**
- * Context Menu Factory for Desktop Manager
- */
-export class ZirconContextMenuFactoryDesktopManager extends ZirconContextMenuFactory {
-  /**
-   * Constructor for the desktop manager context menu factory
-   * @param appUI The Zircon application instance
-   */
-  constructor(appUI: ZirconApplication) {
-    super(appUI);
-  }
+// /**
+//  * Context Menu Factory for Desktop Manager
+//  */
+// export class ZirconContextMenuFactoryDesktopManager extends ZirconContextMenuFactory {
+//   /**
+//    * Constructor for the desktop manager context menu factory
+//    * @param app The Zircon application instance
+//    */
+//   constructor(app: ZirconApplication) {
+//     super(app);
+//   }
 
-  /**
-   * Gets the associated ZirconDesktopManager from an HTML element
-   * @param element The HTML element to check
-   * @returns The associated desktop manager or null if not found
-   */
-  private getAssociatedZirconDesktopManager(
-    element: Element,
-  ): ZirconDesktopManager {
-    if (!element) return null;
-    if (!(element instanceof HTMLElement)) return null;
-    const htmlElement: HTMLElement = element;
-    const zirconObjectId = htmlElement.getAttribute(
-      ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
-    );
+//   /**
+//    * Gets the associated ZirconDesktopManager from an HTML element
+//    * @param element The HTML element to check
+//    * @returns The associated desktop manager or null if not found
+//    */
+//   private getAssociatedZirconDesktopManager(
+//     element: Element,
+//   ): ZirconDesktopManager {
+//     if (!element) return null;
+//     if (!(element instanceof HTMLElement)) return null;
+//     const htmlElement: HTMLElement = element;
+//     const zirconObjectId = htmlElement.getAttribute(
+//       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
+//     );
 
-    if (zirconObjectId === this.getApplication().getDesktopManager()?.getId()) {
-      return this.getApplication().getDesktopManager();
-    }
-    return null;
-  }
+//     if (zirconObjectId === this.getApplication().getDesktopManager()?.getId()) {
+//       return this.getApplication().getDesktopManager();
+//     }
+//     return null;
+//   }
 
-  /**
-   * Determines if this factory can handle the given element
-   * @param element The HTML element to check
-   * @returns True if this factory can handle the element, false otherwise
-   */
-  public handledThisElement(element: Element): boolean {
-    return this.getAssociatedZirconDesktopManager(element) !== null;
-  }
+//   /**
+//    * Determines if this factory can handle the given element
+//    * @param element The HTML element to check
+//    * @returns True if this factory can handle the element, false otherwise
+//    */
+//   public handledThisElement(element: Element): boolean {
+//     return this.getAssociatedZirconDesktopManager(element) !== null;
+//   }
 
-  /**
-   * Gets the context menu items for the given element
-   * @param element The HTML element to get menu items for
-   * @returns Array of context menu items
-   */
-  public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
-    const desktopManager: ZirconDesktopManager =
-      this.getAssociatedZirconDesktopManager(element);
-    if (!desktopManager) return null;
-    return [
-      {
-        label: 'Desktops',
-        children: desktopManager
-          .getDisplayedDesktops()
-          .map((ui: ZirconDesktopManagerUI) => {
-            return {
-              label: ui.desktop.getName(),
-              action: () => {
-                desktopManager.emit('DESKTOP_ACTIVATE_REQUEST', {
-                  desktopId: ui.desktop.getId(),
-                });
-              },
-            };
-          }),
-      },
-    ];
-  }
-}
+//   /**
+//    * Gets the context menu items for the given element
+//    * @param element The HTML element to get menu items for
+//    * @returns Array of context menu items
+//    */
+//   public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
+//     const desktopManager: ZirconDesktopManager =
+//       this.getAssociatedZirconDesktopManager(element);
+//     if (!desktopManager) return null;
+//     return [
+//       {
+//         label: 'Desktops',
+//         children: desktopManager
+//           .getDisplayedDesktops()
+//           .map((ui: ZirconDesktopManagerUI) => {
+//             return {
+//               label: `Activate ${ui.desktop.getName()}`,
+//               action: () => {
+//                 desktopManager.emit('DESKTOP_ACTIVATE_REQUEST', {
+//                   desktopId: ui.desktop.getId(),
+//                 });
+//               },
+//             };
+//           }),
+//       },
+//     ];
+//   }
+// }

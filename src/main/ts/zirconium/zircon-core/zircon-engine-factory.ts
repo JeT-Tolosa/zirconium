@@ -1,8 +1,7 @@
 import { ZirconApplication } from './zircon-app';
 import { ZirconObjectFactory } from './zircon-object-factory';
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
-import { ZirconContextMenuFactoryDesktop } from '../zircon-menu/zircon-desktop-context-menu-factory';
-import { ZirconEngine, ZirconEngineState } from './zircon-engine';
+import { ZirconEngine } from './zircon-engine';
 import { ZIRCON_ENGINE_TYPE, ZIRCON_OBJECT_TYPE } from './zircon-types';
 
 export class ZirconEngineFactory implements ZirconObjectFactory {
@@ -11,12 +10,17 @@ export class ZirconEngineFactory implements ZirconObjectFactory {
   public name = `zircon-engine-factory`;
   public type = ZIRCON_ENGINE_TYPE;
   public ancestorType: string = ZIRCON_OBJECT_TYPE;
-  public contextMenuFactory: ZirconContextMenuFactory =
-    new ZirconContextMenuFactoryDesktop(this._app);
+  public contextMenuFactory: ZirconContextMenuFactory = null;
 
   constructor(app: ZirconApplication) {
+    if (!app)
+      throw new Error(
+        `parent application cannot be null in ${this.constructor.name} constructor`,
+      );
     this._app = app;
+    this.contextMenuFactory = null;
   }
 
-  create: (_state: ZirconEngineState) => Promise<ZirconEngine> = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  create: (_state: any) => Promise<ZirconEngine> = null;
 }

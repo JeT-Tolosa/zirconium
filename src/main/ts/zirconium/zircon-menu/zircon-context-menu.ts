@@ -170,20 +170,14 @@ export class ZirconContextMenu<
     ];
 
     // Stop at FIRST element handled by a context menu factory
-    let handledbyAtLeastOneFactory: boolean = false;
-    for (
-      let elementIndex = 0;
-      elementIndex < elements.length && !handledbyAtLeastOneFactory;
-      elementIndex++
-    ) {
+    for (let elementIndex = 0; elementIndex < elements.length; elementIndex++) {
       const element: Element = elements[elementIndex];
       const factories: ZirconContextMenuFactory[] = this.getApplication()
         .getObjectManager()
         .getContextMenuFactories();
 
       factories?.forEach((factory) => {
-        if (!factory.handledThisElement(element)) return;
-        handledbyAtLeastOneFactory = true;
+        if (!factory?.handledThisElement(element)) return;
         const objItems: ZirconContextMenuItem[] =
           factory.getContextMenuElements(element);
         if (!objItems) return;

@@ -1,7 +1,7 @@
 import { ZirconApplication } from '../zircon-core/zircon-app';
-import { ZirconDesktop, ZirconDesktopState } from './zircon-desktop';
+import { ZirconDesktop } from './zircon-desktop';
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
-import { ZirconContextMenuFactoryDesktop } from '../zircon-menu/zircon-desktop-context-menu-factory';
+import { ZirconContextMenuFactoryDesktop } from '../zircon-menu/zircon-desktop-context-menu';
 import {
   ZIRCON_APP_OBJECT_TYPE,
   ZIRCON_DESKTOP_TYPE,
@@ -14,14 +14,19 @@ export class ZirconDesktopFactory implements ZirconObjectFactory {
   public name = `zircon-desktop-factory`;
   public type = ZIRCON_DESKTOP_TYPE;
   public ancestorType: string = ZIRCON_APP_OBJECT_TYPE;
-  public contextMenuFactory: ZirconContextMenuFactory =
-    new ZirconContextMenuFactoryDesktop(this._app);
+  public contextMenuFactory: ZirconContextMenuFactory = null;
 
   constructor(app: ZirconApplication) {
+    if (!app)
+      throw new Error(
+        `parent application cannot be null in ${this.constructor.name} constructor`,
+      );
     this._app = app;
+    this.contextMenuFactory = new ZirconContextMenuFactoryDesktop(this._app);
   }
 
-  public async create(state: ZirconDesktopState): Promise<ZirconDesktop> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async create(state: any): Promise<ZirconDesktop> {
     return new ZirconDesktop(this._app, state);
   }
 }

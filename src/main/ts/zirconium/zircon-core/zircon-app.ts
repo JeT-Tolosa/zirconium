@@ -7,11 +7,8 @@ import {
 import { v4 as uuid } from 'uuid';
 
 import 'jspanel4/dist/jspanel.min.css';
-import { ZirconWindow, ZirconWindowEvents } from '../zircon-ui/zircon-window';
-import {
-  ZirconDesktop,
-  ZirconDesktopEvents,
-} from '../zircon-ui/zircon-desktop';
+import { ZirconWindowEvents } from '../zircon-ui/zircon-window';
+import { ZirconDesktopEvents } from '../zircon-ui/zircon-desktop';
 import {
   MergeZirconRegistries,
   MergePickEvents,
@@ -24,25 +21,13 @@ import {
   ZirconVizWindowFactory as ZirconVizWindowFactory,
   ZirconWindowFactory as ZirconWindowFactory,
 } from '../zircon-ui/zircon-window-factory';
-import {
-  ZirconEngine,
-  ZirconEngineEvents,
-  ZirconEngineState,
-} from './zircon-engine';
-import {
-  ZirconVizWindow,
-  ZirconVizWindowEvents,
-} from '../zircon-ui/zircon-viz-window';
+import { ZirconEngine, ZirconEngineEvents } from './zircon-engine';
+import { ZirconVizWindowEvents } from '../zircon-ui/zircon-viz-window';
 import { ZirconParamWindowEvents } from '../zircon-params/zircon-param-window';
-import { ZirconViz } from '../zircon-ui/zircon-visualizer';
 import {
   ZIRCON_DESKTOP_MANAGER_TYPE,
-  ZIRCON_DESKTOP_TYPE,
   ZIRCON_ENGINE_TYPE,
   ZIRCON_OBJECT_TYPE,
-  ZIRCON_VISUALIZER_TYPE,
-  ZIRCON_VISUALIZER_WINDOW_TYPE,
-  ZIRCON_WINDOW_TYPE,
 } from './zircon-types';
 import { ZirconObjectManager } from './zircon-object-manager';
 import { ZirconDesktopFactory } from '../zircon-ui/zircon-desktop-factory';
@@ -75,7 +60,6 @@ export type ZirconApplicationEvents = {
   APPLICATION_STARTED: { applicationId: string };
   SET_OBJECT_STATE_REQUEST: { objectId: string; state: ZirconObjectState };
   OBJECT_STATE_REGISTERED: { state: ZirconObjectState };
-  ENGINE_STATE_REGISTERED: { state: ZirconEngineState };
   UNCAUGHT_EXCEPTION: { error: string };
 };
 
@@ -183,7 +167,7 @@ export class ZirconApplication<
     state: ZirconObjectState,
   ): void {
     if (objectId !== state.id) throw new Error('Object ID mismatch');
-    this.registerObjectState(state);
+    this.getObjectManager().registerObjectState(state);
   }
 
   public getId(): string {
@@ -222,7 +206,8 @@ export class ZirconApplication<
       id: this.getDesktopManagerId(),
       desktopIds: [],
     };
-    this.registerObjectState(desktopManagerState);
+
+    this.getObjectManager().registerObjectState(desktopManagerState);
   }
 
   private registerDefaultFactories(): void {
@@ -236,62 +221,6 @@ export class ZirconApplication<
     // this.registerObjectFactory(
     //   new ZirconParamWindowFactory(this),
     // );
-  }
-
-  // TODO: faire une methode generique getExisting et donner le type d'objet
-
-  public getExistingViz(id: string): ZirconViz {
-    const instance = this.getObjectManager().getExistingInstance(
-      id,
-      ZIRCON_VISUALIZER_TYPE,
-    );
-    if (instance && instance instanceof ZirconViz) return instance;
-    return null;
-  }
-
-  public getExistingVizWindow(id: string): ZirconVizWindow {
-    const instance = this.getObjectManager().getExistingInstance(
-      id,
-      ZIRCON_VISUALIZER_WINDOW_TYPE,
-    );
-    if (instance && instance instanceof ZirconVizWindow) return instance;
-    return null;
-  }
-
-  public getExistingWindow(id: string): ZirconWindow {
-    const instance = this.getObjectManager().getExistingInstance(
-      id,
-      ZIRCON_WINDOW_TYPE,
-    );
-    if (instance && instance instanceof ZirconWindow) return instance;
-    return null;
-  }
-
-  public getExistingEngine(id: string): ZirconEngine {
-    const instance = this.getObjectManager().getExistingInstance(
-      id,
-      ZIRCON_ENGINE_TYPE,
-    );
-    if (instance && instance instanceof ZirconEngine) return instance;
-    return null;
-  }
-
-  public getExistingDesktop(id: string): ZirconDesktop {
-    const instance = this.getObjectManager().getExistingInstance(
-      id,
-      ZIRCON_DESKTOP_TYPE,
-    );
-    if (instance && instance instanceof ZirconDesktop) return instance;
-    return null;
-  }
-
-  public getExistingObject(id: string): ZirconObject {
-    const instance = this.getObjectManager().getExistingInstance(
-      id,
-      ZIRCON_OBJECT_TYPE,
-    );
-    if (instance && instance instanceof ZirconObject) return instance;
-    return null;
   }
 
   public getContextMenu(): ZirconContextMenu {
@@ -385,28 +314,22 @@ export class ZirconApplication<
   }
 
   public registerObjectState(state: ZirconObjectState): boolean {
-    if (!this.getObjectManager().registerObjectState(state)) return false;
-    this.emit('OBJECT_STATE_REGISTERED', { state: state });
-    return true;
+    return this.getObjectManager().registerObjectState(state);
   }
 
   private async startEngines(): Promise<void> {
-    return Promise.all(
+    await Promise.all(
       this.getObjectManager()
         .getRegisteredObjectsStates(ZIRCON_ENGINE_TYPE)
-        .map((state) => {
-          return this.getInstance(state.id, ZIRCON_ENGINE_TYPE).then(
-            (engine) => {
-              // TODO remove this cast
-              return this.startEngine(engine as ZirconEngine);
-            },
-          );
+        .map(async (state) => {
+          const engine = await this.getInstance(state.id, ZIRCON_ENGINE_TYPE);
+          return this.startEngine(engine as ZirconEngine);
         }),
-    ).then(() => {});
+    );
   }
 
-  private startEngine(engine: ZirconEngine): void {
-    engine?.start();
+  private async startEngine(engine: ZirconEngine): Promise<void> {
+    await engine?.start();
   }
 
   /**
@@ -416,27 +339,23 @@ export class ZirconApplication<
     await this.createDesktopManager();
     await this.startEngines();
     this.displayUIIn(document.body);
+    // activate first desktop if at least one exist
+    if (this.getDesktopManager().getDesktopIds().length > 0)
+      this.emit('DESKTOP_ACTIVATE_REQUEST', {
+        desktopId: this.getDesktopManager().getDesktopIds()[0],
+      });
   }
 
   private async createDesktopManager(): Promise<ZirconDesktopManager> {
     if (this.__desktopManager) return this.__desktopManager;
-    this.__desktopManager = new ZirconDesktopManager(this);
     const desktopManagerState =
       this.getObjectManager().getRegisteredObjectState(this._desktopManagerId);
     if (!desktopManagerState)
       throw new Error(`createDesktopManager does not have a valid state`);
-    const instance: ZirconObject = await this.getInstance(
-      this._desktopManagerId,
+    this.__desktopManager = new ZirconDesktopManager(
+      this,
+      desktopManagerState as ZirconDesktopManagerState,
     );
-    if (!instance)
-      throw new Error(
-        `createDesktopManager does not return a DesktopManager object ! Id = ${this._desktopManagerId} state = ${JSON.stringify(desktopManagerState)}`,
-      );
-    if (!(instance instanceof ZirconDesktopManager))
-      throw new Error(
-        `createDesktopManager does not return a DesktopManager object ! but a ${instance.getType()}`,
-      );
-    this.__desktopManager = instance;
     return this.__desktopManager;
   }
 

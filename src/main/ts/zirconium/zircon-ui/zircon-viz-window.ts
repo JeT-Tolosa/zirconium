@@ -109,8 +109,8 @@ export class ZirconVizWindow<
     if (this.__viz) {
       // this.__viz.stop();  // TODO implement stop in visualizers
       this.__viz = null;
-      this.displayVisualizer();
     }
+    this.displayVisualizer();
     // TODO: change visusalizer's display if window is displayed...
     return true;
   }

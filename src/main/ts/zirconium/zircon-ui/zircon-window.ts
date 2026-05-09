@@ -164,6 +164,7 @@ export abstract class ZirconWindow<
   public override generateCurrentState(): ZirconWindowState {
     return {
       ...super.generateCurrentState(),
+      type: ZIRCON_WINDOW_TYPE,
       title: this._title,
       left: this.__panel?.getBoundingClientRect().left,
       top: this.__panel?.getBoundingClientRect().top,

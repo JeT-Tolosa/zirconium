@@ -1,9 +1,17 @@
+import { v4 as uuid } from 'uuid';
 import { ZirconApplication } from '../zircon-core/zircon-app';
-import { ZIRCON_VISUALIZER_TYPE } from '../zircon-core/zircon-types';
+import {
+  ZIRCON_VISUALIZER_TYPE,
+  ZIRCON_VISUALIZER_WINDOW_TYPE,
+} from '../zircon-core/zircon-types';
 import { ZirconObject } from '../zircon-core/zircon-object';
-import { ZirconVizWindow } from '../zircon-ui/zircon-viz-window';
+import {
+  ZirconVizWindow,
+  ZirconVizWindowState,
+} from '../zircon-ui/zircon-viz-window';
 import { ZirconContextMenuItem } from './zircon-context-menu';
 import { ZirconContextMenuFactory } from './zircon-context-menu-factory';
+import { ZirconVizState } from '../zircon-ui/zircon-visualizer';
 
 /**
  * Context Menu for Window
@@ -21,9 +29,17 @@ export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory 
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
     );
     if (!zirconObjectId) return null;
-    const obj: ZirconVizWindow =
-      this.getApplication().getExistingVizWindow(zirconObjectId);
-    if (!obj) return;
+    const obj: ZirconObject = this.getApplication()
+      .getObjectManager()
+      .getExistingInstance(zirconObjectId);
+    if (!obj) return null;
+    if (
+      !this.getApplication()
+        .getObjectManager()
+        .isTypeOf(obj.getType(), ZIRCON_VISUALIZER_WINDOW_TYPE)
+    )
+      return null;
+    if (!(obj instanceof ZirconVizWindow)) return null;
     return obj;
   }
 
@@ -36,7 +52,7 @@ export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory 
     if (!window) return null;
     return [
       {
-        label: 'viz window',
+        label: `viz window ${window.getName()}`,
         children: [
           {
             label: 'parameters',
@@ -68,22 +84,49 @@ export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory 
           // },
           {
             label: 'new visualizer',
-            children: Object.keys(
-              this.getApplication()
-                .getObjectManager()
-                .getChildrenObjectTypes(ZIRCON_VISUALIZER_TYPE),
-            ).map((vizType: string) => {
-              return this.createMenuElementNewViz(vizType);
-            }),
+            children: this.getApplication()
+              .getObjectManager()
+              .getChildrenObjectTypes(ZIRCON_VISUALIZER_TYPE)
+              .map((vizType: string) => {
+                return this.createMenuElementNewViz(window, vizType);
+              }),
           },
         ],
       },
     ];
   }
 
-  private createMenuElementNewViz(vizType: string): ZirconContextMenuItem {
+  private createMenuElementNewViz(
+    window: ZirconVizWindow,
+    vizType: string,
+  ): ZirconContextMenuItem {
     return {
       label: `${vizType}`,
+      action: () => {
+        this.addVisualizerToVizWindow(window, vizType);
+      },
     };
+  }
+
+  private addVisualizerToVizWindow(
+    window: ZirconVizWindow,
+    vizType: string,
+  ): void {
+    const vizState: ZirconVizState = {
+      name: vizType,
+      type: vizType,
+      id: `${vizType}-${uuid()}`,
+    };
+
+    this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
+      objectId: vizState.id,
+      state: vizState,
+    });
+    const windowState: ZirconVizWindowState = window.generateCurrentState();
+    windowState.vizId = vizState.id;
+    this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
+      objectId: windowState.id,
+      state: windowState,
+    });
   }
 }

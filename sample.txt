@@ -1,0 +1,22 @@
+fichier zircon-object-manager.ts
+
+export class ZirconObjectManager extends ZirconAppObject {
+  public getExistingInstance<T extends ZirconType>(
+    objectId: string,
+    type: ZirconType = ZIRCON_OBJECT_TYPE,
+  ): ZirconInstanceOf<T> | null {
+    const instance = this.__objectInstances[objectId];
+    if (!instance) return null;
+    if (!this.isTypeOf(instance.getType(), type as string))
+      throw new Error(
+        `Existing object Id ${objectId} exists with type ${instance.getType()} but was requested with type ${type}`,
+      );
+    // vérification runtime du type réel
+    if (!(instance instanceof ZirconObjectHierarchy[type].class)) {
+      return null;
+    }
+    return instance as ZirconInstanceOf<T>;
+  }
+}
+
+est obligé de dépendre de zircon-types ET zircon-registry donc dependance cyclique

@@ -5,28 +5,40 @@ import { ZirconDesktop, ZirconDesktopState } from '../zircon-ui/zircon-desktop';
 import { ZirconVizWindowState } from '../zircon-ui/zircon-viz-window';
 import { ZirconContextMenuItem } from './zircon-context-menu';
 import { ZirconContextMenuFactory } from './zircon-context-menu-factory';
-import { ZIRCON_VISUALIZER_WINDOW_TYPE } from '../zircon-core/zircon-types';
+import {
+  ZIRCON_DESKTOP_TYPE,
+  ZIRCON_VISUALIZER_WINDOW_TYPE,
+} from '../zircon-core/zircon-types';
 
 /**
  *
  * Context Menu for Window
  */
 export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
-  constructor(appUI: ZirconApplication) {
-    super(appUI);
+  constructor(app: ZirconApplication) {
+    super(app);
   }
 
   private getAssociatedZirconDesktop(element: Element): ZirconDesktop {
     if (!element) return null;
     if (!(element instanceof HTMLElement)) return null;
     const htmlElement: HTMLElement = element;
+    if (!htmlElement.checkVisibility({ opacityProperty: true })) return;
     const zirconObjectId = htmlElement.getAttribute(
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
     );
     if (!zirconObjectId) return null;
-    const obj: ZirconDesktop =
-      this.getApplication().getExistingDesktop(zirconObjectId);
-    if (!obj) return;
+    const obj: ZirconObject = this.getApplication()
+      .getObjectManager()
+      .getExistingInstance(zirconObjectId);
+    if (!obj) return null;
+    if (
+      !this.getApplication()
+        .getObjectManager()
+        .isTypeOf(obj.getType(), ZIRCON_DESKTOP_TYPE)
+    )
+      return null;
+    if (!(obj instanceof ZirconDesktop)) return null;
     return obj;
   }
 
@@ -44,35 +56,42 @@ export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
           {
             label: `Create window`,
             action: () => {
-              const windowState: ZirconVizWindowState = {
-                id: `user-window-${uuid()}`,
-                type: ZIRCON_VISUALIZER_WINDOW_TYPE,
-                name: `user window`,
-                width: 300,
-                height: 300,
-                left: element.getBoundingClientRect().x,
-                top: element.getBoundingClientRect().y,
-                vizId: null,
-              };
-              this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
-                objectId: windowState.id,
-                state: windowState,
-              });
-
-              const desktopState: ZirconDesktopState =
-                desktop.generateCurrentState();
-              if (desktopState.windowIds)
-                desktopState.windowIds.push(windowState.id);
-              else desktopState.windowIds = [windowState.id];
-              this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
-                objectId: desktop.getId(),
-                state: desktopState,
-              });
+              this.createWindow(
+                desktop,
+                element.getBoundingClientRect().x,
+                element.getBoundingClientRect().y,
+              );
             },
           },
         ],
       },
     ];
+  }
+
+  private createWindow(desktop: ZirconDesktop, x: number, y: number) {
+    const windowState: ZirconVizWindowState = {
+      id: `user-window-${uuid()}`,
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
+      name: `user window`,
+      title: `user window`,
+      width: 300,
+      height: 300,
+      left: x,
+      top: y,
+      vizId: null,
+    };
+    this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
+      objectId: windowState.id,
+      state: windowState,
+    });
+
+    const desktopState: ZirconDesktopState = desktop.generateCurrentState();
+    if (desktopState.windowIds) desktopState.windowIds.push(windowState.id);
+    else desktopState.windowIds = [windowState.id];
+    this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
+      objectId: desktop.getId(),
+      state: desktopState,
+    });
   }
 
   // /**

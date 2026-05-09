@@ -10,13 +10,14 @@ import { ZirconAppObject } from './zircon-app-object';
 import {
   ZIRCON_OBJECT_MANAGER_TYPE,
   ZIRCON_OBJECT_TYPE,
-  ZirconTypes,
+  ZirconType,
 } from './zircon-types';
 
 export class ZirconObjectManager extends ZirconAppObject {
   private __registeredStates: { [id: string]: ZirconObjectState } = {}; // TODO: UI Object
   private __objectInstances: { [id: string]: ZirconObject } = {}; // TODO: UI Object
   private __objectFactoriesRegistry: ZirconFactoriesRegistry = null;
+  private __objectHierarchy: { [id: string]: string } = {};
 
   constructor(app: ZirconApplication) {
     super(app);
@@ -77,6 +78,8 @@ export class ZirconObjectManager extends ZirconAppObject {
     this.getLogger().info(
       `object factory ${factory.name} registered. Handled type = ${factory.type} [ancestor of ${factory.ancestorType}]`,
     );
+    // store object hierarchy
+    this.__objectHierarchy[factory.type] = factory.ancestorType;
     return true;
   }
 
@@ -137,9 +140,9 @@ export class ZirconObjectManager extends ZirconAppObject {
     if (!state.id) throw new Error('Object state must have an id');
     if (!state.type)
       throw new Error(`Object ${state.id} state must have a type`);
-    // Special case for dekstop manager which is unique
     // add or update state
     this.__registeredStates[state.id] = state;
+    this.emit('OBJECT_STATE_REGISTERED', { state: state });
     return true;
   }
 
@@ -147,20 +150,13 @@ export class ZirconObjectManager extends ZirconAppObject {
     return this.__registeredStates[id];
   }
 
-  //   public registerEngineState(state: ZirconEngineState): boolean {
-  //     if (!state) return false;
-  //     if (!state.id) throw new Error('Engine state must have an id');
-  //     if (!state.type)
-  //       throw new Error(`Engine ${state.id} state must have a type`);
-  //     this.__registeredEngineStates[state.id] = state;
-  //     this.emit('ENGINE_STATE_REGISTERED', { state: state });
-  //     return true;
-  //   }
-
-  public getExistingInstance(objectId: string, type: string): ZirconObject {
+  public getExistingInstance(
+    objectId: string,
+    type: ZirconType = ZIRCON_OBJECT_TYPE,
+  ): ZirconObject | null {
     const instance = this.__objectInstances[objectId];
     if (!instance) return null;
-    if (ZirconTypes.isTypeOf(instance.getType(), type))
+    if (!this.isTypeOf(instance.getType(), type as string))
       throw new Error(
         `Existing object Id ${objectId} exists with type ${instance.getType()} but was requested with type ${type}`,
       );
@@ -169,20 +165,25 @@ export class ZirconObjectManager extends ZirconAppObject {
 
   public async getInstance(
     objectId: string,
-    type: string,
+    type: ZirconType = ZIRCON_OBJECT_TYPE,
   ): Promise<ZirconObject> {
     let instance = await this.getExistingInstance(objectId, type);
-    if (instance) return instance;
+    if (instance) {
+      return instance;
+    }
     const state = this.__registeredStates[objectId];
     if (!state) {
-      this.getLogger().warn(`No state associated with engine Id ${objectId}`);
+      this.getLogger().warn(`No state associated with object Id ${objectId}`);
       return null;
     }
     instance = await this.createObject(state);
     if (!instance)
-      if (!ZirconTypes.isTypeOf(instance.getType(), type))
-        throw new Error(`Object with id ${objectId} is not an engine`);
-    return this.addInstance(instance);
+      if (!this.isTypeOf(instance.getType(), type as string))
+        throw new Error(
+          `Object with id ${objectId} is not the expected class: ${instance.getType()} which is not ofType ${type}`,
+        );
+    this.addInstance(instance);
+    return instance;
   }
 
   //   private addEngineInstance(engine: ZirconEngine): ZirconEngine {
@@ -192,20 +193,35 @@ export class ZirconObjectManager extends ZirconAppObject {
   //   }
 
   public getChildrenObjectTypes(rootType: string): string[] {
-    const types: string[] = [];
-    Object.values(this.getObjectRegistry().getFactories()).filter(
-      (factory: ZirconObjectFactory) => {
-        return ZirconTypes.isTypeOf(rootType, factory.type);
-      },
-    );
-    return types;
+    if (!rootType) return;
+    return Object.values(this.getObjectRegistry().getFactories())
+      .filter((factory: ZirconObjectFactory) => {
+        return this.isTypeOf(factory.type, rootType);
+      })
+      .map((factory: ZirconObjectFactory) => {
+        return factory.type;
+      });
   }
 
-  public getRegisteredObjectsStates(type: string): ZirconObjectState[] {
+  public getRegisteredObjectsStates(
+    type: string = ZIRCON_OBJECT_TYPE,
+  ): ZirconObjectState[] {
+    if (!type) return;
     return Object.values(this.__registeredStates).filter(
       (state: ZirconObjectState) => {
-        return ZirconTypes.isTypeOf(state?.type, type);
+        return this.isTypeOf(state?.type, type);
       },
     );
+  }
+
+  public isTypeOf(type: string, parentType: string): boolean {
+    let current: string | null = type;
+    while (current) {
+      if (current === parentType) {
+        return true;
+      }
+      current = this.__objectHierarchy[current];
+    }
+    return false;
   }
 }

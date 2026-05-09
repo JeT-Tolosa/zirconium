@@ -12,7 +12,7 @@ import pino from 'pino';
  * Base state for all zircon objects UI
  */
 export interface ZirconAppObjectState extends ZirconObjectState {
-  type?: typeof ZIRCON_APP_OBJECT_TYPE;
+  type: typeof ZIRCON_APP_OBJECT_TYPE;
 }
 
 export type ZirconAppObjectEvents = {};
@@ -42,6 +42,10 @@ export abstract class ZirconAppObject<
    */
   constructor(app: ZirconApplication, state?: ZirconAppObjectState) {
     super(state);
+    if (!app)
+      throw new Error(
+        `parent application cannot be null in ${this.constructor.name} constructor`,
+      );
     this._application = app;
     this.setEventDispatcher(app.getEventDispatcher());
   }
@@ -88,6 +92,7 @@ export abstract class ZirconAppObject<
   public override generateCurrentState(): ZirconAppObjectState {
     return {
       ...super.generateCurrentState(),
+      type: ZIRCON_APP_OBJECT_TYPE,
     };
   }
 }

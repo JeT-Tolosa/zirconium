@@ -88,7 +88,7 @@ body {
 .zircon-ui .desktop {
   position: absolute;
   inset: 0;
-  opacity: 0;
+  visibility: hidden;
   transform: translateY(20px);
   pointer-events: none;
   transition:
@@ -98,6 +98,8 @@ body {
 
 .zircon-ui .desktop.active {
   opacity: 1;
+  visibility: visible;
+
   transform: translateY(0);
   pointer-events: auto;
 }
