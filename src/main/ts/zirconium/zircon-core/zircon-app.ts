@@ -35,6 +35,7 @@ import { ZirconDesktopManagerFactory } from './zircon-desktop-manager-factory';
 import { ZirconAppObjectFactory } from './zircon-app-object-factory';
 import { ZirconEngineFactory } from './zircon-engine-factory';
 import { ZirconObjectFactory } from './zircon-object-factory';
+import { ZirconAppFactory } from './zircon-app-factory';
 
 /**
  * Composition of this application UI
@@ -105,6 +106,7 @@ export class ZirconApplication<
   private _id: string = uuid();
   private __logger: pino.Logger = null;
   private __isProduction: boolean = false;
+  private __isStarted: boolean = true;
   private _applicationName: string = null;
   private _eventEmitter: EventEmitter2 = null;
   private _uiClass: string = 'zircon-ui';
@@ -120,6 +122,7 @@ export class ZirconApplication<
    * constructor
    */
   constructor(applicationName: string) {
+    this.__isStarted = false;
     this.__logger = pino({
       name: applicationName,
       level: 'debug',
@@ -135,8 +138,13 @@ export class ZirconApplication<
       }),
     });
     this._applicationName = applicationName;
+    // create event dispatcher
     this._eventEmitter = new EventEmitter2();
     this._eventEmitter.setMaxListeners(1000);
+    // create object manager
+    this.__objectManager = new ZirconObjectManager(this);
+    // register default factories
+
     this.registerDefaultFactories();
     this.registerDefaultObjectStates();
     this.listenToEvents();
@@ -168,6 +176,10 @@ export class ZirconApplication<
   ): void {
     if (objectId !== state.id) throw new Error('Object ID mismatch');
     this.getObjectManager().registerObjectState(state);
+  }
+
+  public isStarted(): boolean {
+    return this.__isStarted;
   }
 
   public getId(): string {
@@ -211,12 +223,14 @@ export class ZirconApplication<
   }
 
   private registerDefaultFactories(): void {
+    this.registerObjectFactory(new ZirconAppFactory(this));
     this.registerObjectFactory(new ZirconWindowFactory(this));
     this.registerObjectFactory(new ZirconDesktopFactory(this));
     this.registerObjectFactory(new ZirconDesktopManagerFactory(this));
     this.registerObjectFactory(new ZirconVizWindowFactory(this));
     this.registerObjectFactory(new ZirconAppObjectFactory(this));
     this.registerObjectFactory(new ZirconEngineFactory(this));
+
     // may be we should not add param window as they are not stored windows...
     // this.registerObjectFactory(
     //   new ZirconParamWindowFactory(this),
@@ -330,6 +344,8 @@ export class ZirconApplication<
 
   private async startEngine(engine: ZirconEngine): Promise<void> {
     await engine?.start();
+    // connect dispatcher
+    engine.setEventDispatcher(this.getEventDispatcher());
   }
 
   /**
@@ -338,6 +354,7 @@ export class ZirconApplication<
   public async start(): Promise<void> {
     await this.createDesktopManager();
     await this.startEngines();
+    this.__isStarted = true;
     this.displayUIIn(document.body);
     // activate first desktop if at least one exist
     if (this.getDesktopManager().getDesktopIds().length > 0)
@@ -357,6 +374,10 @@ export class ZirconApplication<
       desktopManagerState as ZirconDesktopManagerState,
     );
     return this.__desktopManager;
+  }
+
+  public getUI(): HTMLElement {
+    return this.__mainDiv;
   }
 
   /**

@@ -11,9 +11,11 @@ import { ZirconApplication } from '../zircon-core/zircon-app';
 const ZIRCON_CONTEXT_MENU_TYPE: string = 'zircon-context-menu';
 
 export type ZirconContextMenuItem = {
-  label: string;
-  action?: () => void;
-  children?: ZirconContextMenuItem[];
+  label: string; //label displayed in menu
+  action?: () => void; // action to perform when clicked
+  children?: ZirconContextMenuItem[]; // submenus
+  classes?: string[]; // adding classes to displayed menu cell
+  unavailable?: boolean;
 };
 
 //const ZIRCON_CONTEXT_MENU_TYPE: string = 'zircon-context-menu';
@@ -133,7 +135,11 @@ export class ZirconContextMenu<
     items.forEach((item) => {
       const li = document.createElement('li');
       li.textContent = item.label;
-
+      if (item.classes)
+        item.classes.forEach((clazz) => {
+          li.classList.add(clazz);
+        });
+      if (item.unavailable) li.setAttribute('disabled', 'true');
       if (item.children) {
         li.classList.add('has-children');
         li.classList.add('zircon-context-menu-item');

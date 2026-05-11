@@ -28,7 +28,8 @@
 
 import { SharpEyedApp } from './main/ts/sharp-eye/sharp-eye-app';
 const sharpEyeApplication: SharpEyedApp = new SharpEyedApp();
-sharpEyeApplication.create();
-sharpEyeApplication.emit('APPLICATION_START_REQUEST', {
-  applicationId: sharpEyeApplication.getId(),
+sharpEyeApplication.create().then(() => {
+  sharpEyeApplication.emit('APPLICATION_START_REQUEST', {
+    applicationId: sharpEyeApplication.getId(),
+  });
 });

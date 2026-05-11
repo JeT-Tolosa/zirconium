@@ -1,5 +1,5 @@
 import { SimpleZirconObjectFactory } from '../../../zirconium/zircon-core/zircon-object-factory';
-import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye-app';
+import { SHARP_EYE_ENGINE_TYPE } from '../../sharp-eye-app';
 import {
   SatelliteCatalogEngine,
   SatelliteCatalogEngineState,
@@ -9,7 +9,7 @@ export class SatelliteCatalogEngineFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(
       SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE,
-      SHARP_EYE_VIZ_TYPE,
+      SHARP_EYE_ENGINE_TYPE,
     );
   }
 

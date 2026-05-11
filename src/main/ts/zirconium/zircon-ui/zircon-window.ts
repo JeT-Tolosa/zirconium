@@ -3,10 +3,11 @@ import {
   ZIRCON_TARGET_DESKTOP_ID,
   ZirconApplication,
 } from '../zircon-core/zircon-app';
-import { ZirconObject, ZirconObjectState } from '../zircon-core/zircon-object';
+import { ZirconObject } from '../zircon-core/zircon-object';
 import {
   ZirconAppObjectEventRegistry,
   ZirconAppObject,
+  ZirconAppObjectState,
 } from '../zircon-core/zircon-app-object';
 import menuIcon from './hamburger-icon.svg';
 import { jsPanel, IJSPanelInstance, IJSPanelData } from 'jspanel4';
@@ -85,7 +86,8 @@ export type ZirconWindowEventRegistry = MergeZirconRegistries<
   ZirconAppObjectEventRegistry
 >;
 
-export interface ZirconWindowState extends ZirconObjectState {
+export interface ZirconWindowState extends ZirconAppObjectState {
+  type: typeof ZIRCON_WINDOW_TYPE;
   title?: string;
   left?: number;
   top?: number;
@@ -333,6 +335,10 @@ export abstract class ZirconWindow<
     if (this.__panel) return this.__panel.content;
     this.createPanel();
     return this.__panel.content;
+  }
+
+  public isDisplayed(): boolean {
+    return this.__panel?.content != null;
   }
 
   public getLeft(): number {

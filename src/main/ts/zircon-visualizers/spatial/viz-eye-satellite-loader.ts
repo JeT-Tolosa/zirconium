@@ -1,12 +1,12 @@
 import './viz-eye-satellite-loader.css';
 import { v4 as uuid } from 'uuid';
-import gpsJson from '../../../../../assets/orbital-data/celestrak/gps-celestrak.json';
-import starlinkJson from '../../../../../assets/orbital-data/celestrak/starlink-celestrak.json';
-import activeJson from '../../../../../assets/orbital-data/celestrak/active-celestrak.json';
-import scienceJson from '../../../../../assets/orbital-data/celestrak/science-celestrak.json';
-import oneCelestrakJson from '../../../../../assets/orbital-data/celestrak/one-celestrak.json';
-import { SatelliteLoaderCelestrakJson } from '../../libraries/spatial/satellite-loader-celestrak';
-import { ElementLoader } from '../../libraries/spatial/satellite-loader';
+import gpsJson from '../../../../../assets/data/spatial/celestrak/gps-celestrak.json';
+import starlinkJson from '../../../../../assets/data/spatial/celestrak/starlink-celestrak.json';
+import activeJson from '../../../../../assets/data/spatial/celestrak/active-celestrak.json';
+import scienceJson from '../../../../../assets/data/spatial/celestrak/science-celestrak.json';
+import oneCelestrakJson from '../../../../../assets/data/spatial/celestrak/one-celestrak.json';
+import { SatelliteLocalFileLoaderCelestrakJson } from '../../libraries/spatial/satellite-loader-celestrak';
+import { ElementLoader } from '../../libraries/catalog/element-loader';
 import { Satellite, SATELLITE_TYPE } from '../../libraries/spatial/satellite';
 import {
   MergeZirconRegistries,
@@ -19,40 +19,46 @@ import {
 } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { IonButton } from '@ionic/core/components/ion-button';
 
-const celestrakLoader: SatelliteLoaderCelestrakJson =
-  new SatelliteLoaderCelestrakJson('Celestrak Loader');
-
 interface SatelliteLoaderDescriptor {
   name: string;
-  localFile: string;
   loader: ElementLoader<Satellite>;
 }
 
 const loaderDescriptors: { [id: string]: SatelliteLoaderDescriptor } = {
   'celestrak-starlink': {
     name: 'StarLink Celestrak',
-    localFile: starlinkJson as unknown as string,
-    loader: celestrakLoader,
+    loader: new SatelliteLocalFileLoaderCelestrakJson(
+      'Celestrak Loader',
+      starlinkJson as unknown as string,
+    ),
   },
   'one-celestrak-satellite': {
     name: 'One Celestrak',
-    localFile: oneCelestrakJson as unknown as string,
-    loader: celestrakLoader,
+    loader: new SatelliteLocalFileLoaderCelestrakJson(
+      'Celestrak Loader',
+      oneCelestrakJson as unknown as string,
+    ),
   },
   'celestrak-active': {
     name: 'Active Celestrak',
-    localFile: activeJson as string,
-    loader: celestrakLoader,
+    loader: new SatelliteLocalFileLoaderCelestrakJson(
+      'Celestrak Loader',
+      activeJson as unknown as string,
+    ),
   },
   'celestrak-gps': {
     name: 'GPS Celestrak',
-    localFile: gpsJson as unknown as string,
-    loader: celestrakLoader,
+    loader: new SatelliteLocalFileLoaderCelestrakJson(
+      'Celestrak Loader',
+      gpsJson as unknown as string,
+    ),
   },
   'celestrak-science': {
     name: 'Science Celestrak',
-    localFile: scienceJson as unknown as string,
-    loader: celestrakLoader,
+    loader: new SatelliteLocalFileLoaderCelestrakJson(
+      'Celestrak Loader',
+      scienceJson as unknown as string,
+    ),
   },
 };
 
@@ -128,97 +134,6 @@ export class VizSatCatLoader<
     return this._dataSelector;
   }
 
-  // /**
-  //  * Local fetch of Celestrak data
-  //  */
-  // private fetchData(loader : ): Promise<Satellite[]> {
-  //   let retrievedData: Promise<unknown> = null;
-  //   // if (this._local) retrievedData = this.fetchDataCelestrakLocal();
-  //   // else retrievedData = this.fetchDataCelestrakOnline();
-
-  //   retrievedData = Promise.resolve(starlinkJson);
-  //   // return this.fetchDataCelestrakOnline()
-  //   return retrievedData.then((data: unknown) => {
-  //     // const convertCelestrakToSatellite: Satellite[] = this.celestrakJsonToSat(
-  //     //   JSON.parse(data),
-  //     // );
-  //     return data.map((element: unknown) => {
-  //       return {
-  //         OBJECT_NAME: element.OBJECT_NAME,
-  //         OBJECT_ID: element.OBJECT_ID,
-  //         NORAD: element.NORAD_CAT_ID,
-  //       };
-  //     });
-  //   });
-  // }
-
-  // /**
-  //  * Local fetch of Celestrak data
-  //  */
-  // private fetchDataCelestrakLocal(): Promise<Satellite[]> {
-  //   const filepath: string =
-  //     './assets/orbital-data/celestrak/active-celestrak.json';
-  //   this.displayMessage(
-  //     DISPLAY_MESSAGE_LEVEL.INFO,
-  //     `Local Fetching celestrak data from ${filepath}`,
-  //   );
-  //   return fs.readFile(filepath).then((data: unknown) => {
-  //     this.displayMessage(
-  //       DISPLAY_MESSAGE_LEVEL.SUCCESS,
-  //       `Local Fetch completed: preparing data. ${data.length} rows`,
-  //     );
-  //     return JSON.parse(data);
-  //   });
-  // }
-
-  // /**
-  //  * Fetch Celestrak data online
-  //  */
-  // private fetchDataCelestrakOnline(): Promise<unknown> {
-  //   const url: string = CELESTRAK_URL;
-
-  //   this.displayMessage(DISPLAY_MESSAGE_LEVEL.INFO, `Fetching ${url}...`);
-  //   return fetch(url)
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       this.displayMessage(
-  //         DISPLAY_MESSAGE_LEVEL.SUCCESS,
-  //         `Fetch completed: preparing data. ${data.length} rows`,
-  //       );
-  //       this.setData(data);
-  //       this.displayMessage(
-  //         DISPLAY_MESSAGE_LEVEL.SUCCESS,
-  //         `Fetch completed: data size = ${data.length}`,
-  //       );
-  //     })
-  //     .catch((error) => {
-  //       this.displayMessage(
-  //         DISPLAY_MESSAGE_LEVEL.ERROR,
-  //         `Fetch failed: ${error}`,
-  //       );
-  //     });
-  // }
-
-  /**
-   * Display Context Menu
-   * @param event
-   * @returns
-   */
-  private displayContextMenu(event: MouseEvent): void {
-    event.preventDefault();
-
-    const tr = (event.target as HTMLElement).closest('tr');
-    if (!tr) return;
-
-    // const row = this._dataTable.getData(tr);
-
-    // // Sélection automatique si la ligne n’est pas sélectionnée
-    // if (!tr.classList.contains('selected')) {
-    //   this._dataTable.rows().deselect(); // désélectionner toutes les autres
-    //   row.select();
-    // }
-  }
-
   //   const selectedRows = table.rows({ selected: true }).data();
   // console.log(selectedRows);
 
@@ -236,7 +151,7 @@ export class VizSatCatLoader<
       const dataDescriptor: SatelliteLoaderDescriptor =
         loaderDescriptors[dataDescriptorId];
       return dataDescriptor.loader
-        .loadLocalJson(dataDescriptor.localFile)
+        .getData()
         .then((satellites: Satellite[]) => {
           this.emit('COLLECTION_CREATE_CATALOG_REQUEST', {
             catalogType: SATELLITE_TYPE,

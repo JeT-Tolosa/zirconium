@@ -1,14 +1,14 @@
-export const ZIRCON_OBJECT_TYPE = 'zircon-object';
-export const ZIRCON_APP_OBJECT_TYPE = 'zircon-app-object';
-export const ZIRCON_DESKTOP_TYPE = 'zircon-desktop';
-export const ZIRCON_DESKTOP_MANAGER_TYPE = 'zircon-desktop-manager';
-export const ZIRCON_WINDOW_TYPE = 'zircon-window';
-export const ZIRCON_VISUALIZER_TYPE = 'zircon-visualizer';
-export const ZIRCON_VISUALIZER_WINDOW_TYPE = 'zircon-viz-window';
-export const ZIRCON_PARAMETER_WINDOW_TYPE = 'zircon-param-window';
-export const ZIRCON_ENGINE_TYPE = 'zircon-engine';
-export const ZIRCON_ENGINE_MANAGER_TYPE = 'zircon-engine-manager';
-export const ZIRCON_OBJECT_MANAGER_TYPE = 'zircon-object-manager';
+export const ZIRCON_OBJECT_TYPE: string = 'zircon-object';
+export const ZIRCON_APP_OBJECT_TYPE: string = 'zircon-app-object';
+export const ZIRCON_DESKTOP_TYPE: string = 'zircon-desktop';
+export const ZIRCON_DESKTOP_MANAGER_TYPE: string = 'zircon-desktop-manager';
+export const ZIRCON_WINDOW_TYPE: string = 'zircon-window';
+export const ZIRCON_VISUALIZER_TYPE: string = 'zircon-visualizer';
+export const ZIRCON_VISUALIZER_WINDOW_TYPE: string = 'zircon-viz-window';
+export const ZIRCON_PARAMETER_WINDOW_TYPE: string = 'zircon-param-window';
+export const ZIRCON_ENGINE_TYPE: string = 'zircon-engine';
+export const ZIRCON_ENGINE_MANAGER_TYPE: string = 'zircon-engine-manager';
+export const ZIRCON_OBJECT_MANAGER_TYPE: string = 'zircon-object-manager';
 
 export const DESKTOPS_MANAGER_CLASS = 'desktop-manager';
 export const DESKTOPS_CONTAINER_CLASS = `desktops-container`;

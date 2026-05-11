@@ -1,5 +1,5 @@
 import { Satellite } from './satellite';
-import { ElementLoader } from './satellite-loader';
+import { ElementLoader } from '../catalog/element-loader';
 import { z } from 'zod';
 
 interface CelestrackSatellite {
@@ -44,36 +44,55 @@ const CelestrackSatelliteSchema: z.ZodType<CelestrackSatellite> = z.object({
 
 const CelestrackSatelliteFileSchema = z.array(CelestrackSatelliteSchema);
 
-export class SatelliteLoaderCelestrakJson extends ElementLoader<Satellite> {
-  constructor(name: string) {
+function celestrakToSatellite(data: CelestrackSatellite[]): Satellite[] {
+  return data.map((element) => {
+    return {
+      OBJECT_NAME: element.OBJECT_NAME,
+      OBJECT_ID: element.OBJECT_ID,
+    } as Satellite;
+  });
+}
+
+export class SatelliteLocalFileLoaderCelestrakJson extends ElementLoader<Satellite> {
+  private _jsonContent: string = null;
+
+  constructor(name: string, jsonContent: string) {
     super(name);
+    this._jsonContent = jsonContent;
   }
 
   /**
    * Load satellite data of type Celestrak JSON
-   * @param fileLocation
+   * @param jsonContent
    * @returns
    */
-  public loadLocalJson(fileLocation: string): Promise<Satellite[]> {
-    let retrievedData: Promise<unknown> = null;
-    // if (this._local) retrievedData = this.fetchDataCelestrakLocal();
-    // else retrievedData = this.fetchDataCelestrakOnline();
-    retrievedData = Promise.resolve(fileLocation);
-    // return this.fetchDataCelestrakOnline()
-    return retrievedData.then((data) => {
-      const result = CelestrackSatelliteFileSchema.safeParse(data);
+  public async getData(): Promise<Satellite[]> {
+    const data: string = await Promise.resolve(this._jsonContent);
+    const result = CelestrackSatelliteFileSchema.safeParse(data);
+    if (!result.success) {
+      throw result.error;
+    }
+    return celestrakToSatellite(result.data);
+  }
+}
 
-      if (!result.success) {
-        throw result.error;
-      }
+export class SatelliteHTTPSLoaderCelestrakJson extends ElementLoader<Satellite> {
+  private _url: string = null;
 
-      const fileContent = result.data; // typé automatiquement
-      return fileContent.map((element) => {
-        return {
-          OBJECT_NAME: element.OBJECT_NAME,
-          OBJECT_ID: element.OBJECT_ID,
-        } as Satellite;
-      });
-    });
+  constructor(name: string, url: string) {
+    super(name);
+    this._url = url;
+  }
+  /**
+   * Fetch Celestrak data online
+   */
+  public async getData(): Promise<Satellite[]> {
+    const response: Response = await fetch(this._url);
+    const jsonData = response.json();
+    const result = CelestrackSatelliteFileSchema.safeParse(jsonData);
+    if (!result.success) {
+      throw result.error;
+    }
+    return celestrakToSatellite(result.data);
   }
 }

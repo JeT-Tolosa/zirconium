@@ -1,0 +1,1732 @@
+{
+   "type": "FeatureCollection",
+   "features": [
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -88.629170,43.454557 ]
+    },
+    "properties": {
+    "Station_name":"Usradioguy.com",
+	"URL":"<a href=\"https://Usradioguy.com\">USRadioguy</a>",
+    "Country":"USA",
+	"Province_State":"Wisconsin",
+	"Imagery":"<a href=\"https://usradioguy.com/daily-global-composite\"><img src=\"https://usradioguy.com/map/GOES16thumb.jpg\"></a>",
+    "Satellites_received":"GOES 16,18,19 Himawari9, Meteor M2-3&4,NOAA 15,18,19",
+	"Data_Imagery":"HRIT/EMWIN, APT LRIT"
+    }
+  },
+        {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -1.444500,52.945202 ]
+    },
+    "properties": {
+    "Station_name":"Station #0",
+	"URL":"",
+    "Country":"United Kingdom of Great Britain and Northern Ireland",
+	"Province_State":"Derbyshire",
+    "Satellites_received":"NOAA 15, 18, 19; Meteor M2-3, Meteor M2-4",
+	"Data_Imagery":"APT LRIT"
+    }
+  },
+      {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -6.06214,53.37937 ]
+    },
+    "properties": {
+    "Station_name":"Satellite04",
+	"URL":"",
+    "Country":"Ireland",
+	"Province_State":"Dublin",
+    "Satellites_received":"NOAA, Meteor",
+	"Data_Imagery":"APT LRIT, ISS, Other"
+    }
+  },
+      {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 33.45123,43.13151 ]
+    },
+    "properties": {
+    "Station_name":"Starlink",
+	"URL":"",
+    "Country":"Ukraine",
+	"Province_State":"Ukraine",
+    "Satellites_received":"NOAA 15",
+	"Data_Imagery":"APT LRIT"
+    }
+  },
+      {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.129,32.622 ]
+    },
+    "properties": {
+    "Station_name":"AF6R",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"California",
+    "Satellites_received":"NOAA LEO, GOES 16,18,19",
+	"Data_Imagery":"APT LRIT HRIT/EMWIN"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -124.15250,47.00431 ]
+    },
+    "properties": {
+    "Station_name":"W7WSW",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Washington",
+    "Satellites_received":"GOES 18",
+	"Data_Imagery":"HRIT/EMWIN GRB"
+    }
+  },  
+      {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 29.021330,41.112663 ]
+    },
+    "properties": {
+    "Station_name":"ITU CSCRS",
+	"URL":"",
+    "Country":"Turkey",
+	"Province_State":"İstanbul",
+    "Satellites_received":"Worldview",
+	"Data_Imagery":"Other"
+    }
+  },
+      {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 118.1145,24.4790 ]
+    },
+    "properties": {
+    "Station_name":"BG5VJM",
+	"URL":"",
+    "Country":"China",
+	"Province_State":"FUJIAN",
+    "Satellites_received":"GK-2A,NOAA15,NOAA18,NOAA19,FengYun2G,FengYun2H,METOP-B,METOP-C,METEOR-M2 3,METEOR-M2 4",
+	"Data_Imagery":"APT LRIT, APT HRIT, HRPT"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 115.872877,-31.982002 ]
+    },
+    "properties": {
+    "Station_name":"VK6CV",
+	"URL":"",
+    "Country":"Australia",
+	"Province_State":"Western Australia",
+    "Satellites_received":"NOAA",
+	"Data_Imagery":"APT"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 124.2104, 13.5836 ]
+    },
+    "properties": {
+    "Station_name":"DU4DXT/DW4LQY",
+	"URL":"<a href=\"https://catsu.edu.ph\">DU4DXT/DW4LQY</a>",
+    "Country":"Philippines",
+	"Province_State":"Catanduanes",
+    "Satellites_received":"GK2A, NOAA, ISS",
+	"Data_Imagery":"APT LRIT, ISS"
+    }
+  },
+      {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -75.362768,41.281729 ]
+    },
+    "properties": {
+    "Station_name":"Robbijoh",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Pennsylvania",
+    "Satellites_received":"GOES 16",
+	"Data_Imagery":"HRIT/EMWIN"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -84.792047, 44.070039 ]
+    },
+    "properties": {
+    "Station_name":"The Corder Farm",
+	"URL":"<a href=\"http://noaa.thecorderfarm.com\">The Corder Farm</a>",
+    "Country":"Uited States of America",
+	"Province_State":"Michigan",
+    "Satellites_received":"NOAA 15,18,19, METEOR M2 3,4",
+	"Data_Imagery":"APT LRIT"
+    }
+  },
+      {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -77.363972,39.010667 ]
+    },
+    "properties": {
+    "Station_name":"KM4WWQ",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Virginia",
+    "Satellites_received":"GOES 16",
+	"Data_Imagery":"HRIT/EMWIN"
+    }
+  },
+      {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 2.17447,41.41083 ]
+    },
+    "properties": {
+    "Station_name":"EA3AGY",
+	"URL":"",
+    "Country":"Spain",
+	"Province_State":"Barcelona",
+    "Satellites_received":"Meteosat, NOAA 15, 18,19, Meteor MN",
+	"Data_Imagery":"APT HRIT, HRIT/EMWIN, HRPT,ISS"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -90.3226,38.789290 ]
+    },
+    "properties": {
+    "Station_name":"STLAR",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Missouri",
+    "Satellites_received":"NOAA 15,18,19, Meteor M N2-3, N2-2, Metop A, B, C, GOES 16, Orbcomm",
+	"Data_Imagery":"APT LRIT, APT HRIT, HRIT/EMWIN, HRPT,GRB"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 1.1737,51.6637 ]
+    },
+    "properties": {
+    "Station_name":"Berinsfield weather",
+	"URL":"",
+    "Country":"United Kingdom of Great Britain and Northern Ireland",
+	"Province_State":"England",
+    "Satellites_received":"NOAA and M 2-3 ",
+	"Data_Imagery":"APT LRIT, HRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.44603409036165,21.927162942214945 ]
+    },
+    "properties": {
+    "Station_name":"CM6JVR",
+	"URL":"",
+    "Country":"Cuba",
+	"Province_State":"Holy Spirit",
+    "Satellites_received":"GOES 16, GOES 18, NOAA 15, NOAA 18, NOAA 19, METEOR M N2-2, METEOR M N2-3",
+	"Data_Imagery":"HRIT/EMWIN, APT, HRPT"
+    }
+  },  
+	  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -89.2021, 48.4615 ]
+    },
+    "properties": {
+    "Station_name":"VA3ROM",
+	"URL":"<a href=\"http://va3rom.com/APT/APT.html\">VA3ROM</a>",
+    "Country":"Canada",
+	"Province_State":"Ontario",
+    "Satellites_received":"NOAA 15, 18 and 19 (analog APT only)",
+	"Data_Imagery":"APT"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 3.5417,51.2292 ]
+    },
+    "properties": {
+    "Station_name":"on7ndr",
+	"URL":"",
+    "Country":"Belgium",
+	"Province_State":"East Flanders",
+    "Satellites_received":"NOAA 15,18,19 Meteor mn 2-3",
+	"Data_Imagery":"APT LRIT ISS OTHER"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 8.774673088861904,45.41717247177884 ]
+    },
+    "properties": {
+    "Station_name":"IK1HGI",
+	"URL":"",
+    "Country":"Italy",
+	"Province_State":"Novara",
+    "Satellites_received":"noaa,15,18,19",
+	"Data_Imagery":"APT LRIT HRPT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 21.4195,52.4190 ]
+    },
+    "properties": {
+    "Station_name":"SQ7RO",
+	"URL":"",
+    "Country":"Poland",
+	"Province_State":"Poland",
+    "Satellites_received":"NOAA20, NOAA21, NPP, TERRA, AQUA, FY-2H, EWS-G2, STEREO-A, ELECTRO-L3, ARKTIKA-M1, MSG-10, MSG-11, MetOp, Sentinel-2",
+	"Data_Imagery":"APT LRIT HRIT HRPT GVAR ISS OTHER"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -8.3871,40.7662 ]
+    },
+    "properties": {
+    "Station_name":"t0nito's station",
+	"URL":"",
+    "Country":"Portugal",
+	"Province_State":"Aveiro",
+    "Satellites_received":"NOAA 15, NOAA 18, NOAA 19, Meteor M2-2, Meteor M2-3, MetOp-B, MetOp-C",
+	"Data_Imagery":"APT LRIT HRPT"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 144.2052,-38.1315 ]
+    },
+    "properties": {
+    "Station_name":"VK3AYQ",
+	"URL":"",
+    "Country":"Australia",
+	"Province_State":"VIC",
+    "Satellites_received":"NOAA 15,18,19",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 1.926,43.492 ]
+    },
+    "properties": {
+    "Station_name":"F/G3CQL",
+	"URL":"",
+    "Country":"France",
+	"Province_State":"31 - Haute Garonne",
+    "Satellites_received":"NOAA 15,18,19 Meteor 2-3",
+	"Data_Imagery":"APT LRIT ISS"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -81.30263,35.780763 ]
+    },
+    "properties": {
+    "Station_name":"KI4FRU",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"North Carolina",
+    "Satellites_received":"NOAA 15,18,19",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+   {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -3.200, 55.900 ]
+    },
+    "properties": {
+    "Station_name":"GM8ARV",
+	"URL":"<a href=\"https://www.satsignal.eu/\">GM8ARV</a>",
+    "Country":"United Kingdom of Great Britain and Northern Ireland",
+	"Province_State":"Scotland",
+    "Satellites_received":"NOAA-15, 18, 19",
+	"Data_Imagery":"APT LRIT"
+    }	
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 6.0373, 43.3371 ]
+    },
+    "properties": {
+    "Station_name":"F5TYZ",
+	"URL":"",
+    "Country":"France",
+	"Province_State":"Var 83",
+    "Satellites_received":"NOAA 15.18.19 METEOR M2-3",
+	"Data_Imagery":"APT LRIT ISS"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -87.85757, 30.538153 ]
+    },
+    "properties": {
+    "Station_name":"JRB2-DEV Ground Station",
+	"URL":"<a href=\"https://gcgoes.com/\">JRB2-DEV Ground Station</a>",
+    "Country":"United States of America",
+	"Province_State":"AL",
+    "Satellites_received":"GOES 16, NOAA15, NOAA18, NOAA19",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 21.8954, 43.3209 ]
+    },
+    "properties": {
+    "Station_name":"MihajloPi - Vox Galactica",
+	"URL":"<a href=\"https://voxgalactica.com/\">MihajloPi - Vox Galactica</a>",
+    "Country":"Serbia",
+	"Province_State":"Niš",
+    "Satellites_received":"NOAA 15, NOAA 18, NOAA 19, METEOR M2-3",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -2.89,53.19 ]
+    },
+    "properties": {
+    "Station_name":"Chester (UK)",
+	"URL":"",
+    "Country":"United Kingdom of Great Britain and Northern Ireland",
+	"Province_State":"Cheshire",
+    "Satellites_received":"NOAA 15,18,19 Meteor M2-3",
+	"Data_Imagery":"APT, HRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 77.1,8.32 ]
+    },
+    "properties": {
+    "Station_name":"",
+	"URL":"",
+    "Country":"India",
+	"Province_State":"Kerala",
+    "Satellites_received":"NOAA and Meteor",
+	"Data_Imagery":"APT, HRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 5.4770,51.4448 ]
+    },
+    "properties": {
+    "Station_name":"PA3CVI",
+	"URL":"<a href=\"https://www.pa3cvi.nl/\">Station PA3CVI</a>",
+    "Country":"Netherlands",
+	"Province_State":"N. Brabant",
+    "Satellites_received":"NOAA-15, NOAA-18, NOAA19",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 107.6191107,-6.91756 ]
+    },
+    "properties": {
+    "Station_name":"YB1022SWL",
+	"URL":"",
+    "Country":"Indonesia",
+	"Province_State":"West Java",
+    "Satellites_received":"GK-2A, NOAA-15, NOAA-18, NOAA19",
+	"Data_Imagery":"APT LRIT ISS Other"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.6867,45.4142 ]
+    },
+    "properties": {
+    "Station_name":"PDXH0B0",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Washington",
+    "Satellites_received":"Noaa 15,18,19 Meteor m2-3",
+	"Data_Imagery":"APT LRPT"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 147.2916,-43.0208 ]
+    },
+    "properties": {
+    "Station_name":"VK7XTC",
+	"URL":"",
+    "Country":"Australia",
+	"Province_State":"TAS",
+    "Satellites_received":"Noaa 15,18,19 Meteor m2-3,ISS SSTV",
+	"Data_Imagery":"APT LRPT ISS"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 150.6250,-30.3985 ]
+    },
+    "properties": {
+    "Station_name":"VK2MSA",
+	"URL":"",
+    "Country":"Australia",
+	"Province_State":"NSW",
+    "Satellites_received":"Noaa 15,18,19 Meteor m2-3",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -116.33957, 43.58555 ]
+    },
+    "properties": {
+    "Station_name":"KJ7YLS",
+	"URL":"<a href=\"https://ruralradioprojects.com/\">Station 2134</a>",
+    "Country":"United States of America",
+	"Province_State":"Idaho",
+    "Satellites_received":"GOES-16, GOES-18",
+	"Data_Imagery":"HRIT/EMWIN"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -58.5, -34.67 ]
+    },
+    "properties": {
+    "Station_name":"LW7DST",
+	"URL":"<a href=\"https://lw7dst.com.ar/\">LW7DST</a>",
+    "Country":"Argentina",
+	"Province_State":"Buenos Aires",
+    "Satellites_received":"GOES 16 ",
+	"Data_Imagery":"HRIT/EMWIN"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -104.73, 38.92 ]
+    },
+    "properties": {
+    "Station_name":"KF0FCV Colorado Springs",
+	"URL":"<a href=\"http://tpressle.ddns.net:3001/\">KF0FCV Colorado Springs</a>",
+    "Country":"United States of America",
+	"Province_State":"Colorado",
+    "Satellites_received":"GOES 16, NOAA 15, 18, 19 ",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -91.154196,44.949292 ]
+    },
+    "properties": {
+    "Station_name":"N0HIJ",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Wisconsin",
+    "Satellites_received":"GOES 16, 18",
+	"Data_Imagery":"HRIT/EMWIN"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 12.08474,45.93915 ]
+    },
+    "properties": {
+    "Station_name":"NOAA Miane",
+	"URL":"",
+    "Country":"Italy",
+	"Province_State":"Miane",
+    "Satellites_received":"NOAA 15,NOAA 18,NOAA 19, METEOR-M 2",
+	"Data_Imagery":"APT HRIT, APT LRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -109.160,31.920 ]
+    },
+    "properties": {
+    "Station_name":"KE7KRF",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Arizona",
+    "Satellites_received":"GOES 16, NOAA 15, 18, 19",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN,"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 55.450486, 25.21358555 ]
+    },
+    "properties": {
+    "Station_name":"DAGwx",
+	"URL":"<a href=\"https://dubaiastronomy.com/\">KJ6IX</a>",
+    "Country":"United Arab Emirates",
+	"Province_State":"Dubai",
+    "Satellites_received":"NOAA15,18,19,Meteor M2-2, GOES-13 ",
+	"Data_Imagery":"APT LRIT,GVAR"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -119.73745,38.88376 ]
+    },
+    "properties": {
+    "Station_name":"KJ6IX",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Nevada",
+    "Satellites_received":"GOES 17, 16. NOAA 15, 18, 19",
+	"Data_Imagery":"APT LRIT, APT HRIT, HRIT/EMWIN, HRPT"
+    }
+  }, 
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -93.0672,31.7609 ]
+    },
+    "properties": {
+    "Station_name":"HutSatCom",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"LA",
+    "Satellites_received":"GOES 16",
+	"Data_Imagery":"HRIT/EMWIN"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.5372531, 43.5681899 ]
+    },
+    "properties": {
+    "Station_name":"Sasha's Lonely HRPT Station",
+	"URL":"<a href=\"https://zeke800.github.io/\">Sasha's Lonely HRPT Station</a>",
+    "Country":"Canada",
+	"Province_State":"Ontario",
+    "Satellites_received":"MeteorM2, GOES HRIT,Polar APT & HRPT/AVHRR ",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, GOES, HRPT, ISS, Other"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -58.711, -34.492 ]
+    },
+    "properties": {
+    "Station_name":"LU1DQA",
+	"URL":"<a href=\"http://lu1dqa.ddns.net\">LU1DQA</a>",
+    "Country":"Argentina",
+	"Province_State":"Buenos Aires",
+    "Satellites_received":"Meteor m2, NOAA 15, 18, 19",
+	"Data_Imagery":"APT LRIT, APT HRIT"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 12.361051, 65.671802 ]
+    },
+    "properties": {
+    "Station_name":"DO3MLA- JP65EQ",
+	"URL":"<a href=\"https://www.qsl.net/do3mla/meteor-m2-loc-jp65eq.html\">DO3MLA- JP65EQ</a>",
+    "Country":"Norway",
+	"Province_State":"Vevelstad Kummune",
+    "Satellites_received":"NOAA 15,18,19,  MeteorM2 ",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, HRPT, Other"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 6.9148, 51.99196 ]
+    },
+    "properties": {
+    "Station_name":"NWP SAF: DE2MSF",
+	"URL":"<a href=\"http://webserver-2.de/weather/\">NWP SAF: DE2MSF</a>",
+    "Country":"Germany",
+	"Province_State":"NRW",
+    "Satellites_received":"GOES-16, GOES-17,METEOSAT-11,METEOSAT-9 (IODC),HIMAWARI-8,NOAA15,NOAA-18,NOAA-19",
+	"Data_Imagery":"APT LRIT, HRPT, Other"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [  57.4774, -20.2732 ]
+    },
+    "properties": {
+    "Station_name":"3B8GL",
+	"URL":"",
+    "Country":"Mauritius",
+	"Province_State":"Plaine Williems",
+    "Satellites_received":"APT LRIT.GVAR, ISS",
+	"Data_Imagery":"HRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -70.5440,43.3845 ]
+    },
+    "properties": {
+    "Station_name":"N1UVI",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Maine",
+    "Satellites_received":"GOES-16, GOES-17, NOAA 15, 18, 19, Meteor M2",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, HRPT, ISS, Other"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -78.839360,35.804390 ]
+    },
+    "properties": {
+    "Station_name":"AI4Y",
+	"URL":"<a href=\"https://www.qrz.com/db/AI4Y\">AI4Y</a>",
+    "Country":"United States of America",
+	"Province_State":"Virginia",
+    "Satellites_received":"GOES-16, GOES-17, NOAA 15, 18, 19, Meteor M2",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.798122090,45.42770035115 ]
+    },
+    "properties": {
+    "Station_name":"N7FWL",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Oregon",
+    "Satellites_received":"GOES 17",
+	"Data_Imagery":"HRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.1920035,43.3672285 ]
+    },
+    "properties": {
+    "Station_name":"K8COP",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Michigan",
+    "Satellites_received":"GOES 16",
+	"Data_Imagery":"HRIT/EMWIN"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -98.44245, 29.76089 ]
+    },
+    "properties": {
+    "Station_name":"W5ZHY",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Texas",
+    "Satellites_received":"GOES 16, NOAA 18, NOAA 19",
+	"Data_Imagery":"APT LRIT , HRIT/EMWIN"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 124.8,10.4 ]
+    },
+    "properties": {
+    "Station_name":"DV5CEL & DY5BTO Hamsat WX station",
+	"URL":"",
+    "Country":"Philippines",
+	"Province_State":"Leyte",
+    "Satellites_received":"NOAA 15 18 19, ISS, LAPAN-A2",
+	"Data_Imagery":"APT LRIT,Other"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 7.582123, 51.6165 ]
+    },
+    "properties": {
+    "Station_name":"DC9DD",
+	"URL":"<a href=\"http://www.qsl.net/dc9dd/\"DC9DD</a>",
+    "Country":"Germany",
+	"Province_State":"NRW",
+    "Satellites_received":"NOAA 15 18 19 METEOR M2 ISS ",
+	"Data_Imagery":"APT LRIT, APT HRIT ISS Other"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -67.475353, 10.197596 ]
+    },
+    "properties": {
+    "Station_name":"YV5MBI",
+	"URL":"",
+    "Country":"Venezuela (Bolivarian Republic of)",
+	"Province_State":"Turmero Edo Aragua",
+    "Satellites_received":"Noaa 15,18,19",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 8.936540, 49.947830 ]
+    },
+    "properties": {
+    "Station_name":"DO3MLA",
+	"URL":"<a href=\"https://www.qsl.net/do3mla\">DO3MLA</a>",
+    "Country":"Germany",
+	"Province_State":"Hessen",
+    "Satellites_received":"Noaa 15,18,19, Meteor M2",
+	"Data_Imagery":"APT LRIT, Other"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -77.1440,38.4560 ]
+    },
+    "properties": {
+    "Station_name":"KE4WLF",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Virginia",
+    "Satellites_received":"Goes-16, NOAA-15, NOAA-18, NOAA-19",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN,ISS"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 107.6191 , -6.9175 ]
+    },
+    "properties": {
+    "Station_name":"YB1022SWL",
+	"URL":"<a href=\"http://www.inspace.club/wx-station/\">YB1022SWL</a>",
+    "Country":"Indonesia",
+	"Province_State":"Jawa Barat",
+    "Satellites_received":"GK-2A, NOAA 15, NOAA18, NOAA19, Inmarsat",
+	"Data_Imagery":"APT LRIT, ISS, Other"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -83.10648,40.5933 ]
+    },
+    "properties": {
+    "Station_name":"The Central Ohio Earth Station c/o KE8AFF",
+	"URL":"<a href=\"https://www.facebook.com/groups/TheCentralOhioMonitoringPost\">The Central Ohio Earth Station c/o KE8AFF</a>",
+    "Country":"United States of America",
+	"Province_State":"Ohio",
+    "Satellites_received":"NOAA 15,18,19, GOES East, ISS",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, ISS, Other"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 120.808313,15.148759 ]
+    },
+    "properties": {
+    "Station_name":"KN6QKX/DU3",
+	"URL":"<a href=\"http://mgctechtips.netlify.app\">KN6QKX/DU3</a>",
+    "Country":"Philippines",
+	"Province_State":"Pampanga",
+    "Satellites_received":"ISS, NOAA",
+	"Data_Imagery":"APT LRIT, ISS"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 124.764,10.392 ]
+    },
+    "properties": {
+    "Station_name":"DW5CEL",
+	"URL":"",
+    "Country":"Philippines",
+	"Province_State":"Leyte",
+    "Satellites_received":"ISS, LAPAN, NOAA",
+	"Data_Imagery":"APT LRIT, ISS, Other"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.4883,37.6677 ]
+    },
+    "properties": {
+    "Station_name":"N4WVE-Greg’s Amazing Dish",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Virginia",
+    "Satellites_received":"GOES 16, METOP-B, METOP-C,, M2, M2-2, NOAA18, NOAA 19",
+	"Data_Imagery":"APT LRIT,HRPT,HRIT/EMWIN"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 120.385437,16.085403120 ]
+    },
+    "properties": {
+    "Station_name":"DV2JB",
+	"URL":"",
+    "Country":"Philippines",
+	"Province_State":"Dagupan City, Pangasinan",
+    "Satellites_received":"GK-2A, ISS, NOAA 15,18,19",
+	"Data_Imagery":",APT LRIT,HRPT,ISS,Other"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.072480,44.630978 ]
+    },
+    "properties": {
+    "Station_name":"AB9NN",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Michigan",
+    "Satellites_received":"NOAA 15, 18 and 19",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -79.476602,46.171366 ]
+    },
+    "properties": {
+    "Station_name":"WVE3SWS",
+	"URL":"<a href=\"https://www.qrz.com/db/ve3sws\">VE3SWS</a>",
+    "Country":"Canada",
+	"Province_State":"Ontario",
+    "Satellites_received":"GOES, NOAA, ISS",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, ISS"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 0.0, 50.816368 ]
+    },
+    "properties": {
+    "Station_name":"WRXSEUK",
+	"URL":"<a href=\"https://www.facebook.com/wrxseuk/\">WRXSEUK</a>",
+    "Country":"United Kingdom of Great Britain and Northern Ireland",
+	"Province_State":"Sussex",
+    "Satellites_received":"Noaa 15,18,19 and MeteorM2",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 28.028,-26.583 ]
+    },
+    "properties": {
+    "Station_name":"ZS6PAK",
+	"URL":"",
+    "Country":"South Africa",
+	"Province_State":"Gauteng",
+    "Satellites_received":"Noaa 15,18,19 and Meteor M2",
+	"Data_Imagery":"APT LRIT,ISS"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -58.1767,-15.6194 ]
+    },
+    "properties": {
+    "Station_name":"PT9051SWL",
+	"URL":"",
+    "Country":"Brazil",
+	"Province_State":"Mato Grosso",
+    "Satellites_received":"GOES 16, NOAA 15, NOAA18, NOAA19 E METEOR MN2",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, GRB,ISS"
+    }
+  },  
+      {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -76.4,40 ]
+    },
+    "properties": {
+    "Station_name":"Vitality Ground Station",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Pennsylvania",
+    "Satellites_received":"GOES 16, NOAA 15, 18, 19, METEOR-M 2",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 57.4741, -20.2582 ]
+    },
+    "properties": {
+    "Station_name":"Maufox",
+	"URL":"<a href=\"https://www.maufox.net\">Maufox</a>",
+    "Country":"Mauritius",
+	"Province_State":"Plaines Wilhems District",
+    "Satellites_received":"Noaa 15,18,19, Meteor-M N2, Some Cubesats ",
+	"Data_Imagery":"APT LRIT, ISS, Cubesats, Other"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 90.2968287,23.8767347 ]
+    },
+    "properties": {
+    "Station_name":"Akash Torongo - 2",
+	"URL":"",
+    "Country":"Bangladesh",
+	"Province_State":"Savar, Dhaka",
+    "Satellites_received":"NOAA 15 18 19",
+	"Data_Imagery":"APT LRIT, ISS"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 19.91,50.05 ]
+    },
+    "properties": {
+    "Station_name":"SQ9APP",
+	"URL":"",
+    "Country":"Poland",
+	"Province_State":"Krakow",
+    "Satellites_received":"Meteosat-8,10,11, NOAA15,18,19, FengYun2H, 2G, Electro L3 & More",
+	"Data_Imagery":"APT LRIT, APT HRIT, HRIT/EMWIN, HRPT, Other"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 30.00,69.67 ]
+    },
+    "properties": {
+    "Station_name":"Labyrint",
+	"URL":"",
+    "Country":"Norway",
+	"Province_State":"Finnmark",
+    "Satellites_received":"NOAA 15 18 19, Meteor",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 121.13088,14.65387 ]
+    },
+    "properties": {
+    "Station_name":"DU1OC",
+	"URL":"<a href=\"http://www.qrz.com/db/du1oc/\">DU1OC</a>",
+    "Country":"Philippines",
+	"Province_State":"Metro Manila",
+    "Satellites_received":"GK-2A, NOAA-15, 18, 19",
+	"Data_Imagery":"APT LRIT, ISS, Other"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -0.1276, 51.5072 ]
+    },
+    "properties": {
+    "Station_name":"M6IOR",
+	"URL":"<a href=\"https://open-weather.community/\">Open Weather Community</a>",
+    "Country":"United Kingdom of Great Britain and Northern Ireland",
+	"Province_State":"London",
+    "Satellites_received":"NOAA 15, NOAA 18, NOAA 19",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -73.320,42.288 ]
+    },
+    "properties": {
+    "Station_name":"satcolintel5",
+	"URL":"<a href=\"https://network.satnogs.org/stations/2134/\">Station 2134</a>",
+    "Country":"United States of America",
+	"Province_State":"",
+    "Satellites_received":"Cubesat, GOES HRIT,Polar APT & HRPT/AVHRR ",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, Cubesats"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -4.04730,43.34675 ]
+    },
+    "properties": {
+    "Station_name":"R.C. Pablo",
+	"URL":"<a href=\"https://twitter.com/r_mcoy\">@r_mcoy</a>",
+    "Country":"Spain",
+	"Province_State":"Cantabria",
+    "Satellites_received":"Noaa 15 18 19, Meteor M2, ISS, FO29",
+	"Data_Imagery":"APT LRIT, ISS"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -75.770668,39.651791 ]
+    },
+    "properties": {
+    "Station_name":"Newark, DE, USA",
+	"URL":"<a href=\"https://richardsun.com\">Richardsun.com</a>",
+    "Country":"United States of America",
+	"Province_State":"Deleware",
+    "Satellites_received":"NOA 15, 18, 19, METEOR-M 2",
+	"Data_Imagery":"APT LRIT"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 100.6101,13.8510 ]
+    },
+    "properties": {
+    "Station_name":"HS1JZV",
+	"URL":"<a href=\"http://www.qsl.net/hs1jzv\">HS1JZV</a>",
+    "Country":"Thailand",
+	"Province_State":"Bangkok",
+    "Satellites_received":"NOAA15,18,19 Meteor-N2 and ISS",
+	"Data_Imagery":"APT LRIT, ISS"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -77.491450,40.042500 ]
+    },
+    "properties": {
+    "Station_name":"mra2287",
+	"URL":"",
+	"Country":"USA",
+	"Province_State":"Pennsylvania",
+    "Satellites_received":"GOES16",
+	"Data_Imagery":"HRIT/EMWIN"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -80.1918,25.7617 ]
+    },
+    "properties": {
+    "Station_name":"Teds Satellite Emporium",
+	"URL":"",
+	"Country":"USA",
+	"Province_State":"Florida",
+    "Satellites_received":"NOAA",
+    "Data_Imagery":"APT HRIT"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 166.395999,-77.505999 ]
+    },
+    "properties": {
+    "Station_name":"KC4USV",
+	"URL":"<a href=\"https://www.nsf.gov/geo/opp/support/mcmurdo.jsp\">McMurdo Station</a>",
+    "Country":"Antarctica",
+	"Province_State":"McMurdo Station-Ross Island",
+    "Satellites_received":"POE Sats",
+	"Data_Imagery":"HRPT"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.293333,42.228333 ]
+    },
+    "properties": {
+    "Station_name":"KD8CIV",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Michigan",
+    "Satellites_received":"GOES-16",
+	"Data_Imagery":"APT LRIT HRIT"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 149.1438718,-35.223163 ]
+    },
+    "properties": {
+    "Station_name":"Karabar Ground Station",
+	"URL":"",
+    "Country":"Australia",
+	"Province_State":"NSW",
+    "Satellites_received":"Meteor M2 Noaa 15, 18 & 19",
+	"Data_Imagery":"APT LRIT, ISS"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -117.24726,47.62846 ]
+    },
+    "properties": {
+    "Station_name":"Galoosis Ground Station",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Washington",
+    "Satellites_received":"Goes 16, Goes 17, NOAA 15, NOAA 18, NOAA 19, Inmarsat L-band, Inmarsat C-band, Iridium",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, ISS, Other"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -90.400043,38.662023 ]
+    },
+    "properties": {
+    "Station_name":"AB0CV",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Missouri",
+    "Satellites_received":"GOES 16, GOES 17, NOAA 18, 19, 20, All METOP, Russian, and Chinese Polar Weather Satellites",
+	"Data_Imagery":"APT LRIT, APT HRIT, HRIT/EMWIN, HRPT, ISS, Other"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -97.1,33.1 ]
+    },
+    "properties": {
+    "Station_name":"N0SSE",
+	"URL":"<a href=\"http://www.dentonknifeworks.com/currentgeos\">N0SSE</a>",
+    "Country":"United States of America",
+	"Province_State":"Texas",
+    "Satellites_received":"Goes 16, Noaa 15 18 and 19",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, ISS"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 57.61893231535313,-20.417177965897178 ]
+    },
+    "properties": {
+    "Station_name":"3B8BBD-Vickram",
+	"URL":"",
+    "Country":"Mauritius",
+	"Province_State":"New Grove",
+    "Satellites_received":"NOAA 15,18,19",
+	"Data_Imagery":"APT LRIT, ISS, Other"
+    }
+  },  
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -123.80529,39.445723 ]
+    },
+    "properties": {
+    "Station_name":"KF6ZOK",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"California",
+    "Satellites_received":"AOR-E AOR-W GOES 17 Noaa 18 Noaa 19",
+	"Data_Imagery":"APT LRIT, ISS, HRPT, HRIT/EMWIN, Other"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 74.583,16.888 ]
+    },
+    "properties": {
+    "Station_name":"Chougule Ground Station",
+	"URL":"",
+    "Country":"India",
+	"Province_State":"Maharashtra",
+    "Satellites_received":"Meteor M2, NOAA-15, NOAA-19, NOAA-18, ISS SST",
+	"Data_Imagery":"APT LRIT, ISS, Other"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 9.208,45.527 ]
+    },
+    "properties": {
+    "Station_name":"IK2WPM",
+	"URL":"",
+    "Country":"Italy",
+	"Province_State":"Milano",
+    "Satellites_received":"Goes 13, FY-2H, Elektro L3, Noaa 15,18,19 Meteor M2/2.2, Metop-B,C",
+	"Data_Imagery":"APT LRIT, HRIT, HRIT/EMWIN, HRPT, GRB, GVAR, ISS, Other"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -70.7083,46.1042 ]
+    },
+    "properties": {
+    "Station_name":"VE2FXL",
+	"URL":"",
+    "Country":"Canada",
+	"Province_State":"QC",
+    "Satellites_received":"GOES-16",
+	"Data_Imagery":"GRB"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 18.4113,-33.9187 ]
+    },
+    "properties": {
+    "Station_name":"My Eye in the Sky",
+	"URL":"",
+    "Country":"South Africa",
+	"Province_State":"Schotschekloof",
+    "Satellites_received":"NOAA 15, NOAA 18, NOAA 19, EWS-G1",
+	"Data_Imagery":"APT LRIT, HRIT, GVAR"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -99.13057,19.38021 ]
+    },
+    "properties": {
+    "Station_name":"Dcl-Mex",
+	"URL":"",
+    "Country":"Mexico",
+	"Province_State":"Ciudad de Mexico",
+    "Satellites_received":"GOES 16, NOAA 15, NOAA 18, NOAA 19, QuetzSat1 77W",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, Other"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 2.474496,48.383065 ]
+    },
+    "properties": {
+    "Station_name":"F4IKX",
+	"URL":"",
+    "Country":"France",
+	"Province_State":"Essonne (91)",
+    "Satellites_received":"NOAA 15.18.19",
+	"Data_Imagery":"APT LRIT, ISS"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 0.7332917,51.5358099 ]
+    },
+    "properties": {
+    "Station_name":"M7rwa",
+	"URL":"",
+    "Country":"United Kingdom of Great Britain and Northern Ireland",
+	"Province_State":"Essex",
+    "Satellites_received":"Noaa 15,18,19 Meteor M2",
+	"Data_Imagery":"APT LRIT, ISS"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -82.653522,27.834325 ]
+    },
+    "properties": {
+    "Station_name":"My Backyard GOES Receiving Station",
+	"URL":"<a href=\"http://roccosweather.com\">Backyard GOES Receiving Station</a>",
+    "Country":"United States of America",
+	"Province_State":"Florida",
+    "Satellites_received":"GOES-16",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN,"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -73.14635,44.63005 ]
+    },
+    "properties": {
+    "Station_name":"W1ICW",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Vermont",
+    "Satellites_received":"GOES-16, NOAA-15, NOAA-18, NOAA-19, METEOR M2",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN,, HRPT, Other"
+    }
+  }, 
+ {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -78.2,39.15 ]
+    },
+    "properties": {
+    "Station_name":"Kg4who",
+	"URL":"<a href=\"https://www.qsl.net/n2pkt/wxtoimg\">N2PKT</a>",
+    "Country":"United States of America",
+	"Province_State":"Virginia",
+    "Satellites_received":"GOES 16, Noaa 15-18 ,ku band",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, ISS"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -86.5861,34.7304 ]
+    },
+    "properties": {
+    "Station_name":"W4EUS",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Alabama",
+    "Satellites_received":"GOES 16, ISS",
+	"Data_Imagery":"APT LRIT, HRIT/EMWIN, ISS"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -2.633,50.940 ]
+    },
+    "properties": {
+    "Station_name":"Yeovil (UK)",
+	"URL":"",
+    "Country":"United Kingdom of Great Britain and Northern Ireland",
+	"Province_State":"Somerset",
+    "Satellites_received":"NOAA 15, 18, 19, M2",
+	"Data_Imagery":"APT LRIT, ISS"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -84.8750,37.9792 ]
+    },
+    "properties": {
+    "Station_name":"KY4GW",
+	"URL":"",
+    "Country":"USA",
+	"Province_State":"Kentuckey",
+    "Satellites_received":"NOAA 15, 18, 19, GOES 16",
+	"Data_Imagery":"APT LRIT,ISS, HRIT/EMWIN"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -75.157608,39.767479 ]
+    },
+    "properties": {
+    "Station_name":"N2PKT",
+	"URL":"<a href=\"https://www.qsl.net/n2pkt/wxtoimg\">N2PKT</a>",
+    "Country":"USA",
+	"Province_State":"New Jersey",
+    "Satellites_received":"NOAA 15,18,19 - Meteor M2",
+	"Data_Imagery":"APT LRIT,ISS"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 80.341,7.51267 ]
+    },
+    "properties": {
+    "Station_name":"ET038",
+	"URL":"",
+    "Country":"Sri Lanka",
+	"Province_State":"North west",
+    "Satellites_received":"GK-2A,Elektro L3,FY2G,FY2H,NOAA",
+	"Data_Imagery":"APT LRIT APT HRIT HRPT GRB GVAR Other"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -95.610228,29.752163 ]
+    },
+    "properties": {
+    "Station_name":"W0MM",
+	"URL":"<a href=\"http://wx.w0mm.com\">W0MM</a>",
+    "Country":"USA",
+	"Province_State":"Texas",
+    "Satellites_received":"NOAA15, 18, 19",
+	"Data_Imagery":"APT LRIT"
+    }
+  },
+    {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -99.714060,32.481520 ]
+    },
+    "properties": {
+    "Station_name":"WE5TXS",
+	"URL":"",
+    "Country":"United States of America",
+	"Province_State":"Texas",
+    "Satellites_received":"Noaa 15,18,19",
+	"Data_Imagery":"HRPT"
+    }
+  }, 
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -122.9733,46.9733 ]
+    },
+    "properties": {
+    "Station_name":"KD6VPH",
+	"URL":"<a href=\"http://www.kw902.com\">KD6VPH</a>",
+    "Country":"United States Of America",
+	"Province_State":"Washington",
+    "Satellites_received":"GOES 17, NOAA 15, 18, 19",
+	"Data_Imagery":"APT LRIT,HRIT/EMWIN"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 152.989908,-25.98019 ]
+    },
+    "properties": {
+    "Station_name":"VK4KGG",
+	"URL":"",
+    "Country":"Australia",
+	"Province_State":"Queensland",
+    "Satellites_received":"NOAA APT. METEOR LRPT, Inmarsat JAERO and EGC",
+	"Data_Imagery":"APT LRIT,ISS,Other"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -78.458677,35.727829 ]
+    },
+    "properties": {
+    "Station_name":"KB2UUL",
+	"URL":"",
+    "Country":"United States Of America",
+	"Province_State":"North Carolina",
+    "Satellites_received":"GOES 16",
+	"Data_Imagery":"HRIT/EMWIN"
+    }
+  },
+    
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ 37.347,54.693 ]
+    },
+    "properties": {
+    "Station_name":"R2ANF",
+	"URL":"",
+    "Country":"Russia",
+	"Province_State":"Krasnogorsk",
+    "Satellites_received":"Elektro",
+	"Data_Imagery":"GVAR"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -87.349037,44.861499 ]
+    },
+    "properties": {
+    "Station_name":"KA7VIK - Tom",
+	"URL":"",
+    "Country":"USA",
+	"Province_State":"Wisconsin",
+    "Satellites_received":"GOES16, NOAA 15,18,19, Meteor",
+	"Data_Imagery":"HRIT/EMWIN, APT LRIT, ISS, Other"
+    }
+  },  
+  {
+    "type": "Feature",
+    "geometry": {
+       "type": "Point",
+       "coordinates":  [ -25.557,37.742 ]
+    },
+    "properties": {
+    "Station_name":"CU2ZG",
+	"URL":"<a href=\"https://network.satnogs.org/stations/329\">CU2ZG</a>",
+	"Country":"Portugal",
+	"Province_State":"Sao Miguel Island",
+    "Satellites_received":"",
+	"Data_Imagery":""
+    }
+  }
+]
+}

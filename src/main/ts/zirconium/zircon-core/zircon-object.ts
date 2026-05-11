@@ -45,7 +45,7 @@ export type ZirconObjectEventRegistry = MergeZirconRegistries<
 export interface ZirconObjectState {
   id?: string;
   name?: string;
-  type: string;
+  type: typeof ZIRCON_OBJECT_TYPE;
 }
 
 /**
@@ -71,9 +71,9 @@ export abstract class ZirconObject<
     this._id = uuid();
     this.setState(state);
   }
+
   /**
    * // TODO: memory leak if setEventDispatcher is used (we should remove listeners !)
-
    * Set the event emitter to be used
    * @param eventEmitter
    */
@@ -144,8 +144,9 @@ export abstract class ZirconObject<
    */
   public generateCurrentState(): ZirconObjectState {
     return {
-      id: this._id,
       type: ZIRCON_OBJECT_TYPE,
+      id: this.getId(),
+      name: this.getName(),
     };
   }
 

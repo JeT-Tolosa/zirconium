@@ -179,13 +179,14 @@ export class ZirconVizWindow<
   }
 
   private removeVisualizer(): void {
+    if (!this.isDisplayed()) return;
     this.getWindowContent().innerHTML = '';
     this._vizId = null;
     this.__viz = null;
   }
 
   private displayVisualizer(): void {
-    if (!this.getWindowContent()) return;
+    if (!this.isDisplayed()) return;
     this.getWindowContent().innerHTML = '';
     if (!this._vizId) {
       this.getWindowContent().innerHTML = `<p>No Visualizer defined (vizId = null)</p>`;

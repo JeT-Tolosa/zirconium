@@ -113,3 +113,11 @@
 .zircon-context-menu li:hover > ul {
   display: block;
 }
+
+.zircon-context-menu .highlighted {
+  background-color: green;
+}
+
+.zircon-context-menu .lowlighted {
+  background-color: red;
+}

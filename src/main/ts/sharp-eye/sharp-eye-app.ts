@@ -84,6 +84,21 @@ import {
   ZIRCON_VISUALIZER_TYPE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
 } from '../zirconium/zircon-core/zircon-types';
+import { AISCatalogEngineFactory } from './engines/maritime/ais-catalog-engine-factory';
+import {
+  AISCatalogEngine,
+  AISCatalogEngineState,
+} from './engines/maritime/ais-catalog-engine';
+import { VizAISCatalogTabulatorFactory } from '../zircon-visualizers/maritime/viz-eye-ais-catalog-tabulator-factory';
+import {
+  VIZ_AIS_CATALOG_TABULATOR_TYPE,
+  VizAISCatalogTabulatorState,
+} from '../zircon-visualizers/maritime/viz-eye-ais-catalog-tabulator';
+import {
+  VIZ_AIS_LOADER_TYPE,
+  VizAISLoaderState,
+} from '../zircon-visualizers/maritime/viz-eye-ais-loader';
+import { VizAISLoaderFactory } from '../zircon-visualizers/maritime/viz-eye-ais-loader-factory';
 
 export const SHARP_EYE_ENGINE_TYPE = ZIRCON_ENGINE_TYPE;
 export const SHARP_EYE_VIZ_TYPE = ZIRCON_VISUALIZER_TYPE;
@@ -101,6 +116,7 @@ export class SharpEyedApp extends ZirconApplication {
     await this.registerObjectFactory(new SatelliteCatalogEngineFactory());
     await this.registerObjectFactory(new GroundStationCatalogEngineFactory());
     await this.registerObjectFactory(new TimeManagerEngineFactory());
+    await this.registerObjectFactory(new AISCatalogEngineFactory());
 
     this.registerObjectState({
       id: `time-manager-${uuid()}`,
@@ -115,6 +131,11 @@ export class SharpEyedApp extends ZirconApplication {
 
     this.registerObjectState({
       id: `gs-catalog-${uuid()}`,
+      type: AISCatalogEngine.AIS_CATALOG_ENGINE_TYPE,
+    } as AISCatalogEngineState);
+
+    this.registerObjectState({
+      id: `qis-catalog-${uuid()}`,
       type: GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE,
     } as GroundStationCatalogEngineState);
   }
@@ -133,6 +154,7 @@ export class SharpEyedApp extends ZirconApplication {
         this.createDesktops2().id,
         this.createDesktops3().id,
         this.createDesktops4().id,
+        this.createDesktops5().id,
       ],
     };
     this.registerObjectState(desktopManagerState);
@@ -165,15 +187,17 @@ export class SharpEyedApp extends ZirconApplication {
     await this.registerObjectFactory(new AnalogClockFactory());
     await this.registerObjectFactory(new TimeControllerFactory());
 
-    // Spatial Loaders
+    // Spatial Catalogs & Loaders
     await this.registerObjectFactory(new VizSatCatLoaderFactory());
     await this.registerObjectFactory(new VizGroundStationLoaderFactory());
-
-    // Spatial Catalogs
     await this.registerObjectFactory(new VizSatelliteCatalogTabulatorFactory());
     await this.registerObjectFactory(
       new VizGroundStationCatalogTabulatorFactory(),
     );
+
+    // Maritime Catalogs & Loaders
+    await this.registerObjectFactory(new VizAISLoaderFactory());
+    await this.registerObjectFactory(new VizAISCatalogTabulatorFactory());
 
     // Existing Fetch Visualizer
     await this.registerObjectFactory(new VizFetchFactory());
@@ -255,7 +279,7 @@ export class SharpEyedApp extends ZirconApplication {
     });
 
     this.registerObjectState({
-      id: 'groundStationVizId',
+      id: 'groundStationLoaderVizId',
       type: VizGroundStationLoader.VIZ_GROUND_STATION_LOADER_TYPE,
       name: 'Ground Station Loader',
     });
@@ -285,6 +309,18 @@ export class SharpEyedApp extends ZirconApplication {
       type: VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE,
       name: 'Ground Station Catalog',
     });
+
+    this.registerObjectState({
+      id: 'aisLoaderVizId',
+      type: VIZ_AIS_LOADER_TYPE,
+      name: 'AIS Loader',
+    } as VizAISLoaderState);
+
+    this.registerObjectState({
+      id: 'aisCatalogVizId',
+      type: VIZ_AIS_CATALOG_TABULATOR_TYPE,
+      name: 'AIS Catalog',
+    } as VizAISCatalogTabulatorState);
   }
 
   /**
@@ -476,7 +512,6 @@ export class SharpEyedApp extends ZirconApplication {
       height: 1080,
       vizId: 'satcat1VizId',
     };
-    //const timeController = new TimeController();
     this.registerObjectState(satcat1WindowState);
 
     const satcat2WindowState: ZirconVizWindowState = {
@@ -489,7 +524,6 @@ export class SharpEyedApp extends ZirconApplication {
       height: 1080,
       vizId: 'satcat2VizId',
     };
-    // createVisualizerSatelliteCatalog(),
     this.registerObjectState(satcat2WindowState);
 
     const satelliteLoaderWindowState: ZirconVizWindowState = {
@@ -531,9 +565,8 @@ export class SharpEyedApp extends ZirconApplication {
       top: 270,
       width: 385,
       height: 220,
-      vizId: 'groundStationVizId',
+      vizId: 'groundStationLoaderVizId',
     };
-    // window5.setContentObject(new VizGroundStationLoader());
     this.registerObjectState(groundStationLoaderWindowState);
 
     const groundStationCatalog1WindowState: ZirconVizWindowState = {
@@ -546,7 +579,6 @@ export class SharpEyedApp extends ZirconApplication {
       height: 1080,
       vizId: 'groundStationCatalogVizId',
     };
-    // createVisualizerGroundStationCatalog(),
     this.registerObjectState(groundStationCatalog1WindowState);
 
     const groundStationCatalog2WindowState: ZirconVizWindowState = {
@@ -559,13 +591,12 @@ export class SharpEyedApp extends ZirconApplication {
       height: 1080,
       vizId: 'groundStationCatalogVizId',
     };
-    // createVisualizerGroundStationCatalog(),
     this.registerObjectState(groundStationCatalog2WindowState);
 
     const desktop4State: ZirconDesktopState = {
       type: ZIRCON_DESKTOP_TYPE,
       id: `desktop4-${uuid()}`,
-      name: 'Desktop 4',
+      name: 'Spatial',
       windowIds: [
         groundStationLoaderWindowState.id,
         groundStationCatalog1WindowState.id,
@@ -574,5 +605,42 @@ export class SharpEyedApp extends ZirconApplication {
     };
     this.registerObjectState(desktop4State);
     return desktop4State;
+  }
+
+  /**
+   * DESKTOP5
+   */
+  public createDesktops5(): ZirconDesktopState {
+    const AISLoaderWindowState: ZirconVizWindowState = {
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
+      id: `window-${uuid()}`,
+      title: 'AIS Loader',
+      left: 20,
+      top: 270,
+      width: 385,
+      height: 220,
+      vizId: 'aisLoaderVizId',
+    };
+    this.registerObjectState(AISLoaderWindowState);
+    const AISCatalogWindowState: ZirconVizWindowState = {
+      type: ZIRCON_VISUALIZER_WINDOW_TYPE,
+      id: `window-${uuid()}`,
+      title: 'AIS Catalog',
+      left: 710,
+      top: 10,
+      width: 600,
+      height: 1080,
+      vizId: 'aisCatalogVizId',
+    };
+    this.registerObjectState(AISCatalogWindowState);
+
+    const desktop5State: ZirconDesktopState = {
+      type: ZIRCON_DESKTOP_TYPE,
+      id: `desktop5-${uuid()}`,
+      name: 'Maritime',
+      windowIds: [AISLoaderWindowState.id, AISCatalogWindowState.id],
+    };
+    this.registerObjectState(desktop5State);
+    return desktop5State;
   }
 }

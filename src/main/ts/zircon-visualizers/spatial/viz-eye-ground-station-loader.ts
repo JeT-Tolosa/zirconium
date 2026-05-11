@@ -1,15 +1,15 @@
 import './viz-eye-ground-station-loader.css';
 import { v4 as uuid } from 'uuid';
-import usRadioGuyGroundJson from '../../../../../assets/orbital-data/usradioguy/ground.json';
-import usRadioGuyXFilesJson from '../../../../../assets/orbital-data/usradioguy/xfiles.json';
-import usRadioGuyNOAAJson from '../../../../../assets/orbital-data/usradioguy/NASANOAA.json';
-import { ElementLoader } from '../../libraries/spatial/satellite-loader';
+import usRadioGuyGroundJson from '../../../../../assets/data/spatial/usradioguy/ground.json';
+import usRadioGuyXFilesJson from '../../../../../assets/data/spatial/usradioguy/xfiles.json';
+import usRadioGuyNOAAJson from '../../../../../assets/data/spatial/usradioguy/NASANOAA.json';
+import { ElementLoader } from '../../libraries/catalog/element-loader';
 import {
   MergeZirconRegistries,
   PickEvents,
 } from '../../zirconium/zircon-event';
 import { CatalogEngineEvents } from '../../sharp-eye/engines/catalog-engine';
-import { USRadioGuyGroundStationLoaderJson } from '../../libraries/spatial/ground-station-loader-usradioguy';
+import { USRadioGuyGroundStationLocalLoaderJson } from '../../libraries/spatial/ground-station-loader-usradioguy';
 import {
   GROUND_STATION_TYPE,
   GroundStation,
@@ -20,30 +20,29 @@ import {
 } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { IonButton } from '@ionic/core/components/ion-button';
 
-const usRadioGuyGroundStationLoader: USRadioGuyGroundStationLoaderJson =
-  new USRadioGuyGroundStationLoaderJson();
-
 interface GroundStationLoaderDescriptor {
   name: string;
-  localFile: string;
   loader: ElementLoader<GroundStation>;
 }
 
 const loaderDescriptors: { [id: string]: GroundStationLoaderDescriptor } = {
   'usradioguy-ground': {
     name: 'USRadioGuy Ground',
-    localFile: usRadioGuyGroundJson as unknown as string,
-    loader: usRadioGuyGroundStationLoader,
+    loader: new USRadioGuyGroundStationLocalLoaderJson(
+      usRadioGuyGroundJson as unknown as string,
+    ),
   },
   'usradioguy-XFiles': {
     name: 'USRadioGuy XFiles',
-    localFile: usRadioGuyXFilesJson as unknown as string,
-    loader: usRadioGuyGroundStationLoader,
+    loader: new USRadioGuyGroundStationLocalLoaderJson(
+      usRadioGuyXFilesJson as unknown as string,
+    ),
   },
   'usradioguy-NOAA': {
     name: 'USRadioGuy NOAA',
-    localFile: usRadioGuyNOAAJson as unknown as string,
-    loader: usRadioGuyGroundStationLoader,
+    loader: new USRadioGuyGroundStationLocalLoaderJson(
+      usRadioGuyNOAAJson as unknown as string,
+    ),
   },
 };
 
@@ -150,29 +149,21 @@ export class VizGroundStationLoader<
     this._fetchButton = document.createElement('ion-button');
     this._fetchButton.classList.add('groundstation-button');
     this._fetchButton.innerText = 'Load Data';
-    this._fetchButton.addEventListener('click', () => {
+    this._fetchButton.addEventListener('click', async () => {
       const dataDescriptorId: string =
         this.getDataSelector().options[this.getDataSelector().selectedIndex]
           ?.value;
       if (!dataDescriptorId) throw new Error('Unable to fetch data');
       const dataDescriptor: GroundStationLoaderDescriptor =
         loaderDescriptors[dataDescriptorId];
-      return dataDescriptor.loader
-        .loadLocalJson(dataDescriptor.localFile)
-        .then((groundStations: GroundStation[]) => {
-          // this.setSatelliteData(satellites);
+      const groundStations: GroundStation[] =
+        await dataDescriptor.loader.getData();
 
-          this.emit('COLLECTION_CREATE_CATALOG_REQUEST', {
-            catalogType: GROUND_STATION_TYPE,
-            catalogDescriptor: { id: 'null', name: dataDescriptor.name },
-            elements: groundStations,
-          });
-        })
-        .catch((error) => {
-          this.emit('UNCAUGHT_EXCEPTION', {
-            error: `An error occured fetching ${dataDescriptor.name}: ${error}`,
-          });
-        });
+      this.emit('COLLECTION_CREATE_CATALOG_REQUEST', {
+        catalogType: GROUND_STATION_TYPE,
+        catalogDescriptor: { id: 'null', name: dataDescriptor.name },
+        elements: groundStations,
+      });
     });
 
     return this._fetchButton;

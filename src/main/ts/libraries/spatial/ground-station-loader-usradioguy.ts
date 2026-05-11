@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { GroundStation } from './ground-station';
-import { ElementLoader } from './satellite-loader';
+import { ElementLoader } from '../catalog/element-loader';
 
 // interface USRadioGuyGroundStation {
 //   type: 'Feature';
@@ -41,21 +41,24 @@ const USRadioGuyGroundStationFileSchema = z.object({
   features: z.array(USRadioGuyGroundStationSchema),
 });
 
-export class USRadioGuyGroundStationLoaderJson extends ElementLoader<GroundStation> {
-  constructor() {
+export class USRadioGuyGroundStationLocalLoaderJson extends ElementLoader<GroundStation> {
+  private _jsonContent: string = null;
+
+  constructor(jsonContent: string) {
     super('USRadioGuy Loader');
+    this._jsonContent = jsonContent;
   }
 
   /**
    * Load satellite data of type Celestrak JSON
-   * @param fileLocation
+   * @param jsonContent
    * @returns
    */
-  public loadLocalJson(fileLocation: string): Promise<GroundStation[]> {
+  public getData(): Promise<GroundStation[]> {
     let retrievedData: Promise<unknown> = null;
     // if (this._local) retrievedData = this.fetchDataCelestrakLocal();
     // else retrievedData = this.fetchDataCelestrakOnline();
-    retrievedData = Promise.resolve(fileLocation);
+    retrievedData = Promise.resolve(this._jsonContent);
     // return this.fetchDataCelestrakOnline()
     return retrievedData.then((data) => {
       const result = USRadioGuyGroundStationFileSchema.safeParse(data);
