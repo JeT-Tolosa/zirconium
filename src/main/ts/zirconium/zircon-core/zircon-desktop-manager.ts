@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import {
   ZIRCON_DROPPABLE_CLASS,
   ZIRCON_TARGET_DESKTOP_ID,
@@ -29,9 +30,12 @@ import {
   DESKTOP_SELECTOR_CLASS,
   DESKTOPS_CONTAINER_CLASS,
   DESKTOPS_MANAGER_CLASS,
+  DESKTOPS_MANAGER_HEADER_CLASS,
   DESKTOPS_SELECTOR_CLASS,
+  TOOLBAR_CONTAINER_CLASS,
   ZIRCON_DESKTOP_MANAGER_TYPE,
 } from './zircon-types';
+import { ToolbarElement as ToolbarElementDescriptor } from './zircon-desktop-manager-toolbar';
 
 export interface ZirconDesktopManagerState extends ZirconObjectState {
   type: typeof ZIRCON_DESKTOP_MANAGER_TYPE;
@@ -87,6 +91,7 @@ interface ZirconDesktopManagerUI {
   desktopElement: HTMLElement;
   desktopSelectorElement: HTMLElement;
 }
+
 /**
  * A Zircon View Region is a collection  of managed Zircon Desktops
  */
@@ -96,10 +101,13 @@ export class ZirconDesktopManager<
 > extends ZirconAppObject<R> {
   // private __parent: HTMLElement = null;
   private __mainDiv: HTMLDivElement = null;
+  private __headerDiv: HTMLDivElement = null;
+  private __toolbarContainer: HTMLDivElement = null;
   private __desktopContainer: HTMLDivElement = null;
   private __desktopsSelectorContainer: HTMLDivElement = null;
   private __desktopNameContainer: HTMLDivElement = null;
   private __desktopNameSpan: HTMLSpanElement = null;
+  private __toolbarElements: { [id: string]: ToolbarElementDescriptor } = {};
   // private _currentD: { desktop: ZirconDesktop; button: HTMLElement } = null;
   private _desktopIds: string[] = [];
 
@@ -379,7 +387,7 @@ export class ZirconDesktopManager<
       this.getId(),
     );
     this.__mainDiv.classList.add(DESKTOPS_MANAGER_CLASS);
-    this.__mainDiv.appendChild(this.getDesktopsSelectorsContainer());
+    this.__mainDiv.appendChild(this.getHeaderDiv());
     this.__mainDiv.appendChild(this.getDesktopsContainer());
     return this.__mainDiv;
   }
@@ -403,6 +411,19 @@ export class ZirconDesktopManager<
     return this.__desktopContainer;
   }
 
+  private getToolbarContainer(): HTMLDivElement {
+    if (this.__toolbarContainer) return this.__toolbarContainer;
+    this.__toolbarContainer = document.createElement('div');
+    this.__toolbarContainer.classList.add(TOOLBAR_CONTAINER_CLASS);
+    this.__toolbarContainer.id = `toolbar-container-${this.getId()}`;
+    this.__toolbarContainer.innerHTML =
+      '<div>A</div><div>B</div><div>C</div><div>D</div>';
+    Object.keys(this.__toolbarElements).forEach((toolbarElementId: string) => {
+      this.displayToolbarElement(toolbarElementId);
+    });
+    return this.__toolbarContainer;
+  }
+
   /**
    * Gets the container element for desktop selectors
    * @returns The desktop selectors container div element
@@ -419,6 +440,20 @@ export class ZirconDesktopManager<
     );
 
     return this.__desktopsSelectorContainer;
+  }
+
+  private getHeaderDiv(): HTMLDivElement {
+    if (this.__headerDiv) return this.__headerDiv;
+    this.__headerDiv = document.createElement('div');
+    this.__headerDiv.classList.add(DESKTOPS_MANAGER_HEADER_CLASS);
+    this.__headerDiv.id = `desktops-manager-header-${this.getId()}`;
+    this.__headerDiv.setAttribute(
+      ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
+      this.getId(),
+    );
+    this.__headerDiv.appendChild(this.getDesktopsSelectorsContainer());
+    this.__headerDiv.appendChild(this.getToolbarContainer());
+    return this.__headerDiv;
   }
 
   /**
@@ -516,8 +551,25 @@ export class ZirconDesktopManager<
     }
     return true;
   }
-}
 
+  public addToolbarElement(toolbarElement: ToolbarElementDescriptor): string {
+    if (!toolbarElement) return;
+    const id = `toolber-element-${uuid()}`;
+    this.__toolbarElements[id] = toolbarElement;
+    this.displayToolbarElement(id);
+    return id;
+  }
+
+  private displayToolbarElement(id: string): void {
+    const toolbarElement: ToolbarElementDescriptor = this.__toolbarElements[id];
+    if (!toolbarElement) return;
+    if (!this.__toolbarContainer) return;
+    const toolDiv = document.createElement('div');
+    toolDiv.id = id;
+    toolDiv.appendChild(toolbarElement.content);
+    this.__toolbarContainer.append(toolDiv);
+  }
+}
 // /**
 //  * Context Menu Factory for Desktop Manager
 //  */

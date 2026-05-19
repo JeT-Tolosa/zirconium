@@ -21,19 +21,37 @@ body {
   font-size: 0.5em;
 }
 
-.zircon-ui .desktop-manager {
+.zircon-ui .desktops-manager {
   display: flex;
   flex-direction: column;
   height: 100%;
 }
 
-.zircon-ui .desktops-selector {
+.zircon-ui .desktops-manager-header {
   display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  overflow: auto;
+  padding: 0px;
   gap: 10px;
-  padding: 10px;
-  background: #0b0b22;
+
+  /* effet glass */
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
   border-bottom: solid 1px #ffffff55;
   box-shadow: 0 10px 15px #00000099;
+}
+
+.zircon-ui .desktops-selector,
+.zircon-ui .toolbar-container {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  align-items: center;
+  box-shadow: 0 10px 15px #00000099;
+  height: 100%;
   z-index: 1000;
 }
 
@@ -57,8 +75,17 @@ body {
   transition: all 0.2s ease;
 }
 
-.zircon-ui .desktop-selector::before,
-.zircon-ui .desktop-selector::after {
+.zircon-ui .toolbar-container > div {
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.zircon-ui .desktops-manager-header > * > *::before,
+.zircon-ui .desktops-manager-header > * > *::after {
   content: '';
   position: absolute;
   left: 0;
@@ -68,18 +95,23 @@ body {
   opacity: 0.8;
 }
 
-.zircon-ui .desktop-selector::before {
+.zircon-ui .desktops-manager-header > * > *::before {
   top: 0px;
 }
 
-.zircon-ui .desktop-selector::after {
+.zircon-ui .desktops-manager-header > * > *::after {
   bottom: 0px;
 }
 
-.zircon-ui .desktop-selector:hover {
+.zircon-ui .desktops-manager-header > * > *:hover {
+  background: linear-gradient(90deg, transparent, #333, transparent);
+  transform: scale(1.2);
+}
+
+/* .zircon-ui .desktop-selector:hover {
   background: linear-gradient(90deg, transparent, #333, transparent);
   transform: scale(1.1);
-}
+} */
 
 .zircon-ui .desktop-selector.active {
   background: linear-gradient(90deg, transparent, #233d93, transparent);

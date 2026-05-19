@@ -134,10 +134,7 @@ export class VizSatCatLoader<
     return this._dataSelector;
   }
 
-  //   const selectedRows = table.rows({ selected: true }).data();
-  // console.log(selectedRows);
-
-  public getFetchButton(): HTMLElement {
+   public getFetchButton(): HTMLElement {
     if (this._fetchButton) return this._fetchButton;
     this._fetchButton = document.createElement('ion-button');
     this._fetchButton.classList.add('satcat-button');

@@ -99,6 +99,7 @@ import {
   VizAISLoaderState,
 } from '../zircon-visualizers/maritime/viz-eye-ais-loader';
 import { VizAISLoaderFactory } from '../zircon-visualizers/maritime/viz-eye-ais-loader-factory';
+import { UserConnectUIZirconPlugin } from '../zircon-plugins/connect-ui/connect-ui-plugin';
 
 export const SHARP_EYE_ENGINE_TYPE = ZIRCON_ENGINE_TYPE;
 export const SHARP_EYE_VIZ_TYPE = ZIRCON_VISUALIZER_TYPE;
@@ -110,6 +111,10 @@ export class SharpEyedApp extends ZirconApplication {
   constructor() {
     super('Sharp Eye');
     this.setUIClass('sharp-eye-ui');
+  }
+
+  private async registerPlugins(): Promise<void> {
+    this.getPluginManager().registerPlugin(new UserConnectUIZirconPlugin());
   }
 
   private async registerEngines(): Promise<void> {
@@ -141,6 +146,7 @@ export class SharpEyedApp extends ZirconApplication {
   }
 
   public async create(): Promise<void> {
+    await this.registerPlugins();
     await this.registerEngines();
     await this.registerVisualizers();
     this.registerVisualizerStates();

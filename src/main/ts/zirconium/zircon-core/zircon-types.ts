@@ -10,10 +10,12 @@ export const ZIRCON_ENGINE_TYPE: string = 'zircon-engine';
 export const ZIRCON_ENGINE_MANAGER_TYPE: string = 'zircon-engine-manager';
 export const ZIRCON_OBJECT_MANAGER_TYPE: string = 'zircon-object-manager';
 
-export const DESKTOPS_MANAGER_CLASS = 'desktop-manager';
+export const DESKTOPS_MANAGER_CLASS = 'desktops-manager';
+export const DESKTOPS_MANAGER_HEADER_CLASS = 'desktops-manager-header';
+export const DESKTOP_MANAGER_DESKTOPS_CONTAINER_CLASS = `desktops-container`;
+export const TOOLBAR_CONTAINER_CLASS = `toolbar-container`;
 export const DESKTOPS_CONTAINER_CLASS = `desktops-container`;
 export const DESKTOPS_SELECTOR_CLASS = `desktops-selector`;
-export const DESKTOP_CONTAINER_CLASS = `desktop-container`;
 export const DESKTOP_SELECTOR_CLASS = `desktop-selector`;
 export const ACTIVE_DESKTOP_CLASS = 'active';
 

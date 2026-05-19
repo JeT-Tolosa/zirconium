@@ -36,6 +36,8 @@ import { ZirconAppObjectFactory } from './zircon-app-object-factory';
 import { ZirconEngineFactory } from './zircon-engine-factory';
 import { ZirconObjectFactory } from './zircon-object-factory';
 import { ZirconAppFactory } from './zircon-app-factory';
+import { ZirconPluginManager } from '../zircon-plugin/zircon-plugin-manager';
+import { ZirconPlugin } from '../zircon-plugin/zircon-plugin';
 
 /**
  * Composition of this application UI
@@ -117,6 +119,7 @@ export class ZirconApplication<
   private _desktopManagerId: string = 'application-desktop-manager';
   private __desktopManager: ZirconDesktopManager = null;
   private __objectManager: ZirconObjectManager = null;
+  private __pluginManager: ZirconPluginManager = null;
 
   /**
    * constructor
@@ -194,6 +197,12 @@ export class ZirconApplication<
     if (!this.__objectManager)
       this.__objectManager = new ZirconObjectManager(this);
     return this.__objectManager;
+  }
+
+  public getPluginManager(): ZirconPluginManager {
+    if (!this.__pluginManager)
+      this.__pluginManager = new ZirconPluginManager(this);
+    return this.__pluginManager;
   }
 
   public async getInstance(
@@ -331,6 +340,10 @@ export class ZirconApplication<
     return this.getObjectManager().registerObjectState(state);
   }
 
+  public registerPlugin(plugin: ZirconPlugin): boolean {
+    return this.getPluginManager().registerPlugin(plugin);
+  }
+
   private async startEngines(): Promise<void> {
     await Promise.all(
       this.getObjectManager()
@@ -353,6 +366,7 @@ export class ZirconApplication<
    */
   public async start(): Promise<void> {
     await this.createDesktopManager();
+    await this.getPluginManager().startPlugins();
     await this.startEngines();
     this.__isStarted = true;
     this.displayUIIn(document.body);

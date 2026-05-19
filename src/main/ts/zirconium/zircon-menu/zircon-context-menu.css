@@ -115,9 +115,9 @@
 }
 
 .zircon-context-menu .highlighted {
-  background-color: green;
+  background-color: rgb(51, 50, 57);
 }
 
 .zircon-context-menu .lowlighted {
-  background-color: red;
+  background-color: rgb(119, 124, 223);
 }
