@@ -3,9 +3,10 @@
  */
 export interface TimeDescriptor {
   realStartTime: number;
-  simulatedStartTime: number;
-  simulatedStopTime: number; // if > 0, time is limited to this time
-  timeMultiplicator: number; // 1 is real time
+  simulatedStartTime: number; // start of the date range
+  simulatedCurrentTime: number; // current Time MUST be between start and stop time
+  simulatedStopTime: number; // end of the date range, if <= 0, time is unlimited
+  timeMultiplicator: number; // 1 is real time, 2: time runs 2 times faster. < 1 time runs slower
   running: boolean;
 }
 
@@ -15,9 +16,11 @@ export class TimingHelper {
    * @returns a time descriptor for real time
    */
   public static createRealTimeDescriptor(): TimeDescriptor {
+    const now: number = Date.now();
     return {
-      realStartTime: Date.now(),
-      simulatedStartTime: Date.now(),
+      realStartTime: now,
+      simulatedStartTime: now,
+      simulatedCurrentTime: now,
       simulatedStopTime: 0,
       timeMultiplicator: 1,
       running: true,

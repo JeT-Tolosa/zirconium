@@ -1,15 +1,10 @@
+import { AuthError, AuthService, LoginResult } from './connect';
+
 export interface KeycloakConfig {
   url: string;
   realm: string;
   clientId: string;
   redirectUri: string;
-}
-
-export interface LoginResult {
-  accessToken: string;
-  refreshToken?: string;
-  idToken?: string;
-  expiresIn?: number;
 }
 
 interface OAuthMessage {
@@ -24,11 +19,6 @@ interface TokenResponse {
   refresh_token?: string;
   id_token?: string;
   expires_in?: number;
-}
-
-export interface AuthService {
-  login(): Promise<LoginResult>;
-  logout(): Promise<void>;
 }
 
 export class KeycloakAuthService implements AuthService {
@@ -46,9 +36,12 @@ export class KeycloakAuthService implements AuthService {
     const verifier = this.generateCodeVerifier();
     const challenge = await this.generateCodeChallenge(verifier);
     const state = crypto.randomUUID();
+
     sessionStorage.setItem('pkce_verifier', verifier);
     sessionStorage.setItem('oauth_state', state);
+
     const authUrl = this.buildAuthorizationUrl(challenge, state);
+
     const popup = window.open(
       authUrl,
       'oauth2-login',
@@ -64,48 +57,92 @@ export class KeycloakAuthService implements AuthService {
     );
 
     if (!popup) {
-      throw new Error('Popup bloquée par le navigateur');
+      throw new AuthError(
+        'POPUP_BLOCKED',
+        'La popup de connexion a été bloquée',
+      );
     }
 
     return new Promise<LoginResult>((resolve, reject) => {
-      const timeout = window.setTimeout(() => {
-        cleanup();
-        reject(new Error('Authentication timeout'));
-      }, 120000);
+      const timeout = window.setTimeout(
+        () => {
+          cleanup();
+
+          reject(
+            new AuthError(
+              'AUTH_TIMEOUT',
+              'Le serveur de connexion ne répond pas',
+            ),
+          );
+        },
+        60 * 1000, // 60 secondes
+      );
+
+      const popupWatcher = window.setInterval(() => {
+        if (popup.closed) {
+          cleanup();
+
+          reject(
+            new AuthError(
+              'POPUP_CLOSED',
+              'La fenêtre de connexion a été fermée',
+            ),
+          );
+        }
+      }, 500);
 
       const cleanup = (): void => {
         window.clearTimeout(timeout);
+        window.clearInterval(popupWatcher);
         window.removeEventListener('message', listener);
-        popup.close();
+
+        sessionStorage.removeItem('pkce_verifier');
+        sessionStorage.removeItem('oauth_state');
+
+        if (!popup.closed) {
+          popup.close();
+        }
       };
 
       const listener = async (event: MessageEvent): Promise<void> => {
         if (event.origin !== window.location.origin) {
           return;
         }
+
         const data = event.data as OAuthMessage;
+
         if (data.type !== 'oauth_callback') {
           return;
         }
-        cleanup();
+
         try {
           if (data.error) {
-            throw new Error(data.error);
+            throw new AuthError('OAUTH_ERROR', `Erreur OAuth: ${data.error}`);
           }
 
           const expectedState = sessionStorage.getItem('oauth_state');
-          if (expectedState !== data.state) {
-            throw new Error('Invalid state');
+
+          if (!expectedState || expectedState !== data.state) {
+            throw new AuthError('INVALID_STATE', 'State OAuth invalide');
           }
 
           if (!data.code) {
-            throw new Error('Missing authorization code');
+            throw new AuthError('MISSING_CODE', 'Code d’autorisation manquant');
           }
 
           const tokens = await this.exchangeCode(data.code, verifier);
+
+          cleanup();
+
           resolve(tokens);
         } catch (error: unknown) {
-          reject(error instanceof Error ? error : new Error('Unknown error'));
+          cleanup();
+
+          reject(
+            error instanceof Error
+              ? error
+              : new AuthError('UNKNOWN', 'Erreur inconnue'),
+          );
         }
       };
 
@@ -119,6 +156,7 @@ export class KeycloakAuthService implements AuthService {
         `/realms/${this.config.realm}` +
         `/protocol/openid-connect/auth`,
     );
+
     url.searchParams.set('client_id', this.config.clientId);
     url.searchParams.set('redirect_uri', this.config.redirectUri);
     url.searchParams.set('response_type', 'code');
@@ -126,6 +164,7 @@ export class KeycloakAuthService implements AuthService {
     url.searchParams.set('code_challenge', challenge);
     url.searchParams.set('code_challenge_method', 'S256');
     url.searchParams.set('state', state);
+
     return url.toString();
   }
 
@@ -146,27 +185,78 @@ export class KeycloakAuthService implements AuthService {
       code_verifier: verifier,
     });
 
-    const response = await fetch(tokenUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body,
-    });
+    const controller = new AbortController();
 
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(text);
+    const timeout = window.setTimeout(() => {
+      controller.abort();
+    }, 15000);
+
+    try {
+      const response = await fetch(tokenUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body,
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        let errorMessage = `Erreur HTTP ${response.status}`;
+
+        try {
+          const text = await response.text();
+
+          if (text) {
+            errorMessage = text;
+          }
+        } catch {
+          // ignore
+        }
+
+        throw new AuthError('TOKEN_EXCHANGE_FAILED', errorMessage);
+      }
+
+      let json: TokenResponse;
+
+      try {
+        json = (await response.json()) as TokenResponse;
+      } catch {
+        throw new AuthError('INVALID_RESPONSE', 'Réponse serveur invalide');
+      }
+
+      if (!json.access_token) {
+        throw new AuthError(
+          'MISSING_ACCESS_TOKEN',
+          'Access token absent de la réponse',
+        );
+      }
+
+      return {
+        accessToken: json.access_token,
+        refreshToken: json.refresh_token,
+        idToken: json.id_token,
+        expiresIn: json.expires_in,
+      };
+    } catch (error: unknown) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw new AuthError(
+          'NETWORK_TIMEOUT',
+          'Le serveur met trop de temps à répondre',
+        );
+      }
+
+      if (error instanceof TypeError) {
+        throw new AuthError(
+          'NETWORK_ERROR',
+          'Impossible de contacter le serveur d’authentification',
+        );
+      }
+
+      throw error;
+    } finally {
+      window.clearTimeout(timeout);
     }
-
-    const json = (await response.json()) as TokenResponse;
-
-    return {
-      accessToken: json.access_token,
-      refreshToken: json.refresh_token,
-      idToken: json.id_token,
-      expiresIn: json.expires_in,
-    };
   }
 
   private generateCodeVerifier(): string {
@@ -176,7 +266,9 @@ export class KeycloakAuthService implements AuthService {
 
   private async generateCodeChallenge(verifier: string): Promise<string> {
     const data = new TextEncoder().encode(verifier);
+
     const digest = await crypto.subtle.digest('SHA-256', data);
+
     return this.base64UrlEncode(new Uint8Array(digest));
   }
 
