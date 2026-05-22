@@ -1,0 +1,23 @@
+.time-controller-range {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+}
+
+.time-controller-range * {
+  padding: 2px;
+}
+
+.time-controller-range .start-time,
+.time-controller-range .end-time {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.time-controller-range .date-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
