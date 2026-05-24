@@ -1,5 +1,5 @@
+import { ElementLoader } from '../../catalog/element-loader';
 import { Satellite } from './satellite';
-import { ElementLoader } from '../catalog/element-loader';
 import { z } from 'zod';
 
 interface CelestrackSatellite {

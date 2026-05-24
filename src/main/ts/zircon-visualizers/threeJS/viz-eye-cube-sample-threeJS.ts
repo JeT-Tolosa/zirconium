@@ -44,7 +44,7 @@ export class VizCubeSampleThreeJS extends VizThreeJS {
     });
 
     this._renderer.setSize(200, 200);
-    this.getMainDiv().appendChild(this._renderer.domElement);
+    this.getContainer().appendChild(this._renderer.domElement);
 
     this._geometry = new THREE.BoxGeometry(1, 1, 1);
     this._material = new THREE.MeshNormalMaterial();
@@ -62,15 +62,15 @@ export class VizCubeSampleThreeJS extends VizThreeJS {
     this._cube.rotation.x += 0.05;
     this._cube.rotation.y += 0.05;
     if (
-      this._renderer.domElement.width != this.getMainDiv().clientWidth ||
-      this._renderer.domElement.height != this.getMainDiv().clientHeight
+      this._renderer.domElement.width != this.getContainer().clientWidth ||
+      this._renderer.domElement.height != this.getContainer().clientHeight
     ) {
       this._camera.aspect =
-        this.getMainDiv().clientWidth / this.getMainDiv().clientHeight;
+        this.getContainer().clientWidth / this.getContainer().clientHeight;
       this._camera.updateProjectionMatrix();
       this._renderer.setSize(
-        this.getMainDiv().clientWidth,
-        this.getMainDiv().clientHeight,
+        this.getContainer().clientWidth,
+        this.getContainer().clientHeight,
       );
     }
     this._renderer.render(this._scene, this._camera);

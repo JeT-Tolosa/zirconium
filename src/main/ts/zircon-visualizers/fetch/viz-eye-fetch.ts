@@ -150,7 +150,7 @@ export class VizFetch extends ZirconViz {
    * Get chart's div element
    * @returns   Chart's div element
    */
-  public getMainDiv(): HTMLDivElement {
+  public getContainer(): HTMLDivElement {
     if (this._div) return this._div;
     this._div = document.createElement('div');
     this._div.id = uuid();

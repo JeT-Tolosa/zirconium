@@ -1,9 +1,9 @@
 import {
   Satellite,
   SATELLITE_TYPE,
-} from '../../../libraries/spatial/satellite';
+} from '../../../libraries/spatial/satellite/satellite';
 import { CatalogEngine } from '../catalog-engine';
-import { satelliteIndexationMethod } from '../../../libraries/spatial/satellite-catalog';
+import { satelliteIndexationMethod } from '../../../libraries/spatial/satellite/satellite-catalog';
 import { ZirconEngineState } from '../../../zirconium/zircon-core/zircon-engine';
 
 export interface SatelliteCatalogEngineState extends ZirconEngineState {

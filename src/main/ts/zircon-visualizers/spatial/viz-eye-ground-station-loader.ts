@@ -9,16 +9,17 @@ import {
   PickEvents,
 } from '../../zirconium/zircon-event';
 import { CatalogEngineEvents } from '../../sharp-eye/engines/catalog-engine';
-import { USRadioGuyGroundStationLocalLoaderJson } from '../../libraries/spatial/ground-station-loader-usradioguy';
-import {
-  GROUND_STATION_TYPE,
-  GroundStation,
-} from '../../libraries/spatial/ground-station';
 import {
   ZirconViz,
   ZirconVizEventRegistry,
+  ZirconVizState,
 } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { IonButton } from '@ionic/core/components/ion-button';
+import { USRadioGuyGroundStationLocalLoaderJson } from '../../libraries/spatial/ground-station/ground-station-loader-usradioguy';
+import {
+  GROUND_STATION_TYPE,
+  GroundStation,
+} from '../../libraries/spatial/ground-station/ground-station';
 
 interface GroundStationLoaderDescriptor {
   name: string;
@@ -46,7 +47,7 @@ const loaderDescriptors: { [id: string]: GroundStationLoaderDescriptor } = {
   },
 };
 
-export interface VizGroundStationLoaderState {
+export interface VizGroundStationLoaderState extends ZirconVizState {
   type: typeof VizGroundStationLoader.VIZ_GROUND_STATION_LOADER_TYPE;
 }
 
@@ -173,7 +174,7 @@ export class VizGroundStationLoader<
    * Get chart's div element
    * @returns   Chart's div element
    */
-  public getMainDiv(): HTMLDivElement {
+  public getContainer(): HTMLDivElement {
     if (this._div) return this._div;
     this._div = document.createElement('div');
     this._div.id = uuid();

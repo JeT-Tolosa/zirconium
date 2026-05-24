@@ -67,7 +67,7 @@ export class VizCesium extends ZirconViz {
     // this._viewer = new Cesium.Viewer(this.getDiv().id, {
     //   terrain: Cesium.Terrain.fromWorldTerrain(),
     // });
-    this._viewer = new Cesium.Viewer(this.getMainDiv().id);
+    this._viewer = new Cesium.Viewer(this.getContainer().id);
 
     // Fly the camera to San Francisco at the given longitude, latitude, and height.
     this._viewer.camera.flyTo({
@@ -100,7 +100,7 @@ export class VizCesium extends ZirconViz {
   /**
    * Get Main div element
    */
-  public getMainDiv(): HTMLDivElement {
+  public getContainer(): HTMLDivElement {
     if (this._mainDiv) return this._mainDiv;
     this._mainDiv = document.createElement('div');
     this._mainDiv.style.width = '100%';

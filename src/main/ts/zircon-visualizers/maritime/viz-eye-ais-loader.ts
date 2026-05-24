@@ -10,6 +10,7 @@ import { AIS_TYPE, AIS } from '../../libraries/maritime/ais';
 import {
   ZirconViz,
   ZirconVizEventRegistry,
+  ZirconVizState,
 } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { IonButton } from '@ionic/core/components/ion-button';
 import { AISLoaderAISStreamLocalJson } from '../../libraries/maritime/aisStream-loader-AISStream';
@@ -32,7 +33,7 @@ const loaderDescriptors: { [id: string]: AISLoaderDescriptor } = {
   },
 };
 
-export interface VizAISLoaderState {
+export interface VizAISLoaderState extends ZirconVizState {
   type: typeof VIZ_AIS_LOADER_TYPE;
 }
 
@@ -123,7 +124,7 @@ export class VizAISLoader<
    * Get chart's div element
    * @returns   Chart's div element
    */
-  public getMainDiv(): HTMLDivElement {
+  public getContainer(): HTMLDivElement {
     if (this._div) return this._div;
     this._div = document.createElement('div');
     this._div.id = uuid();

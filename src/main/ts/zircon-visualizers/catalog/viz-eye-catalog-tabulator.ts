@@ -22,8 +22,8 @@ import { CatalogEngineEvents } from '../../sharp-eye/engines/catalog-engine';
 import {
   ZirconViz,
   ZirconVizEventRegistry,
+  ZirconVizState,
 } from '../../zirconium/zircon-ui/zircon-visualizer';
-import { ZirconObjectState } from '../../zirconium/zircon-core/zircon-object';
 
 /**
  * Events definition for Catalog Tabulator
@@ -82,7 +82,7 @@ export type VizCatalogTabulatorEventRegistry<CatalogElement> =
     ZirconVizEventRegistry
   >;
 
-export interface VizCatalogCollectionTabulatorState extends ZirconObjectState {
+export interface VizCatalogCollectionTabulatorState extends ZirconVizState {
   catalogId?: string;
 }
 
@@ -454,7 +454,7 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
    * Get chart's div element
    * @returns   Chart's div element
    */
-  public getMainDiv(): HTMLDivElement {
+  public getContainer(): HTMLDivElement {
     if (this._div) return this._div;
     this._div = document.createElement('div');
     this._div.id = uuid();

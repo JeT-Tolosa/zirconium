@@ -10,7 +10,27 @@ export interface TimeDescriptor {
   running: boolean;
 }
 
+// simulatedCurrentTime = (now - realStartTime ) * timeFactor + simulatedStartTime
+// now - (simulatedCurrentTime - simulatedStartTime) / timeFactor
+
 export class TimingHelper {
+  public static readonly HOUR_IN_MILLISECONDS: number = 3600000;
+  public static MAIN_TIME_SOURCE_ID: string = 'main-time-source';
+
+  static computeRealStartTime(
+    startSimulatedTime: number,
+    currentSimulatedTime: number,
+    timeFactor: number,
+  ): number {
+    if (Math.abs(timeFactor) < TimeRunner.MIN_TIME_FACTOR)
+      throw new Error(
+        `time factor = ${timeFactor} but cannot be lower than ${TimeRunner.MIN_TIME_FACTOR}`,
+      );
+    return (
+      Date.now() - (currentSimulatedTime - startSimulatedTime) / timeFactor
+    );
+  }
+
   /**
    * Create a time descriptor for real time
    * @returns a time descriptor for real time
@@ -38,6 +58,7 @@ export class TimeRunner {
   private _timeDescriptor: TimeDescriptor = null;
   private _timeChangeCallbacks: Array<(runner: TimeRunner) => void> = [];
   private _intervalId: NodeJS.Timeout = null;
+  public static readonly MIN_TIME_FACTOR: number = 0.0001;
 
   /**
    * Constructor

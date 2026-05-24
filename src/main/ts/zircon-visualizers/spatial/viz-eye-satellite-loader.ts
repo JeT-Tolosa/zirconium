@@ -5,9 +5,7 @@ import starlinkJson from '../../../../../assets/data/spatial/celestrak/starlink-
 import activeJson from '../../../../../assets/data/spatial/celestrak/active-celestrak.json';
 import scienceJson from '../../../../../assets/data/spatial/celestrak/science-celestrak.json';
 import oneCelestrakJson from '../../../../../assets/data/spatial/celestrak/one-celestrak.json';
-import { SatelliteLocalFileLoaderCelestrakJson } from '../../libraries/spatial/satellite-loader-celestrak';
 import { ElementLoader } from '../../libraries/catalog/element-loader';
-import { Satellite, SATELLITE_TYPE } from '../../libraries/spatial/satellite';
 import {
   MergeZirconRegistries,
   PickEvents,
@@ -16,8 +14,14 @@ import { CatalogEngineEvents } from '../../sharp-eye/engines/catalog-engine';
 import {
   ZirconViz,
   ZirconVizEventRegistry,
+  ZirconVizState,
 } from '../../zirconium/zircon-ui/zircon-visualizer';
 import { IonButton } from '@ionic/core/components/ion-button';
+import {
+  Satellite,
+  SATELLITE_TYPE,
+} from '../../libraries/spatial/satellite/satellite';
+import { SatelliteLocalFileLoaderCelestrakJson } from '../../libraries/spatial/satellite/satellite-loader-celestrak';
 
 interface SatelliteLoaderDescriptor {
   name: string;
@@ -73,7 +77,7 @@ export type VizSatCatLoaderEventRegistry = MergeZirconRegistries<
   ZirconVizEventRegistry
 >;
 
-export interface VizSatCatLoaderState {
+export interface VizSatCatLoaderState extends ZirconVizState {
   type: typeof VizSatCatLoader.VIZ_SAT_CAT_LOADER_TYPE;
 }
 
@@ -134,7 +138,7 @@ export class VizSatCatLoader<
     return this._dataSelector;
   }
 
-   public getFetchButton(): HTMLElement {
+  public getFetchButton(): HTMLElement {
     if (this._fetchButton) return this._fetchButton;
     this._fetchButton = document.createElement('ion-button');
     this._fetchButton.classList.add('satcat-button');
@@ -170,7 +174,7 @@ export class VizSatCatLoader<
    * Get chart's div element
    * @returns   Chart's div element
    */
-  public getMainDiv(): HTMLDivElement {
+  public getContainer(): HTMLDivElement {
     if (this._div) return this._div;
     this._div = document.createElement('div');
     this._div.id = uuid();

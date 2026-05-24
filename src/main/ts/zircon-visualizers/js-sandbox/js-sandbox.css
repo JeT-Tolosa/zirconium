@@ -1,0 +1,30 @@
+.js-sandbox-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: 0px;
+}
+
+.js-sandbox-code {
+  width: 100%;
+}
+
+.js-sandbox-code ion-textarea::part(native),
+.js-sandbox-result ion-textarea::part(native) {
+  caret-color: white;
+}
+
+.js-sandbox-result {
+  width: 100%;
+}
+
+.js-sandbox-result.ok,
+.js-sandbox-result.ok > legend {
+  color: lightgreen;
+  border-color: lightgreen;
+}
+
+.js-sandbox-result.nok {
+  background-color: darkred;
+}

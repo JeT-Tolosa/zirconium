@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { GroundStation } from './ground-station';
-import { ElementLoader } from '../catalog/element-loader';
+import { ElementLoader } from '../../catalog/element-loader';
 
 // interface USRadioGuyGroundStation {
 //   type: 'Feature';

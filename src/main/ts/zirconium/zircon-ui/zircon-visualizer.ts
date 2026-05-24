@@ -11,7 +11,6 @@ import { ZIRCON_VISUALIZER_TYPE } from '../zircon-core/zircon-types';
  * Base state for all zircon objects UI
  */
 export type ZirconVizState = ZirconObjectState;
-export const DEFAULT_ZIRCON_VIZ_STATE: ZirconVizState = {};
 
 export type ZirconVizEvents = {
   VISUALIZER_DISPLAY_REQUEST: { vizId: string };
@@ -74,7 +73,7 @@ export abstract class ZirconViz<
     // do nothing by default
   }
 
-  public abstract getMainDiv(): HTMLDivElement;
+  public abstract getContainer(): HTMLDivElement;
 
   /**
    * Action performed when displayIn method is called
@@ -91,7 +90,7 @@ export abstract class ZirconViz<
     }
     this.__parentWindow = parentWindow;
     if (!this.__parentWindow?.getWindowContent()) return false;
-    this.__parentWindow?.getWindowContent().appendChild(this.getMainDiv());
+    this.__parentWindow?.getWindowContent().appendChild(this.getContainer());
     this.onDisplay();
     return true;
   }
@@ -102,7 +101,7 @@ export abstract class ZirconViz<
    */
   public removeFromParent(): boolean {
     if (!this.__parentWindow) return false;
-    this.__parentWindow.getWindowContent()?.removeChild(this.getMainDiv());
+    this.__parentWindow.getWindowContent()?.removeChild(this.getContainer());
     const windowState = this.__parentWindow.generateCurrentState();
     windowState.vizId = null;
     this.emit('VISUALIZER_REMOVED_FROM_WINDOW', {

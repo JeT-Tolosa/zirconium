@@ -23,7 +23,7 @@ export class AnalogClock extends AbstractClock {
     super(state);
   }
 
-  public getMainDiv(): HTMLDivElement {
+  public getContainer(): HTMLDivElement {
     if (this.__mainDiv) return this.__mainDiv;
     this.__mainDiv = document.createElement('div');
     this.__mainDiv.id = uuid();

@@ -1,6 +1,9 @@
-import { Catalog, CatalogDescriptor } from '../catalog/catalog';
-import { CatalogCollection } from '../catalog/catalog-collection';
-import { GROUND_STATION_TYPE, GroundStation } from './ground-station';
+import { Catalog, CatalogDescriptor } from '../../catalog/catalog';
+import { CatalogCollection } from '../../catalog/catalog-collection';
+import {
+  GROUND_STATION_TYPE,
+  GroundStation,
+} from '../ground-station/ground-station';
 
 /**
  * satellite indexation method

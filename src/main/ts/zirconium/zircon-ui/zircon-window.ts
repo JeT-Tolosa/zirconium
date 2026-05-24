@@ -190,7 +190,7 @@ export abstract class ZirconWindow<
     jsPanel.create({
       panelClass: 'zircon',
       container: document.body,
-      headerTitle: this._title,
+      headerTitle: this.getTitle(),
       headerLogo: `<img src="${menuIcon}" />`,
       position: {
         my: 'left-top',
@@ -400,6 +400,10 @@ export abstract class ZirconWindow<
       height: this._height,
     });
     return true;
+  }
+
+  public getTitle(): string {
+    return this._title || this.getName();
   }
 
   /**

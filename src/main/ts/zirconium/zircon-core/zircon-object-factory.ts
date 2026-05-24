@@ -72,6 +72,14 @@ export class ZirconFactoriesRegistry {
 
   public createInstance(state: any): Promise<any> | null {
     if (!this.isHandled(state)) return null;
+    if (!state.type)
+      throw new Error(
+        `Object state has no type defined:  ${JSON.stringify(state)}}`,
+      );
+    if (!this._objectFactories[state.type])
+      throw new Error(
+        `Object type ${state.type} has no associated Factory. Please add one for this type using Application.registerObjectFactory(factory: ZirconObjectFactory)`,
+      );
     return this._objectFactories[state.type].create(state);
   }
 

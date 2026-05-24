@@ -27,8 +27,21 @@
  */
 
 import { SharpEyedApp } from './main/ts/sharp-eye/sharp-eye-app';
+
 const sharpEyeApplication: SharpEyedApp = new SharpEyedApp();
+
 sharpEyeApplication.create().then(() => {
+  const onStart = function () {
+    sharpEyeApplication.emit('DESKTOP_ACTIVATE_REQUEST', {
+      desktopId: sharpEyeApplication.getDesktopManager().getDesktopIds()[
+        sharpEyeApplication.getDesktopManager().getDesktopIds().length - 1
+      ],
+    });
+    //sharpEyeApplication.removeListener('APPLICATION_STARTED', onStart);
+  };
+
+  sharpEyeApplication.addListener('APPLICATION_STARTED', onStart);
+
   sharpEyeApplication.emit('APPLICATION_START_REQUEST', {
     applicationId: sharpEyeApplication.getId(),
   });

@@ -356,7 +356,7 @@ export class ZirconDesktopManager<
    * @param parent The parent HTML element to display in
    * @returns True if something was added to the DOM, false otherwise
    */
-  public displayUIIn(parent: HTMLElement): boolean {
+  public async displayUIIn(parent: HTMLElement): Promise<boolean> {
     if (!parent) return false;
     const mainDiv = this.getMainDiv();
     if (!mainDiv) return false;
@@ -364,7 +364,7 @@ export class ZirconDesktopManager<
     // append app mainDiv in given parent
     parent.appendChild(mainDiv);
     // append desktopManager UI in app mainDiv
-    this.displayDesktops();
+    await this.displayDesktops();
     return true;
   }
 

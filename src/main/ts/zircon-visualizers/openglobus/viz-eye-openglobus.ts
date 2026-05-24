@@ -50,7 +50,7 @@ export class VizOpenGlobus extends ZirconViz {
     this._sat = new OG.Bing('bing');
 
     this._globe = new OG.Globe({
-      target: this.getMainDiv(),
+      target: this.getContainer(),
       name: 'Earth',
       terrain: new OG.GlobusRgbTerrain(),
       layers: [this._osm, this._sat],
@@ -91,7 +91,7 @@ export class VizOpenGlobus extends ZirconViz {
     });
 
     this._globe = new OG.Globe({
-      target: this.getMainDiv(),
+      target: this.getContainer(),
       name: 'Earth',
       terrain: new OG.GlobusRgbTerrain(null, { heightFactor: 7.1 }),
       // layers: [attr],
@@ -115,7 +115,7 @@ export class VizOpenGlobus extends ZirconViz {
    * Get chart's div element
    * @returns   Chart's div element
    */
-  public getMainDiv(): HTMLDivElement {
+  public getContainer(): HTMLDivElement {
     if (this._mainDiv) return this._mainDiv;
     this._mainDiv = document.createElement('div');
     this._mainDiv.style.width = '100%';
@@ -129,7 +129,7 @@ export class VizOpenGlobus extends ZirconViz {
     const sat: OG.Bing = new OG.Bing('sat');
 
     this._globe = new OG.Globe({
-      target: this.getMainDiv(),
+      target: this.getContainer(),
       name: 'Earth',
       layers: [sat, this._collection],
       atmosphereEnabled: true,

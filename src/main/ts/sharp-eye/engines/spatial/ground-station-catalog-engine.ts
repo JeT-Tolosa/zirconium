@@ -1,9 +1,9 @@
 import {
   GroundStation,
   GROUND_STATION_TYPE,
-} from '../../../libraries/spatial/ground-station';
+} from '../../../libraries/spatial/ground-station/ground-station';
 import { CatalogEngine } from '../catalog-engine';
-import { groundStationIndexationMethod } from '../../../libraries/spatial/ground-station-catalog';
+import { groundStationIndexationMethod } from '../../../libraries/spatial/ground-station/ground-station-catalog';
 import { ZirconEngineState } from '../../../zirconium/zircon-core/zircon-engine';
 
 export interface GroundStationCatalogEngineState extends ZirconEngineState {

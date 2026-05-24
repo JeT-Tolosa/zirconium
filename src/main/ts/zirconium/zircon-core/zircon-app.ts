@@ -78,7 +78,10 @@ export type ZirconApplicationEventRegistry = MergeZirconRegistries<
           ZirconWindowEvents,
           'WINDOW_SET_PARENT_DESKTOP_REQUEST' | 'WINDOW_SET_PARENT_DESKTOP_DONE'
         >,
-        PickEvents<ZirconApplicationEvents, 'UNCAUGHT_EXCEPTION'>,
+        PickEvents<
+          ZirconApplicationEvents,
+          'UNCAUGHT_EXCEPTION' | 'APPLICATION_STARTED'
+        >,
       ]
     >;
     outgoing: MergePickEvents<
@@ -283,19 +286,6 @@ export class ZirconApplication<
     return this._eventEmitter;
   }
 
-  // /**
-  //  * get window by ID
-  //  */
-  // public getWindowById(id: string): ZirconWindow {
-  //   return this.getDesktopManager().getWindowById(id);
-  // }
-  // /**
-  //  * get desktop by ID
-  //  */
-  // public getDesktopById(id: string): ZirconDesktop {
-  //   return this.getDesktopManager().getDesktopById(id);
-  // }
-
   /**
    * @returns get UI Class
    */
@@ -322,7 +312,7 @@ export class ZirconApplication<
    * display UI in parent
    * @returns true if something has been added to the DOM, false otherwise
    */
-  private displayUIIn(parent: HTMLElement): boolean {
+  private async displayUIIn(parent: HTMLElement): Promise<boolean> {
     if (!parent) return false;
     const mainDiv = this.getMainDiv();
     if (!mainDiv) return false;
@@ -332,7 +322,7 @@ export class ZirconApplication<
     // append app mainDiv in given parent
     this._parent.appendChild(mainDiv);
     // append desktopManager UI in app mainDiv
-    this.getDesktopManager().displayUIIn(this.getMainDiv());
+    await this.getDesktopManager().displayUIIn(this.getMainDiv());
     return true;
   }
 
@@ -369,12 +359,13 @@ export class ZirconApplication<
     await this.getPluginManager().startPlugins();
     await this.startEngines();
     this.__isStarted = true;
-    this.displayUIIn(document.body);
+    await this.displayUIIn(document.body);
     // activate first desktop if at least one exist
     if (this.getDesktopManager().getDesktopIds().length > 0)
       this.emit('DESKTOP_ACTIVATE_REQUEST', {
         desktopId: this.getDesktopManager().getDesktopIds()[0],
       });
+    this.emit('APPLICATION_STARTED', { applicationId: this.getId() });
   }
 
   private async createDesktopManager(): Promise<ZirconDesktopManager> {

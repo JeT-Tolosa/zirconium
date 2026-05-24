@@ -175,7 +175,7 @@ export abstract class VizJSChart<
   /**
    * Get Logger's div element
    */
-  public getMainDiv(): HTMLDivElement {
+  public getContainer(): HTMLDivElement {
     if (this._mainDiv) return this._mainDiv;
     this._mainDiv = document.createElement('div');
     this._mainDiv.id = uuid();

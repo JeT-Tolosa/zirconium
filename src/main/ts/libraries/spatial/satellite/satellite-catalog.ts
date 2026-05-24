@@ -1,5 +1,5 @@
-import { Catalog, CatalogDescriptor } from '../catalog/catalog';
-import { CatalogCollection } from '../catalog/catalog-collection';
+import { Catalog, CatalogDescriptor } from '../../catalog/catalog';
+import { CatalogCollection } from '../../catalog/catalog-collection';
 import { Satellite, SATELLITE_TYPE } from './satellite';
 
 /**

@@ -43,7 +43,7 @@ export class VizHelmetSampleThreeJS extends VizThreeJS {
 
     this._renderer = new THREE.WebGPURenderer({ antialias: true });
     this._renderer.setSize(window.innerWidth, window.innerHeight);
-    this.getMainDiv().appendChild(this._renderer.domElement);
+    this.getContainer().appendChild(this._renderer.domElement);
 
     const hdrUrls = [
       'px.hdr',
@@ -106,15 +106,15 @@ export class VizHelmetSampleThreeJS extends VizThreeJS {
 
   public render() {
     if (
-      this._renderer.domElement.width != this.getMainDiv().clientWidth ||
-      this._renderer.domElement.height != this.getMainDiv().clientHeight
+      this._renderer.domElement.width != this.getContainer().clientWidth ||
+      this._renderer.domElement.height != this.getContainer().clientHeight
     ) {
       this._camera.aspect =
-        this.getMainDiv().clientWidth / this.getMainDiv().clientHeight;
+        this.getContainer().clientWidth / this.getContainer().clientHeight;
       this._camera.updateProjectionMatrix();
       this._renderer.setSize(
-        this.getMainDiv().clientWidth,
-        this.getMainDiv().clientHeight,
+        this.getContainer().clientWidth,
+        this.getContainer().clientHeight,
       );
     }
     this._renderer.render(this._scene, this._camera);

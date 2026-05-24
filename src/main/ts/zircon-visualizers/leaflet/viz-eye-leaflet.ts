@@ -44,7 +44,10 @@ export class VizLeaflet extends ZirconViz {
 
   public createMap(): void {
     if (this._map) return;
-    this._map = Leaflet.map(this.getMainDiv().id).setView([51.505, -0.09], 13);
+    this._map = Leaflet.map(this.getContainer().id).setView(
+      [51.505, -0.09],
+      13,
+    );
 
     Leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -81,7 +84,7 @@ export class VizLeaflet extends ZirconViz {
    * Get chart's div element
    * @returns   Chart's div element
    */
-  public getMainDiv(): HTMLDivElement {
+  public getContainer(): HTMLDivElement {
     if (this._mainDiv) return this._mainDiv;
     this._mainDiv = document.createElement('div');
     this._mainDiv.style.width = '100%';

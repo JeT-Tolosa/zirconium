@@ -84,7 +84,7 @@ export class TimeManagerEngine<
   R extends TimeManagerEngineEventRegistry = TimeManagerEngineEventRegistry,
 > extends ZirconEngine<R> {
   public static readonly TIME_MANAGER_ENGINE_TYPE = 'time-manager-engine';
-  public static readonly DEFAULT_TIME_SOURCE = 'main-time-source';
+  public static readonly DEFAULT_TIME_SOURCE = TimingHelper.MAIN_TIME_SOURCE_ID;
   public static readonly DEFAULT_TIME_RUNNER = new TimeRunner(
     TimingHelper.createRealTimeDescriptor(),
   );

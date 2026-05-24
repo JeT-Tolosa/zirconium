@@ -5,19 +5,22 @@ import { VizCesium } from '../zircon-visualizers/cesium/viz-eye-cesium';
 import { VizCubeSampleThreeJS } from '../zircon-visualizers/threeJS/viz-eye-cube-sample-threeJS';
 import { VizFetch } from '../zircon-visualizers/fetch/viz-eye-fetch';
 import { VizCatalogCollectionTabulator } from '../zircon-visualizers/catalog/viz-eye-catalog-tabulator';
-import {
-  GROUND_STATION_TYPE,
-  GroundStation,
-} from '../libraries/spatial/ground-station';
-import { groundStationIndexationMethod } from '../libraries/spatial/ground-station-catalog';
 import { VizThreeJS } from '../zircon-visualizers/threeJS/viz-eye-threeJS';
 import { VizHelmetSampleThreeJS } from '../zircon-visualizers/threeJS/viz-eye-helmet-sample-threeJS';
 import { VizLeaflet } from '../zircon-visualizers/leaflet/viz-eye-leaflet';
 import { VizLineJSChart } from '../zircon-visualizers/jschart/line-jschart';
 import { VizEventLogger } from '../zircon-visualizers/logger/viz-eye-event-logger';
 import { VizOpenGlobus } from '../zircon-visualizers/openglobus/viz-eye-openglobus';
-import { Satellite, SATELLITE_TYPE } from '../libraries/spatial/satellite';
-import { satelliteIndexationMethod } from '../libraries/spatial/satellite-catalog';
+import {
+  Satellite,
+  SATELLITE_TYPE,
+} from '../libraries/spatial/satellite/satellite';
+import { satelliteIndexationMethod } from '../libraries/spatial/satellite/satellite-catalog';
+import {
+  GROUND_STATION_TYPE,
+  GroundStation,
+} from '../libraries/spatial/ground-station/ground-station';
+import { groundStationIndexationMethod } from '../libraries/spatial/ground-station/ground-station-catalog';
 
 export function createVisualizerSatelliteCatalog(): VizCatalogCollectionTabulator<Satellite> {
   const viz: VizCatalogCollectionTabulator<Satellite> =

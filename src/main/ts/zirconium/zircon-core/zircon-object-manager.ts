@@ -54,9 +54,15 @@ export class ZirconObjectManager extends ZirconAppObject {
         `Object factory must inherent from an object type. Factory name = ${factory.name}. default should be ${ZIRCON_OBJECT_TYPE}`,
       );
     const existingFactory = this.getHandlingFactory(factory.type);
+    if (existingFactory && existingFactory.name === factory.name) {
+      this.getLogger().warn(
+        `Factory  ${factory.name} already registerd for type ${factory.type}. Skip multiple registrations`,
+      );
+      return Promise.resolve(true);
+    }
     if (existingFactory) {
       throw new Error(
-        `Factory ${factory.name} cannot be registered for type ${factory.type}. Factory ${existingFactory.name}`,
+        `Factory  ${factory.name} cannot be registerd. A factory already exists for type ${factory.type}: ${existingFactory.name}`,
       );
     }
     // test object creation

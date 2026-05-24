@@ -1,8 +1,8 @@
+import { Satellite } from '../../libraries/spatial/satellite/satellite';
 import {
   VizCatalogCollectionTabulator,
   VizCatalogCollectionTabulatorState,
 } from '../catalog/viz-eye-catalog-tabulator';
-import { Satellite } from '../../libraries/spatial/satellite';
 
 export interface VizSatelliteCatalogTabulatorState extends VizCatalogCollectionTabulatorState {
   type: typeof VizSatelliteCatalogTabulator.VIZ_SATELLITE_CATALOG_TABULATOR_TYPE;
