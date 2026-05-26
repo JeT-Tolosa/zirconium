@@ -16,6 +16,9 @@ import {
   ZIRCON_DESKTOP_TYPE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
 } from '../../zirconium/zircon-core/zircon-types';
+import { VizCesiumFactory } from '../../zircon-visualizers/cesium/viz-eye-cesium-factory';
+import { CESIUM_VISUALIZER_TYPE } from '../../zircon-visualizers/cesium/viz-eye-cesium';
+import { VizCesiumState } from '../../zircon-visualizers/cesium/viz-eye-cesium';
 
 /**
  * DESKTOP4
@@ -23,6 +26,8 @@ import {
 export async function createDesktop4(
   app: SharpEyedApp,
 ): Promise<ZirconDesktopState> {
+  await app.registerObjectFactory(new VizCesiumFactory());
+
   await app.registerObjectFactory(new VizGroundStationLoaderFactory());
   await app.registerObjectFactory(
     new VizGroundStationCatalogTabulatorFactory(),
@@ -34,13 +39,6 @@ export async function createDesktop4(
     name: 'Ground Station Loader',
   };
   app.registerObjectState(vizGSLoaderState);
-
-  const vizGSCatalogState: VizGroundStationCatalogTabulatorState = {
-    id: 'groundStationCatalogVizId',
-    type: VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE,
-    name: 'Ground Station Catalog',
-  };
-  app.registerObjectState(vizGSCatalogState);
 
   const groundStationLoaderWindowState: ZirconVizWindowState = {
     type: ZIRCON_VISUALIZER_WINDOW_TYPE,
@@ -54,17 +52,42 @@ export async function createDesktop4(
   };
   app.registerObjectState(groundStationLoaderWindowState);
 
+  const vizGSCatalogState: VizGroundStationCatalogTabulatorState = {
+    id: 'groundStationCatalogVizId',
+    type: VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE,
+    name: 'Ground Station Catalog',
+  };
+  app.registerObjectState(vizGSCatalogState);
   const groundStationCatalog1WindowState: ZirconVizWindowState = {
     type: ZIRCON_VISUALIZER_WINDOW_TYPE,
     id: `window-${uuid()}`,
     title: 'Ground Station Catalog 1',
-    left: 100,
+    left: 10,
     top: 10,
     width: 600,
     height: 1080,
     vizId: vizGSCatalogState.id,
   };
   app.registerObjectState(groundStationCatalog1WindowState);
+  const vizCesiumState: VizCesiumState = {
+    id: 'cesiumVizId',
+    type: CESIUM_VISUALIZER_TYPE,
+    name: 'Cesium Visualizer',
+    token:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MTQ3MzJjOS1jY2MwLTRiOGUtYTU5Ny1kNTMxNTQ2MDIxOGIiLCJpZCI6Mzk2Mzc0LCJpYXQiOjE3NzI0MTE2OTB9.O-0_Gu3rYf-7ijUGGlWZtrybQ3OhKMtx0mjBidAcBIw',
+  };
+  app.registerObjectState(vizCesiumState);
+  const cesiumWindowState: ZirconVizWindowState = {
+    type: ZIRCON_VISUALIZER_WINDOW_TYPE,
+    id: `window-${uuid()}`,
+    title: 'Cesium Visualizer',
+    left: 620,
+    top: 10,
+    width: 600,
+    height: 1080,
+    vizId: vizCesiumState.id,
+  };
+  app.registerObjectState(cesiumWindowState);
 
   const desktop4State: ZirconDesktopState = {
     type: ZIRCON_DESKTOP_TYPE,
@@ -73,6 +96,7 @@ export async function createDesktop4(
     windowIds: [
       groundStationLoaderWindowState.id,
       groundStationCatalog1WindowState.id,
+      cesiumWindowState.id,
     ],
   };
   app.registerObjectState(desktop4State);

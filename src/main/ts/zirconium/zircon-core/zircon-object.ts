@@ -139,7 +139,7 @@ export abstract class ZirconObject<
 
   /**
    * Get the state of this Object. Children must override this method to add their own properties
-   * example { ...super.getCurrentState(), myProperty: myValue }
+   * example { ...super.generateCurrentState(), myProperty: myValue }
    * @returns The state of the object
    */
   public generateCurrentState(): ZirconObjectState {

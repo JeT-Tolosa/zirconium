@@ -2,17 +2,8 @@ import { EventEmitter } from 'events';
 import { Catalog } from './catalog';
 import { PickEvents } from '../../zirconium/zircon-event';
 
-// export enum CatalogCollectionEvents {
-//   CATALOG_COLLECTION_CHANGED = 'CATALOG_COLLECTION_CHANGED', // { catalogId: string }
-// }
-
-// export const CatalogCollectionEvents = {
-//   CATALOG_COLLECTION_CHANGED: 'CATALOG_COLLECTION_CHANGED',
-//   MANAGED_CATALOG_CONTENT_CHANGED: 'MANAGED_CATALOG_CONTENT_CHANGED',
-// } as const;
-
 export type CatalogCollectionEvents = {
-  CATALOG_COLLECTION_CHANGED: {};
+  CATALOG_COLLECTION_CHANGED: { catalogId: string };
   MANAGED_CATALOG_CONTENT_CHANGED: {
     catalogType: string;
     catalogId: string;
@@ -85,7 +76,7 @@ export class CatalogCollection<CatalogElement> {
     cat.subscriber('CATALOG_CONTENT_CHANGED', (arg) => {
       this.onCatalogContentChanged(arg.catalogId);
     });
-    this.emit('CATALOG_COLLECTION_CHANGED', {});
+    this.emit('CATALOG_COLLECTION_CHANGED', { catalogId: cat.getId() });
     return true;
   }
 

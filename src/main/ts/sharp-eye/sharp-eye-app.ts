@@ -63,9 +63,6 @@ export class SharpEyedApp extends ZirconApplication {
    * DESKTOPS
    */
   public async createDesktops(): Promise<void> {
-    await this.registerPlugins();
-    await this.registerEngines();
-
     const desktop1State: ZirconDesktopState = await createDesktop1(this);
     const desktop2State: ZirconDesktopState = await createDesktop2(this);
     const desktop3State: ZirconDesktopState = await createDesktop3(this);
@@ -104,25 +101,32 @@ export class SharpEyedApp extends ZirconApplication {
     await this.registerObjectFactory(new TimeManagerEngineFactory());
     await this.registerObjectFactory(new AISCatalogEngineFactory());
 
-    this.registerObjectState({
-      id: `time-manager-${uuid()}`,
+    const timeManagerEngineState: TimeManagerEngineState = {
+      id: `time-manager-engine-${uuid()}`,
       type: TimeManagerEngine.TIME_MANAGER_ENGINE_TYPE,
-      timeDescriptor: TimingHelper.createRealTimeDescriptor(),
-    } as TimeManagerEngineState);
+      timeDescriptors: {
+        [TimingHelper.MAIN_TIME_SOURCE_ID]:
+          TimingHelper.createRealTimeDescriptor(),
+      },
+    };
+    this.registerObjectState(timeManagerEngineState);
 
-    this.registerObjectState({
-      id: `satellite-catalog-${uuid()}`,
+    const satelliteCatalogEngineState: SatelliteCatalogEngineState = {
+      id: `satellite-catalog-engine-${uuid()}`,
       type: SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE,
-    } as SatelliteCatalogEngineState);
+    };
+    this.registerObjectState(satelliteCatalogEngineState);
 
-    this.registerObjectState({
-      id: `gs-catalog-${uuid()}`,
+    const aisCatalogEngineState: AISCatalogEngineState = {
+      id: `ais-catalog-engine-${uuid()}`,
       type: AISCatalogEngine.AIS_CATALOG_ENGINE_TYPE,
-    } as AISCatalogEngineState);
+    };
+    this.registerObjectState(aisCatalogEngineState);
 
-    this.registerObjectState({
-      id: `qis-catalog-${uuid()}`,
+    const groundStationCatalogEngineState: GroundStationCatalogEngineState = {
+      id: `gs-catalog-engine-${uuid()}`,
       type: GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE,
-    } as GroundStationCatalogEngineState);
+    };
+    this.registerObjectState(groundStationCatalogEngineState);
   }
 }

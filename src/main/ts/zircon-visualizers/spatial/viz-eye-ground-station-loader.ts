@@ -56,7 +56,7 @@ export type VizGroundStationLoaderEventRegistry = MergeZirconRegistries<
     incoming: {};
     outgoing: PickEvents<
       CatalogEngineEvents<GroundStation>,
-      'COLLECTION_CREATE_CATALOG_REQUEST'
+      'COLLECTION_CATALOG_CREATE_REQUEST'
     >;
   },
   ZirconVizEventRegistry
@@ -148,7 +148,7 @@ export class VizGroundStationLoader<
   public getFetchButton(): HTMLElement {
     if (this._fetchButton) return this._fetchButton;
     this._fetchButton = document.createElement('ion-button');
-    this._fetchButton.classList.add('groundstation-button');
+    this._fetchButton.classList.add('loader-button');
     this._fetchButton.innerText = 'Load Data';
     this._fetchButton.addEventListener('click', async () => {
       const dataDescriptorId: string =
@@ -160,9 +160,9 @@ export class VizGroundStationLoader<
       const groundStations: GroundStation[] =
         await dataDescriptor.loader.getData();
 
-      this.emit('COLLECTION_CREATE_CATALOG_REQUEST', {
+      this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
         catalogType: GROUND_STATION_TYPE,
-        catalogDescriptor: { id: 'null', name: dataDescriptor.name },
+        catalogDescriptor: { name: dataDescriptor.name },
         elements: groundStations,
       });
     });

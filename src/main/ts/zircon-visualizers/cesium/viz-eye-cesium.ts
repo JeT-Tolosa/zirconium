@@ -1,13 +1,15 @@
 import { v4 as uuid } from 'uuid';
-import * as Cesium from 'cesium';
 
-import 'cesium/Build/Cesium/Widgets/InfoBox/InfoBox.css';
-import 'cesium/Build/Cesium/Widgets/widgets.css';
 import {
   ZirconViz,
+  ZirconVizEventRegistry,
   ZirconVizState,
 } from '../../zirconium/zircon-ui/zircon-visualizer';
+import { MergeZirconRegistries } from '../../zirconium/zircon-event';
+import { GlobeViewer } from '../../libraries/spatial/globe-viewer/globe-viewer';
+import { GlobeViewerCesium } from '../../libraries/spatial/globe-viewer/globe-viewer-cesium';
 
+export const CESIUM_VISUALIZER_TYPE: string = 'cesium-visualizer';
 /**
  * Visualizer based on Cesium library
  * https://cesium.com/platform/cesiumjs/
@@ -18,17 +20,31 @@ import {
  */
 
 export interface VizCesiumState extends ZirconVizState {
+  type: typeof CESIUM_VISUALIZER_TYPE;
   token?: string;
+  sunLightning?: boolean;
+  timeControllerId?: string;
 }
 
-const CESIUM_TOKEN: string =
+const DEFAULT_CESIUM_TOKEN: string =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MTQ3MzJjOS1jY2MwLTRiOGUtYTU5Ny1kNTMxNTQ2MDIxOGIiLCJpZCI6Mzk2Mzc0LCJpYXQiOjE3NzI0MTE2OTB9.O-0_Gu3rYf-7ijUGGlWZtrybQ3OhKMtx0mjBidAcBIw';
 
-export class VizCesium extends ZirconViz {
+export type VizCesiumEventRegistry = MergeZirconRegistries<
+  {
+    incoming: {};
+    outgoing: {};
+  },
+  ZirconVizEventRegistry
+>;
+
+export class VizCesium<
+  R extends VizCesiumEventRegistry = VizCesiumEventRegistry,
+> extends ZirconViz<R> {
   public static readonly CESIUM_VISUALIZER_TYPE = 'cesium-visualizer';
-  private _mainDiv: HTMLDivElement = null;
-  private _token: string = CESIUM_TOKEN;
-  private _viewer: Cesium.Viewer = null;
+  private _token: string = DEFAULT_CESIUM_TOKEN;
+  private _sunLightning: boolean = true;
+  private __mainDiv: HTMLDivElement = null;
+  private __viewer: GlobeViewer = null;
 
   /**
    * constructor
@@ -41,13 +57,47 @@ export class VizCesium extends ZirconViz {
     return VizCesium.CESIUM_VISUALIZER_TYPE;
   }
 
+  public override generateCurrentState(): VizCesiumState {
+    const baseState = super.generateCurrentState();
+    return {
+      ...baseState,
+      type: VizCesium.CESIUM_VISUALIZER_TYPE,
+      sunLightning: this.getSunLightning(),
+      token: this.getToken(),
+    };
+  }
+
+  public override async setState(state?: VizCesiumState): Promise<void> {
+    if (!state) return;
+    await super.setState(state);
+    if (state.token) {
+      this.setToken(state.token);
+    }
+    if (state.sunLightning !== undefined) {
+      this.setSunLightning(state.sunLightning);
+    }
+  }
+
   /**
    * Get Cesium token
    * @param token Cesium token
    */
   public setToken(token: string): void {
     this._token = token;
-    Cesium.Ion.defaultAccessToken = token;
+    this.getGlobeViewer()?.setOption('token', token);
+  }
+
+  private getGlobeViewer(): GlobeViewer {
+    return this.__viewer;
+  }
+
+  public setSunLightning(sunLightning: boolean): void {
+    this._sunLightning = sunLightning;
+    this.getGlobeViewer()?.setOption('sunLightning', sunLightning);
+  }
+
+  public getSunLightning(): boolean {
+    return this._sunLightning;
   }
 
   /**
@@ -57,55 +107,38 @@ export class VizCesium extends ZirconViz {
     return this._token;
   }
 
-  public createChart(): void {
-    // Your access token can be found at: https://ion.cesium.com/tokens.
-    // Replace `your_access_token` with your Cesium ion access token.
-
-    Cesium.Ion.defaultAccessToken = this.getToken();
-
-    // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
-    // this._viewer = new Cesium.Viewer(this.getDiv().id, {
-    //   terrain: Cesium.Terrain.fromWorldTerrain(),
-    // });
-    this._viewer = new Cesium.Viewer(this.getContainer().id);
-
-    // Fly the camera to San Francisco at the given longitude, latitude, and height.
-    this._viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(-122.4175, 37.655, 400),
-      orientation: {
-        heading: Cesium.Math.toRadians(0.0),
-        pitch: Cesium.Math.toRadians(-15.0),
-      },
-    });
-
-    // // Add Cesium OSM Buildings, a global 3D buildings layer.
-    // const buildingTileset = await Cesium.createOsmBuildingsAsync();
-    // this._viewer.scene.primitives.add(buildingTileset);
+  private async createViewer(): Promise<void> {
+    if (this.__viewer) return;
+    const cesiumOptions = {
+      token: this.getToken(),
+      sunLightning: this.getSunLightning(),
+    };
+    this.__viewer = new GlobeViewerCesium(cesiumOptions);
   }
 
-  // /**
-  //  * Create chart and dock it into given parent
-  //  * @param parent  Parent element to dock chart into
-  //  * @returns   true if chart was created and docked, false otherwise
-  //  */
-  // public override displayIn(parent: HTMLDivElement): boolean {
-  //   if (!parent) return false;
-  //   parent.appendChild(this.getCanvas());
-  //   this.createChart(this.getCanvas());
-  //   console.log(
-  //     `display chart ${this.getId()} in canvas ${this.getCanvas().id} in parent ${parent.id}`,
-  //   );
-  // }
+  private async displayViewer(): Promise<void> {
+    if (!this.__viewer) await this.createViewer();
+    this.__viewer.displayIn(this.getContainer());
+  }
+
+  public override async onDisplay(): Promise<void> {
+    await this.displayViewer();
+  }
 
   /**
    * Get Main div element
    */
-  public getContainer(): HTMLDivElement {
-    if (this._mainDiv) return this._mainDiv;
-    this._mainDiv = document.createElement('div');
-    this._mainDiv.style.width = '100%';
-    this._mainDiv.style.height = '100%';
-    this._mainDiv.id = uuid();
-    return this._mainDiv;
+  public override getContainer(): HTMLDivElement {
+    if (this.__mainDiv) return this.__mainDiv;
+    this.__mainDiv = document.createElement('div');
+    this.__mainDiv.style.width = '100%';
+    this.__mainDiv.style.height = '100%';
+    this.__mainDiv.id = `cesium-viz-container-${uuid()}`;
+    return this.__mainDiv;
+  }
+
+  public override updateResize(): boolean {
+    this.__viewer?.updateResize();
+    return true;
   }
 }

@@ -33,7 +33,7 @@ export type VizCatalogTabulatorEvents<CatalogElement> = {
     catalogDescriptor: CatalogDescriptor;
     elements: CatalogElement[];
   };
-  COLLECTION_CREATE_CATALOG_DONE: {
+  COLLECTION_CATALOG_CREATED: {
     catalogDescriptor: CatalogDescriptor;
     elements: CatalogElement[];
   };
@@ -52,8 +52,7 @@ export type VizCatalogTabulatorEventRegistry<CatalogElement> =
         [
           PickEvents<
             VizCatalogTabulatorEvents<CatalogElement>,
-            | 'COLLECTION_GET_CATALOG_CONTENT_DONE'
-            | 'COLLECTION_CREATE_CATALOG_DONE'
+            'COLLECTION_GET_CATALOG_CONTENT_DONE' | 'COLLECTION_CATALOG_CREATED'
           >,
           PickEvents<CatalogEvents, 'CATALOG_CONTENT_CHANGED'>,
           PickEvents<
@@ -72,7 +71,7 @@ export type VizCatalogTabulatorEventRegistry<CatalogElement> =
           PickEvents<
             CatalogEngineEvents<CatalogElement>,
             | 'COLLECTION_GET_CATALOG_CONTENT_REQUEST'
-            | 'COLLECTION_CREATE_CATALOG_REQUEST'
+            | 'COLLECTION_CATALOG_CREATE_REQUEST'
             | 'COLLECTION_ADD_ELEMENTS_REQUEST'
             | 'COLLECTION_ADD_ELEMENTS_REQUEST'
           >,
@@ -119,12 +118,9 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
   }
 
   protected override listenToEvents(): void {
-    this.addListener('COLLECTION_CREATE_CATALOG_DONE', (arg) => {
+    this.addListener('COLLECTION_CATALOG_CREATED', (arg) => {
       if (arg.catalogDescriptor?.type !== this.getCatalogType()) return;
-      this.onCOLLECTION_CREATE_CATALOG_DONE(
-        arg.catalogDescriptor,
-        arg.elements,
-      );
+      this.onCOLLECTION_CATALOG_CREATED(arg.catalogDescriptor, arg.elements);
     });
     this.addListener('COLLECTION_GET_CATALOG_CONTENT_DONE', (arg) => {
       this.onCOLLECTION_GET_CATALOG_DONE(arg.catalogDescriptor, arg.elements);
@@ -148,7 +144,7 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
     }
   }
 
-  private onCOLLECTION_CREATE_CATALOG_DONE(
+  private onCOLLECTION_CATALOG_CREATED(
     catalogDescriptor: CatalogDescriptor,
     elements: CatalogElement[],
   ): void {
@@ -436,7 +432,7 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
     this._catalogSelector.setCatalogCollection(this._catColl);
     this._catalogSelector.getUI().classList.add('catalog-selector');
     this._catalogSelector.onCreateNewCatalog((catalogName: string) => {
-      this.emit('COLLECTION_CREATE_CATALOG_REQUEST', {
+      this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
         catalogType: this.getCatalogType(),
         catalogDescriptor: { name: catalogName },
       });
@@ -468,7 +464,7 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
 
   /**
    */
-  public getSatCatDiv(): HTMLDivElement {
+  private getSatCatDiv(): HTMLDivElement {
     if (this._catalogTabulatorDiv) return this._catalogTabulatorDiv;
     this._catalogTabulatorDiv = document.createElement('div');
     this._catalogTabulatorDiv.id = `tabulator-div-${uuid()}`;

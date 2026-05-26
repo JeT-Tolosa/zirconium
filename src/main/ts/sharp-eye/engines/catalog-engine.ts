@@ -19,12 +19,12 @@ import {
  */
 export type CatalogEngineEvents<CatalogElement> = {
   // create catalog
-  COLLECTION_CREATE_CATALOG_REQUEST: {
+  COLLECTION_CATALOG_CREATE_REQUEST: {
     catalogType: string;
     catalogDescriptor: CatalogDescriptor;
     elements?: CatalogElement[];
   };
-  COLLECTION_CREATE_CATALOG_DONE: {
+  COLLECTION_CATALOG_CREATED: {
     catalogDescriptor: CatalogDescriptor;
     elements: CatalogElement[];
   };
@@ -94,7 +94,7 @@ export type CatalogEngineEventRegistry<CatalogElement> = MergeZirconRegistries<
       [
         PickEvents<
           CatalogEngineEvents<CatalogElement>,
-          | 'COLLECTION_CREATE_CATALOG_REQUEST'
+          | 'COLLECTION_CATALOG_CREATE_REQUEST'
           | 'COLLECTION_CLEAR_CATALOG_REQUEST'
           | 'COLLECTION_ADD_ELEMENTS_REQUEST'
           | 'COLLECTION_SET_ELEMENTS_REQUEST'
@@ -110,7 +110,7 @@ export type CatalogEngineEventRegistry<CatalogElement> = MergeZirconRegistries<
       [
         PickEvents<
           CatalogEngineEvents<CatalogElement>,
-          | 'COLLECTION_CREATE_CATALOG_DONE'
+          | 'COLLECTION_CATALOG_CREATED'
           | 'COLLECTION_CREATE_CATALOG_ERROR'
           | 'COLLECTION_CLEAR_CATALOG_DONE'
           | 'COLLECTION_CLEAR_CATALOG_ERROR'
@@ -187,8 +187,11 @@ export abstract class CatalogEngine<
     this.addListener('COLLECTION_GET_CATALOG_CONTENT_REQUEST', (arg) => {
       this.onCOLLECTION_GET_CATALOG_REQUEST(arg.catalogId);
     });
-    this.addListener('COLLECTION_CREATE_CATALOG_REQUEST', (arg) => {
-      this.onCOLLECTION_CREATE_CATALOG_REQUEST(
+    this.addListener('CATALOG_COLLECTION_CHANGED', (arg) => {
+      this.onCATALOG_COLLECTION_CHANGED(arg.catalogId);
+    });
+    this.addListener('COLLECTION_CATALOG_CREATE_REQUEST', (arg) => {
+      this.onCOLLECTION_CATALOG_CREATE_REQUEST(
         arg.catalogType,
         arg.catalogDescriptor,
         arg.elements,
@@ -196,7 +199,7 @@ export abstract class CatalogEngine<
     });
   }
 
-  private onCOLLECTION_CREATE_CATALOG_REQUEST(
+  private onCOLLECTION_CATALOG_CREATE_REQUEST(
     catalogType: string,
     catalogDescriptor: CatalogDescriptor,
     elements: CatalogElement[],
@@ -207,7 +210,7 @@ export abstract class CatalogEngine<
       catalogDescriptor.name,
       elements,
     );
-    this.emit('COLLECTION_CREATE_CATALOG_DONE', {
+    this.emit('COLLECTION_CATALOG_CREATED', {
       catalogDescriptor: cat.getDescriptor(),
 
       elements: Object.values(cat.getElements()),
@@ -227,6 +230,10 @@ export abstract class CatalogEngine<
         }),
       });
     }
+  }
+
+  private onCATALOG_COLLECTION_CHANGED(_catalogId: string) {
+    throw new Error('Not yet implemented');
   }
 
   private onCOLLECTION_GET_CATALOG_REQUEST(catalogId: string) {

@@ -194,9 +194,9 @@ export class ZirconVizWindow<
       return;
     }
     this.getVisualizer()
-      .then((viz: ZirconViz) => {
+      .then(async (viz: ZirconViz) => {
         if (viz) {
-          viz.displayIn(this);
+          await viz.displayIn(this);
           this.__viz = viz;
         }
       })

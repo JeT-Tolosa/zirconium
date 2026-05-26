@@ -71,7 +71,7 @@ export type VizSatCatLoaderEventRegistry = MergeZirconRegistries<
     incoming: {};
     outgoing: PickEvents<
       CatalogEngineEvents<Satellite>,
-      'COLLECTION_CREATE_CATALOG_REQUEST'
+      'COLLECTION_CATALOG_CREATE_REQUEST'
     >;
   },
   ZirconVizEventRegistry
@@ -141,7 +141,7 @@ export class VizSatCatLoader<
   public getFetchButton(): HTMLElement {
     if (this._fetchButton) return this._fetchButton;
     this._fetchButton = document.createElement('ion-button');
-    this._fetchButton.classList.add('satcat-button');
+    this._fetchButton.classList.add('loader-button');
     this._fetchButton.innerText = 'Load Data';
 
     this._fetchButton.addEventListener('click', () => {
@@ -154,9 +154,9 @@ export class VizSatCatLoader<
       return dataDescriptor.loader
         .getData()
         .then((satellites: Satellite[]) => {
-          this.emit('COLLECTION_CREATE_CATALOG_REQUEST', {
+          this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
             catalogType: SATELLITE_TYPE,
-            catalogDescriptor: { id: 'null', name: dataDescriptor.name },
+            catalogDescriptor: { name: dataDescriptor.name },
             elements: satellites,
           });
         })

@@ -78,12 +78,14 @@ export abstract class ZirconViz<
   /**
    * Action performed when displayIn method is called
    */
-  public onDisplay(): void {}
+  public onDisplay(): Promise<void> {
+    return Promise.resolve();
+  }
 
   /**
    * @returns   true if chart was created and docked, false otherwise
    */
-  public displayIn(parentWindow: ZirconVizWindow): boolean {
+  public async displayIn(parentWindow: ZirconVizWindow): Promise<boolean> {
     if (this.__parentWindow === parentWindow) return false;
     if (this.__parentWindow) {
       this.removeFromParent();
@@ -91,7 +93,7 @@ export abstract class ZirconViz<
     this.__parentWindow = parentWindow;
     if (!this.__parentWindow?.getWindowContent()) return false;
     this.__parentWindow?.getWindowContent().appendChild(this.getContainer());
-    this.onDisplay();
+    await this.onDisplay();
     return true;
   }
 
