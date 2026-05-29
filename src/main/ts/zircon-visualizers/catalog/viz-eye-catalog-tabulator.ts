@@ -433,7 +433,7 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
     this._catalogSelector.getUI().classList.add('catalog-selector');
     this._catalogSelector.onCreateNewCatalog((catalogName: string) => {
       this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
-        catalogType: this.getCatalogType(),
+        dataType: this.getCatalogType(),
         catalogDescriptor: { name: catalogName },
       });
     });

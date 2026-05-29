@@ -38,7 +38,7 @@ export class CatalogCollectionSelectorComponent {
   }
 
   public getCatalogType(): string {
-    return this._catColl?.getCatalogType();
+    return this._catColl?.getDataType();
   }
 
   /**

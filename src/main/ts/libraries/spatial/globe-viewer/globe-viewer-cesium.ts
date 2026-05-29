@@ -12,6 +12,7 @@ import {
   buildInstancedVisibilityLines,
   VisibilityEngineCesium,
 } from './visibility-cesium';
+import { CesiumPrimitiveDataProvider } from './cesium-primitive-source';
 
 const DEFAULT_CESIUM_TOKEN: string =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MTQ3MzJjOS1jY2MwLTRiOGUtYTU5Ny1kNTMxNTQ2MDIxOGIiLCJpZCI6Mzk2Mzc0LCJpYXQiOjE3NzI0MTE2OTB9.O-0_Gu3rYf-7ijUGGlWZtrybQ3OhKMtx0mjBidAcBIw';
@@ -64,6 +65,7 @@ export class GlobeViewerCesium extends GlobeViewer<
   private _token: string = DEFAULT_CESIUM_TOKEN;
   private _sunLightning: boolean = true;
   private _skyAtmosphere: boolean = true;
+  private primitiveSources: { [id: string]: CesiumPrimitiveDataProvider } = {};
 
   constructor(options?: GlobeViewerOptionsCesium) {
     super();
@@ -71,6 +73,16 @@ export class GlobeViewerCesium extends GlobeViewer<
     this.on('optionsChanged', (_event) => {
       this.onOptionsChanged();
     });
+  }
+
+  public addPrimitiveSource(source: CesiumPrimitiveDataProvider): void {
+    if (!source) return;
+    this.primitiveSources[source.getId()] = source;
+  }
+
+  public removePrimitiveSource(sourceId: string): void {
+    if (!sourceId || !this.primitiveSources[sourceId]) return;
+    delete this.primitiveSources[sourceId];
   }
 
   private onOptionsChanged(): void {
@@ -267,13 +279,13 @@ export class GlobeViewerCesium extends GlobeViewer<
 
     this._viewer.scene.primitives.add(collection);
 
-    // const dataSource = await Cesium.CzmlDataSource.load(
+    // const dataProvider = await Cesium.CzmlDataProvider.load(
     //   CESIUM_SATELLITES_CZML_SAMPLE,
     // );
 
-    // this._viewer.dataSources.add(dataSource);
+    // this._viewer.dataProviders.add(dataProvider);
 
-    // this._viewer.zoomTo(dataSource);
+    // this._viewer.zoomTo(dataProvider);
   }
 
   public destroyViewer(): void {

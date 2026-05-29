@@ -38,6 +38,7 @@ import { ZirconObjectFactory } from './zircon-object-factory';
 import { ZirconAppFactory } from './zircon-app-factory';
 import { ZirconPluginManager } from '../zircon-plugin/zircon-plugin-manager';
 import { ZirconPlugin } from '../zircon-plugin/zircon-plugin';
+import { ZirconDataProviderManager } from '../zircon-data/zircon-data-provider-manager';
 
 /**
  * Composition of this application UI
@@ -123,6 +124,7 @@ export class ZirconApplication<
   private __desktopManager: ZirconDesktopManager = null;
   private __objectManager: ZirconObjectManager = null;
   private __pluginManager: ZirconPluginManager = null;
+  private __dataProviderManager: ZirconDataProviderManager = null;
 
   /**
    * constructor
@@ -206,6 +208,12 @@ export class ZirconApplication<
     if (!this.__pluginManager)
       this.__pluginManager = new ZirconPluginManager(this);
     return this.__pluginManager;
+  }
+
+  public getDataProviderManager(): ZirconDataProviderManager {
+    if (!this.__dataProviderManager)
+      this.__dataProviderManager = new ZirconDataProviderManager(this);
+    return this.__dataProviderManager;
   }
 
   public async getInstance(

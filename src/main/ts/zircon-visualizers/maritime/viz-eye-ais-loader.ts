@@ -111,7 +111,7 @@ export class VizAISLoader<
       const aisData: AIS[] = await dataDescriptor.loader.getData();
 
       this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
-        catalogType: AIS_TYPE,
+        dataType: AIS_TYPE,
         catalogDescriptor: { name: dataDescriptor.name },
         elements: aisData,
       });

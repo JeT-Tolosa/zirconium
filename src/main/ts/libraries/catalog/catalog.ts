@@ -24,7 +24,8 @@ export class Catalog<CatalogElement> {
     id: uuid(),
     name: 'catalog',
   };
-  private _catalogType: string = 'generic';
+
+  private _dataType: string = 'unknown data type';
   private _elements: { [index: string]: CatalogElement } = {};
   private _indexationMethod: (el: CatalogElement) => string;
   private _eventEmitter: EventEmitter = new EventEmitter();
@@ -35,18 +36,18 @@ export class Catalog<CatalogElement> {
    * @param indexation indexation method
    */
   constructor(
-    catalogType: string,
+    catalogDataType: string,
     catalogDescriptor: CatalogDescriptor,
     indexation: (el: CatalogElement) => string,
   ) {
-    this._catalogType = catalogType;
+    this._dataType = catalogDataType;
     this._desc = { ...catalogDescriptor };
     if (!this._desc.id) this._desc.id = uuid(); // assign a random id if not defined
     this.setIndexMethod(indexation);
   }
 
-  public getCatalogType(): string {
-    return this._catalogType;
+  public getDataType(): string {
+    return this._dataType;
   }
 
   private emit<K extends keyof CatalogEventRegistry['outgoing']>(
@@ -58,7 +59,7 @@ export class Catalog<CatalogElement> {
     return true;
   }
 
-  public subscriber<K extends keyof CatalogEventRegistry['outgoing']>(
+  public addListener<K extends keyof CatalogEventRegistry['outgoing']>(
     eventName: K,
     callback: (arg: CatalogEventRegistry['outgoing'][K]) => void,
   ) {
@@ -117,7 +118,7 @@ export class Catalog<CatalogElement> {
     return {
       id: this.getId(),
       name: this.getName(),
-      type: this.getCatalogType(),
+      type: this.getDataType(),
     };
   }
 
@@ -131,7 +132,7 @@ export class Catalog<CatalogElement> {
    */
   public duplicate(name: string): Catalog<CatalogElement> {
     const cat: Catalog<CatalogElement> = new Catalog(
-      this.getCatalogType(),
+      this.getDataType(),
       { ...this.getDescriptor(), name: name }, // override name
       this._indexationMethod,
     );

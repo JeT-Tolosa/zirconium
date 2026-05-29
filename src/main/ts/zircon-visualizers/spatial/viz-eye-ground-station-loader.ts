@@ -161,7 +161,7 @@ export class VizGroundStationLoader<
         await dataDescriptor.loader.getData();
 
       this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
-        catalogType: GROUND_STATION_TYPE,
+        dataType: GROUND_STATION_TYPE,
         catalogDescriptor: { name: dataDescriptor.name },
         elements: groundStations,
       });

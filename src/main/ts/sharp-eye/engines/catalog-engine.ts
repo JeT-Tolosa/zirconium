@@ -20,7 +20,7 @@ import {
 export type CatalogEngineEvents<CatalogElement> = {
   // create catalog
   COLLECTION_CATALOG_CREATE_REQUEST: {
-    catalogType: string;
+    dataType: string;
     catalogDescriptor: CatalogDescriptor;
     elements?: CatalogElement[];
   };
@@ -102,7 +102,7 @@ export type CatalogEngineEventRegistry<CatalogElement> = MergeZirconRegistries<
           | 'COLLECTION_GET_CATALOG_DESCRIPTORS_REQUEST'
           | 'COLLECTION_GET_CATALOG_CONTENT_REQUEST'
         >,
-        PickEvents<CatalogCollectionEvents, 'CATALOG_COLLECTION_CHANGED'>,
+        PickEvents<CatalogCollectionEvents, 'CATALOG_COLLECTION_ADDED'>,
       ]
     >;
 
@@ -148,27 +148,27 @@ export abstract class CatalogEngine<
     CatalogEngineEventRegistry<CatalogElement>,
 > extends ZirconEngine<R> {
   private _catColl: CatalogCollection<CatalogElement> = null;
-  private _catalogType: string = 'generic';
+  private _dataType: string = 'unknown data type';
   private _indexation: (el: CatalogElement) => string;
 
   constructor(
     name: string,
-    catalogType: string,
+    catalogDataType: string,
     indexation: (el: CatalogElement) => string,
   ) {
     super();
     this.setName(name);
-    this._catalogType = catalogType;
+    this._dataType = catalogDataType;
     this._indexation = indexation;
     this._catColl = new CatalogCollection<CatalogElement>(
-      catalogType,
+      catalogDataType,
       indexation,
     );
 
     // respond to catalog event
     this._catColl.subscriber('MANAGED_CATALOG_CONTENT_CHANGED', (arg) => {
       this.emit('MANAGED_CATALOG_CONTENT_CHANGED', {
-        catalogType: this.getCatalogType(),
+        dataType: this.getDataType(),
         catalogId: arg.catalogId,
       });
     });
@@ -185,14 +185,14 @@ export abstract class CatalogEngine<
       this.onCOLLECTION_GET_CATALOG_DESCRIPTORS_REQUEST();
     });
     this.addListener('COLLECTION_GET_CATALOG_CONTENT_REQUEST', (arg) => {
-      this.onCOLLECTION_GET_CATALOG_REQUEST(arg.catalogId);
+      this.onCOLLECTION_GET_CATALOG_CONTENT_REQUEST(arg.catalogId);
     });
-    this.addListener('CATALOG_COLLECTION_CHANGED', (arg) => {
-      this.onCATALOG_COLLECTION_CHANGED(arg.catalogId);
+    this.addListener('CATALOG_COLLECTION_ADDED', (arg) => {
+      this.onCATALOG_COLLECTION_ADDED(arg.catalogId);
     });
     this.addListener('COLLECTION_CATALOG_CREATE_REQUEST', (arg) => {
       this.onCOLLECTION_CATALOG_CREATE_REQUEST(
-        arg.catalogType,
+        arg.dataType,
         arg.catalogDescriptor,
         arg.elements,
       );
@@ -200,25 +200,23 @@ export abstract class CatalogEngine<
   }
 
   private onCOLLECTION_CATALOG_CREATE_REQUEST(
-    catalogType: string,
+    dataType: string,
     catalogDescriptor: CatalogDescriptor,
     elements: CatalogElement[],
   ) {
-    if (catalogType !== this.getCatalogType()) return;
-
+    if (dataType !== this.getDataType()) return;
     const cat: Catalog<CatalogElement> = this.createNewCatalog(
       catalogDescriptor.name,
       elements,
     );
     this.emit('COLLECTION_CATALOG_CREATED', {
       catalogDescriptor: cat.getDescriptor(),
-
       elements: Object.values(cat.getElements()),
     });
   }
 
   private onCOLLECTION_GET_CATALOG_DESCRIPTORS_REQUEST() {
-    const cats: Catalog<CatalogElement>[] = this._catColl.getCatalogs();
+    const cats: Catalog<CatalogElement>[] = this._catColl?.getCatalogs();
     if (!cats) {
       this.emit('COLLECTION_GET_CATALOG_DESCRIPTORS_ERROR', {
         error: `Catalogs cannot be retrieved from element catalog collection`,
@@ -232,16 +230,16 @@ export abstract class CatalogEngine<
     }
   }
 
-  private onCATALOG_COLLECTION_CHANGED(_catalogId: string) {
-    throw new Error('Not yet implemented');
+  private onCATALOG_COLLECTION_ADDED(_catalogId: string) {
+    // Implementation for when a catalog is added to the collection
   }
 
-  private onCOLLECTION_GET_CATALOG_REQUEST(catalogId: string) {
-    const cat: Catalog<CatalogElement> = this._catColl.getCatalog(catalogId);
+  private onCOLLECTION_GET_CATALOG_CONTENT_REQUEST(catalogId: string) {
+    const cat: Catalog<CatalogElement> = this._catColl?.getCatalog(catalogId);
     if (!cat) {
       this.emit('COLLECTION_GET_CATALOG_CONTENT_ERROR', {
         catalogId: catalogId,
-        error: `catalogId=${catalogId} cannot be retrieved from element catalog collection`,
+        error: `catalogId=${catalogId} cannot be retrieved from element catalog collection to get catalog content`,
       });
     } else {
       this.emit('COLLECTION_GET_CATALOG_CONTENT_DONE', {
@@ -254,11 +252,11 @@ export abstract class CatalogEngine<
     catalogId: string,
     elements: CatalogElement[],
   ) {
-    const cat: Catalog<CatalogElement> = this._catColl.getCatalog(catalogId);
+    const cat: Catalog<CatalogElement> = this._catColl?.getCatalog(catalogId);
     if (!cat) {
       this.emit('COLLECTION_ADD_ELEMENTS_ERROR', {
         catalogId: catalogId,
-        error: `catalogId=${catalogId} cannot be retrieved from element catalog collection`,
+        error: `catalogId=${catalogId} cannot be retrieved from element catalog collection to add elements`,
       });
     } else {
       const addedElementsIds: string[] = cat.addElements(elements);
@@ -281,8 +279,8 @@ export abstract class CatalogEngine<
    * Type of elements managed by this catalog
    * @returns
    */
-  public getCatalogType(): string {
-    return this._catalogType;
+  public getDataType(): string {
+    return this._dataType;
   }
 
   /**
@@ -397,7 +395,7 @@ export abstract class CatalogEngine<
     elements: CatalogElement[],
   ): Catalog<CatalogElement> {
     const cat: Catalog<CatalogElement> = new Catalog<CatalogElement>(
-      this.getCatalogType(),
+      this.getDataType(),
       {
         name: catalogName,
       } as CatalogDescriptor,

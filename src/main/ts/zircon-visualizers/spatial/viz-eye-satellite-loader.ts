@@ -155,7 +155,7 @@ export class VizSatCatLoader<
         .getData()
         .then((satellites: Satellite[]) => {
           this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
-            catalogType: SATELLITE_TYPE,
+            dataType: SATELLITE_TYPE,
             catalogDescriptor: { name: dataDescriptor.name },
             elements: satellites,
           });
