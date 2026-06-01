@@ -13,6 +13,7 @@ export const ZIRCON_DATA_PROVIDER_TYPE = 'zircon-data-provider-type';
 
 export interface ZirconDataProviderDescriptor {
   id: string;
+  name: string;
   type: string;
   dataType: string;
 }
@@ -48,13 +49,13 @@ export class ZirconDataProvider<
   T = any,
   R extends ZirconDataProviderEventRegistry = ZirconDataProviderEventRegistry,
 > extends ZirconObject<R> {
-  private _dataType: string =null;
+  private _dataType: string = null;
   private _data: T = null;
   private __onDataChangeCB: () => void = null;
 
   constructor(name: string, dataType: string) {
     super({ name: name, type: ZIRCON_DATA_PROVIDER_TYPE });
-    this._dataType = dataType;  
+    this._dataType = dataType;
   }
 
   public getData(): T {
@@ -72,7 +73,7 @@ export class ZirconDataProvider<
   public getType(): string {
     return ZIRCON_DATA_PROVIDER_TYPE;
   }
-  
+
   protected override listenToEvents(): void {
     super.listenToEvents();
     this.addListener('DATA_PROVIDER_CONTENT_REQUEST', (arg) =>
@@ -92,6 +93,7 @@ export class ZirconDataProvider<
   public getDescriptor(): ZirconDataProviderDescriptor {
     return {
       id: this.getId(),
+      name: this.getName(),
       type: this.getType(),
       dataType: this.getDataType(),
     };

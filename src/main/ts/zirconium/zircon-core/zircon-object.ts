@@ -78,11 +78,11 @@ export abstract class ZirconObject<
    * @param eventEmitter
    */
   public setEventDispatcher(eventEmitter: EventEmitter2): void {
+    if (this._eventEmitter === eventEmitter) return;
     this._eventEmitter = eventEmitter;
     this.listenToEvents();
   }
 
-  
   /**
    * // TODO: memory leak if setEventDispatcher is used (we should remove listeners !)
    * Unset the event emitter to be used

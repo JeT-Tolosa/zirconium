@@ -41,8 +41,8 @@ export type VizAISLoaderEventRegistry = MergeZirconRegistries<
   {
     incoming: {};
     outgoing: PickEvents<
-      CatalogEngineEvents<AIS>,
-      'COLLECTION_CATALOG_CREATE_REQUEST'
+      CatalogEngineEvents,
+      'CATALOG_ENGINE_COLLECTION_CREATE_REQUEST'
     >;
   },
   ZirconVizEventRegistry
@@ -110,10 +110,13 @@ export class VizAISLoader<
         throw new Error('invalid AIS data loader');
       const aisData: AIS[] = await dataDescriptor.loader.getData();
 
-      this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
+      this.emit('CATALOG_ENGINE_COLLECTION_CREATE_REQUEST', {
         dataType: AIS_TYPE,
-        catalogDescriptor: { name: dataDescriptor.name },
-        elements: aisData,
+        itemCollectionDescriptor: {
+          itemType: AIS_TYPE,
+          name: dataDescriptor.name,
+        },
+        items: aisData,
       });
     });
 

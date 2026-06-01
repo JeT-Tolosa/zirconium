@@ -71,7 +71,7 @@ export type VizSatCatLoaderEventRegistry = MergeZirconRegistries<
     incoming: {};
     outgoing: PickEvents<
       CatalogEngineEvents<Satellite>,
-      'COLLECTION_CATALOG_CREATE_REQUEST'
+      'CATALOG_ENGINE_COLLECTION_CREATE_REQUEST'
     >;
   },
   ZirconVizEventRegistry
@@ -154,10 +154,13 @@ export class VizSatCatLoader<
       return dataDescriptor.loader
         .getData()
         .then((satellites: Satellite[]) => {
-          this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
+          this.emit('CATALOG_ENGINE_COLLECTION_CREATE_REQUEST', {
             dataType: SATELLITE_TYPE,
-            catalogDescriptor: { name: dataDescriptor.name },
-            elements: satellites,
+            itemCollectionDescriptor: {
+              itemType: SATELLITE_TYPE,
+              name: dataDescriptor.name,
+            },
+            items: satellites,
           });
         })
         .catch((error) => {

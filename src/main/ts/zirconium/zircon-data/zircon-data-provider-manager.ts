@@ -47,9 +47,9 @@ export type ZirconDataProviderManagerRegistry = MergeZirconRegistries<
       [
         PickEvents<
           ZirconDataProviderManagerEvents,
-          'DATA_PROVIDER_MANAGER_DESCRIPTORS_REQUEST' |
-          'REGISTER_DATA_PROVIDER_REQUEST' |
-          'UNREGISTER_DATA_PROVIDER_REQUEST'
+          | 'DATA_PROVIDER_MANAGER_DESCRIPTORS_REQUEST'
+          | 'REGISTER_DATA_PROVIDER_REQUEST'
+          | 'UNREGISTER_DATA_PROVIDER_REQUEST'
         >,
       ]
     >;
@@ -85,7 +85,8 @@ export class ZirconDataProviderManager<
     });
     this.addListener('REGISTER_DATA_PROVIDER_REQUEST', (arg) => {
       this.registerDataProvider(arg.dataProvider);
-    });    this.addListener('UNREGISTER_DATA_PROVIDER_REQUEST', (arg) => {
+    });
+    this.addListener('UNREGISTER_DATA_PROVIDER_REQUEST', (arg) => {
       this.unregisterDataProvider(arg.dataProviderId);
     });
   }
@@ -111,6 +112,11 @@ export class ZirconDataProviderManager<
     }
   }
 
+  public getDataProvider(id: string): ZirconDataProvider {
+    if (!id) return null;
+    return this.__registeredDataProviders[id];
+  }
+
   public registerDataProvider(dataProvider: ZirconDataProvider): boolean {
     if (!dataProvider) return false;
     if (
@@ -125,21 +131,21 @@ export class ZirconDataProviderManager<
     this.__registeredDataProviders[dataProvider.getId()] = dataProvider;
     this.emit('DATA_PROVIDER_MANAGER_PROVIDER_REGISTERED', {
       dataProviderDescriptor: dataProvider.getDescriptor(),
-    }); 
+    });
     return true;
   }
 
-    public unregisterDataProvider(dataProviderId: string): boolean {
+  public unregisterDataProvider(dataProviderId: string): boolean {
     if (!dataProviderId) return false;
     const dataProvider = this.__registeredDataProviders[dataProviderId];
-    if (      !dataProvider)      return false;
+    if (!dataProvider) return false;
 
     // connect data provider to app event bus
     dataProvider.unsetEventDispatcher();
     delete this.__registeredDataProviders[dataProvider.getId()];
     this.emit('DATA_PROVIDER_MANAGER_PROVIDER_UNREGISTERED', {
       dataProviderDescriptor: dataProvider.getDescriptor(),
-    }); 
+    });
     return true;
   }
 

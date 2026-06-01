@@ -151,6 +151,8 @@ export class ZirconApplication<
     this._eventEmitter.setMaxListeners(1000);
     // create object manager
     this.__objectManager = new ZirconObjectManager(this);
+    // create data provider manager
+    this.__dataProviderManager = new ZirconDataProviderManager(this);
     // register default factories
 
     this.registerDefaultFactories();

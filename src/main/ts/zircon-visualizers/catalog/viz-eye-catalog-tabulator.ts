@@ -15,8 +15,15 @@ import {
   ZirconVizEventRegistry,
   ZirconVizState,
 } from '../../zirconium/zircon-ui/zircon-visualizer';
-import { ItemCollection, ItemCollectionDescriptor } from '../../libraries/collection/item-collection';
-import { CatalogEngineEvents } from '../../sharp-eye/engines/catalog-engine';
+import {
+  ItemCollection,
+  ItemCollectionDescriptor,
+} from '../../libraries/collection/item-collection';
+import {
+  CatalogEngineDescriptor,
+  CatalogEngineEvents,
+} from '../../sharp-eye/engines/catalog-engine';
+import { ItemArray } from '../../libraries/collection/item-array';
 
 /**
  * Events definition for Catalog Tabulator
@@ -45,34 +52,35 @@ export type VizCatalogTabulatorEventRegistry<T> = MergeZirconRegistries<
   {
     incoming: MergePickEvents<
       [
-          PickEvents<
+        PickEvents<
           CatalogEngineEvents<T>,
-            | 'CATALOG_ENGINE_COLLECTION_ADDED'
-            | 'CATALOG_ENGINE_COLLECTION_REMOVED'
-            | 'CATALOG_ENGINE_COLLECTION_CREATED'
-            >,
-
+          | 'CATALOG_ENGINE_COLLECTION_ADDED'
+          | 'CATALOG_ENGINE_COLLECTION_REMOVED'
+          | 'CATALOG_ENGINE_COLLECTION_DESCRIPTORS'
+          | 'CATALOG_ENGINE_COLLECTION_CONTENT'
+          | 'CATALOG_ENGINE_ELEMENTS_ADDED'
+          | 'CATALOG_ENGINE_ELEMENTS_REMOVED'
+          | 'CATALOG_ENGINE_ELEMENTS_SET'
+        >,
       ]
     >;
 
     outgoing: MergePickEvents<
       [
-        PickEvents<
-          VizCatalogTabulatorEvents<T>,
-            'CATALOG_COLLECTION_CREATED'
-            | 'CATALOG_COLLECTION_REMOVED'
-            | 'CATALOG_ITEM_SELECTED'
-        >
-        // PickEvents<
+        //PickEvents<
         //   VizCatalogTabulatorEvents<T>,
-        //   'CATALOG_ITEM_SELECTED'
+        //   | 'CATALOG_COLLECTION_CREATED'
+        //   | 'CATALOG_COLLECTION_REMOVED'
+        //   | 'CATALOG_ITEM_SELECTED'
         // >,
-        // PickEvents<
-        //   CatalogEngineEvents<T>,
-        //   | 'COLLECTION_GET_CATALOG_CONTENT_REQUEST'
-        //   | 'COLLECTION_CATALOG_CREATE_REQUEST'
-        //   | 'COLLECTION_ADD_ELEMENTS_REQUEST'
-        // >,
+        PickEvents<VizCatalogTabulatorEvents<T>, 'CATALOG_ITEM_SELECTED'>,
+        PickEvents<
+          CatalogEngineEvents<T>,
+          | 'CATALOG_ENGINE_GET_COLLECTION_DESCRIPTORS_REQUEST'
+          | 'CATALOG_ENGINE_GET_COLLECTION_CONTENT_REQUEST'
+          | 'CATALOG_ENGINE_ADD_ELEMENTS_REQUEST'
+          | 'CATALOG_ENGINE_COLLECTION_CREATE_REQUEST'
+        >,
       ]
     >;
   },
@@ -83,14 +91,16 @@ export interface VizCollectionCatalogTabulatorState extends ZirconVizState {
   catalogId?: string;
 }
 
-export class VizCollectionCatalogTabulator<T> extends ZirconViz<
-  VizCatalogTabulatorEventRegistry<T>
-> {
-private _itemCollections: {
+export class VizCollectionCatalogTabulator<
+  T,
+  R extends VizCatalogTabulatorEventRegistry<T> =
+    VizCatalogTabulatorEventRegistry<T>,
+> extends ZirconViz<R> {
+  private _itemCollections: {
     [id: string]: ItemCollection;
   } = {};
   private _dataType: string = 'unknown data type';
-    private _indexationMethod: (el: T) => string;
+  private _indexationMethod: (el: T) => string;
 
   private _div: HTMLDivElement = null;
   private _catalogTabulatorDiv: HTMLDivElement = null;
@@ -114,81 +124,89 @@ private _itemCollections: {
   }
 
   protected override listenToEvents(): void {
-    // this.addListener('ITEM_COLLECTION_CHANGED', (arg) => {
-    //   if (arg.itemCollectionDescriptor?.dataType !== this.getElementsType()) return;
-    //   this.onCATALOG_CHANGED(arg.itemCollectionDescriptor);
-    // });
-
-            // 'CATALOG_COLLECTION_CREATED'
-            // 'CATALOG_COLLECTION_REMOVED'
-            // 'CATALOG_ITEM_SELECTED'
-
+    this.addListener('CATALOG_ENGINE_ELEMENTS_ADDED', (arg) => {
+      this.onCATALOG_ENGINE_COLLECTION_ELEMENTS_CHANGED(
+        arg.catalogDescriptor,
+        arg.itemCollectionDescriptor,
+      );
+    });
+    this.addListener('CATALOG_ENGINE_ELEMENTS_REMOVED', (arg) => {
+      this.onCATALOG_ENGINE_COLLECTION_ELEMENTS_CHANGED(
+        arg.catalogDescriptor,
+        arg.itemCollectionDescriptor,
+      );
+    });
+    this.addListener('CATALOG_ENGINE_ELEMENTS_SET', (arg) => {
+      this.onCATALOG_ENGINE_COLLECTION_ELEMENTS_CHANGED(
+        arg.catalogDescriptor,
+        arg.itemCollectionDescriptor,
+      );
+    });
 
     this.addListener('CATALOG_ENGINE_COLLECTION_ADDED', (arg) => {
-      if (arg.itemCollectionDescriptor.id !== this.getId()) return;
-      this.onCATALOG_ENGINE_COLLECTION_CHANGED(arg.itemCollectionDescriptor);
+      this.onCATALOG_ENGINE_COLLECTIONS_CHANGED(arg.catalogDescriptor);
     });
-    // this.addListener('CATALOG_ENGINE_COLLECTION_REMOVED', (arg) => {
-    //   if (arg.itemCollectionDescriptor.id !== this.getId()) return;
-    //   this.onCCATALOG_ENGINE_COLLECTION_CHANGED(arg.itemCollectionDescriptor);
-    // });
-    // this.addListener('CATALOG_COLLECTION_REMOVED', (arg) => {
-    //   if (arg.id !== this.getId()) return;
-    //   this.onCATALOG_COLLECTION_REMOVED(arg.itemCollectionDescriptor);
-    // });
-    // this.addListener('COLLECTION_GET_CATALOG_CONTENT_DONE', (arg) => {
-    //   this.onCOLLECTION_GET_CATALOG_DONE(arg.itemCollectionDescriptor, arg.elements);
-    // });
-    // this.addListener('MANAGED_CATALOG_CONTENT_CHANGED', (arg) => {
-    //   this.onMANAGED_CATALOG_CONTENT_CHANGED(arg.catalogId);
-    // });
+    this.addListener('CATALOG_ENGINE_COLLECTION_REMOVED', (arg) => {
+      this.onCATALOG_ENGINE_COLLECTIONS_CHANGED(arg.catalogDescriptor);
+    });
+    this.addListener('CATALOG_ENGINE_COLLECTION_CONTENT', (arg) => {
+      this.onCATALOG_ENGINE_COLLECTION_CONTENT(
+        arg.catalogDescriptor,
+        arg.itemCollectionDescriptor,
+        arg.items,
+      );
+    });
+    this.addListener('CATALOG_ENGINE_COLLECTION_DESCRIPTORS', (arg) => {
+      this.onCATALOG_ENGINE_COLLECTION_DESCRIPTORS(
+        arg.catalogDescriptor,
+        arg.itemCollectionDescriptors,
+      );
+    });
   }
 
   public getElementsType(): string {
     return this._dataType;
   }
 
-  private onCATALOG_ENGINE_COLLECTION_CHANGED(itemCollectionDescriptor: ItemCollectionDescriptor): void {
-    if (
-      this.getCollectionCatalogComponent().getSelectedItemCollectionId() ===
-      itemCollectionDescriptor.id
-    ) {
-      this.emit('CATALOG_CONTENT_REQUEST', {
-        catalogId: itemCollectionDescriptor.id,
-      });
-    }
+  private onCATALOG_ENGINE_COLLECTION_DESCRIPTORS(
+    catalogDescriptor: CatalogEngineDescriptor,
+    itemCollectionDescriptors: ItemCollectionDescriptor[],
+  ): void {
+    if (catalogDescriptor?.dataType !== this.getElementsType()) return;
+    this.getCollectionCatalogComponent().setItemCollectionDescriptors(
+      itemCollectionDescriptors,
+    );
   }
 
-  // private onCATALOG_ADDED(
-  //   itemCollectionDescriptor: ItemCollectionDescriptor,
-  //   items: T[],
-  // ): void {
-  //   const cat = new ItemArray<T>(
-  //     this.getElementsType(),
-  //     itemCollectionDescriptor,
-  //   );
-  //   cat.setItems(items);
-  //   this.getCollectionCatalogComponent().addCatalog(cat);
-  //   // select catalog if none is already selected
-  //   if (this.getCollectionCatalogComponent().getSelectedCatalogId() === null)
-  //     this.getCollectionCatalogComponent().selectItemCollection(itemCollectionDescriptor.id);
-  // }
+  private onCATALOG_ENGINE_COLLECTION_ELEMENTS_CHANGED(
+    catalogDescriptor: CatalogEngineDescriptor,
+    itemCollectionDescriptor: ItemCollectionDescriptor,
+  ): void {
+    if (catalogDescriptor?.dataType !== this.getElementsType()) return;
+    this.requestItemCollectionContent(itemCollectionDescriptor.id);
+  }
 
-  // private onCATALOG_CONTENT(
-  //   itemCollectionDescriptor: ItemCollectionDescriptor,
-  //   elements: T[],
-  // ): void {
-  //   if (this.getId() !== itemCollectionDescriptor.id) return;
-  //   if (this.getElementsType() !== itemCollectionDescriptor.type) return;
+  private onCATALOG_ENGINE_COLLECTION_CONTENT(
+    catalogDescriptor: CatalogEngineDescriptor,
+    itemCollectionDescriptor: ItemCollectionDescriptor,
+    items: T[],
+  ): void {
+    if (catalogDescriptor?.dataType !== this.getElementsType()) return;
+    const array = new ItemArray<T>(itemCollectionDescriptor);
+    array.addItems(items);
+    this._itemCollections[itemCollectionDescriptor.id] = array;
+    if (itemCollectionDescriptor.id === this.getSelectedCatalogId())
+      this.setTabulatorData(items);
+  }
 
-  //   this._items = {};
-
-  //   elements?.forEach((el) => {
-  //     this._items[this._indexationMethod(el)] = el;
-  //   });
-
-  //   this.displaySelectedCatalogContent();
-  // }
+  private onCATALOG_ENGINE_COLLECTIONS_CHANGED(
+    catalogDescriptor: CatalogEngineDescriptor,
+  ): void {
+    if (catalogDescriptor?.dataType !== this.getElementsType()) return;
+    this.emit('CATALOG_ENGINE_GET_COLLECTION_DESCRIPTORS_REQUEST', {
+      dataType: this.getElementsType(),
+    });
+  }
 
   /**
    * Set indexation method
@@ -234,20 +252,34 @@ private _itemCollections: {
     const itemCollectionId: string =
       this.getCollectionCatalogComponent().getSelectedItemCollectionId();
     if (!itemCollectionId) return;
-    const itemCollection: ItemCollection = this.getItemCollection(itemCollectionId);
-    if (itemCollection == null)
-      throw new Error(
-        `catalog id ${itemCollectionId} is not in element catalog collection`,
-      );
-    if (!itemCollection.getItems()) {
+    const itemCollection: ItemCollection =
+      this.getItemCollection(itemCollectionId);
+    if (!itemCollection) {
+      this.displayNoData();
       // ask for catalog content
-      this.emit('COLLECTION_GET_CATALOG_CONTENT_REQUEST', {
-        catalogId: itemCollectionId,
+      this.emit('CATALOG_ENGINE_GET_COLLECTION_CONTENT_REQUEST', {
+        itemCollectionId: itemCollectionId,
       });
+      return;
+    }
+
+    if (!itemCollection.getItems()) {
+      this.requestItemCollectionContent(itemCollectionId);
     } else {
       // set stored values
       this.setTabulatorData(Object.values(itemCollection.getItems() as T[]));
     }
+  }
+
+  private requestItemCollectionContent(itemCollectionId: string): void {
+    // ask for catalog content
+    this.emit('CATALOG_ENGINE_GET_COLLECTION_CONTENT_REQUEST', {
+      itemCollectionId: itemCollectionId,
+    });
+  }
+
+  private getSelectedCatalogId(): string {
+    return this.getCollectionCatalogComponent().getSelectedItemCollectionId();
   }
 
   private getItemCollection(itemCollectionId: string): ItemCollection {
@@ -276,6 +308,12 @@ private _itemCollections: {
    */
   public override async onDisplay(): Promise<void> {
     this.getTabulator().on('tableBuilt', () => {});
+  }
+
+  private displayNoData(): void {
+    this.getTabulator().setData([]);
+    this.getTabulator().options.placeholder = 'Retrieving data...';
+    this.getTabulator().redraw();
   }
 
   private getTabulator(): Tabulator {
@@ -349,9 +387,10 @@ private _itemCollections: {
 
       const data = JSON.parse(json) as Array<unknown>;
       // TODO: unsafe cast: Check data type
-      this.emit('COLLECTION_ADD_ELEMENTS_REQUEST', {
-        catalogId: this.getCollectionCatalogComponent().getSelectedItemCollectionId(),
-        elements: data as T[],
+      this.emit('CATALOG_ENGINE_ADD_ELEMENTS_REQUEST', {
+        itemCollectionId:
+          this.getCollectionCatalogComponent().getSelectedItemCollectionId(),
+        items: data as T[],
       });
     });
   }
@@ -450,12 +489,16 @@ private _itemCollections: {
     if (this._itemCollectionSelector) return this._itemCollectionSelector;
     this._itemCollectionSelector = new CollectionCatalogSelectorComponent();
     this._itemCollectionSelector.getUI().classList.add('catalog-selector');
-    this._itemCollectionSelector.onCreateNewCollection((collectionName: string) => {
-      this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
-        dataType: this.getElementsType(),
-        itemCollectionDescriptor: { name: collectionName },
-      });
-    });
+    this._itemCollectionSelector.onCreateNewCollection(
+      (collectionName: string) => {
+        this.emit('CATALOG_ENGINE_COLLECTION_CREATE_REQUEST', {
+          itemCollectionDescriptor: {
+            itemType: this.getElementsType(),
+            name: collectionName,
+          },
+        });
+      },
+    );
     this._itemCollectionSelector.onSelectedItemCollectionChange((_: string) => {
       this.displaySelectedCatalogContent();
     });
@@ -463,7 +506,9 @@ private _itemCollections: {
   }
 
   private selectCatalog(collectionId: string): boolean {
-    return this.getCollectionCatalogComponent().selectItemCollection(collectionId);
+    return this.getCollectionCatalogComponent().selectItemCollection(
+      collectionId,
+    );
   }
   /**
    * Get chart's div element

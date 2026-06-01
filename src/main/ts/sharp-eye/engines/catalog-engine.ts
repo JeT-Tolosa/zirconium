@@ -34,47 +34,69 @@ interface CatalogEngineEntry<T> {
   collection: ItemArray<T>;
   dataProvider: ZirconDataProvider<ItemArray<T>>;
 }
+
+export interface CatalogEngineDescriptor {
+  id: string;
+  name: string;
+  dataType: string;
+}
+
 /**
  * Events
  */
-export type CatalogEngineEvents<T> = {
+export type CatalogEngineEvents<T = unknown> = {
   // create catalog
   CATALOG_ENGINE_COLLECTION_CREATE_REQUEST: {
-    dataType: string;
     itemCollectionDescriptor: ItemCollectionDescriptor;
     items?: T[];
   };
-  CATALOG_ENGINE_COLLECTION_CREATED: {
-    itemCollectionDescriptor: ItemCollectionDescriptor;
-    items: T[];
+  // CATALOG_ENGINE_COLLECTION_CREATED: {
+  //   catalogDescriptor: CatalogEngineDescriptor;
+  //   itemCollectionDescriptor: ItemCollectionDescriptor;
+  //   items: T[];
+  // };
+  CATALOG_ENGINE_CREATE_COLLECTION_ERROR: {
+    catalogDescriptor: CatalogEngineDescriptor;
+    itemCollectionDescriptor: string;
   };
-  CATALOG_ENGINE_CREATE_COLLECTION_ERROR: { itemCollectionDescriptor: string };
   // Clear Catalog
-  CATALOG_ENGINE_CLEAR_COLLECTION_REQUEST: { collectionId: string };
-  CATALOG_ENGINE_COLLECTION_CLEARED: { collectionId: string };
-  CATALOG_ENGINE_CLEAR_COLLECTION_ERROR: { error: string };
+  CATALOG_ENGINE_CLEAR_COLLECTION_REQUEST: {
+    itemCollectionId: string;
+  };
+  CATALOG_ENGINE_COLLECTION_CLEARED: {
+    catalogDescriptor: CatalogEngineDescriptor;
+    itemCollectionId: string;
+  };
+  CATALOG_ENGINE_CLEAR_COLLECTION_ERROR: {
+    catalogDescriptor: CatalogEngineDescriptor;
+    error: string;
+  };
   // add items
   CATALOG_ENGINE_ADD_ELEMENTS_REQUEST: {
-    collectionId: string;
+    itemCollectionId: string;
     items: T[];
   };
   CATALOG_ENGINE_ELEMENTS_ADDED: {
+    catalogDescriptor: CatalogEngineDescriptor;
     itemCollectionDescriptor: ItemCollectionDescriptor;
   };
   CATALOG_ENGINE_ADD_ELEMENTS_ERROR: {
-    collectionId: string;
+    catalogDescriptor: CatalogEngineDescriptor;
+    itemCollectionId: string;
     error: unknown;
   };
   // set items
   CATALOG_ENGINE_SET_ELEMENTS_REQUEST: {
-    collectionId: string;
+    itemCollectionId: string;
     items: T[];
   };
   CATALOG_ENGINE_ELEMENTS_SET: {
+    catalogDescriptor: CatalogEngineDescriptor;
     itemCollectionDescriptor: ItemCollectionDescriptor;
   };
   CATALOG_ENGINE_SET_ELEMENTS_ERROR: {
-    collectionId: string;
+    catalogDescriptor: CatalogEngineDescriptor;
+    itemCollectionId: string;
     error: unknown;
   };
   // Remove items
@@ -83,34 +105,46 @@ export type CatalogEngineEvents<T> = {
     itemIds: string[];
   };
   CATALOG_ENGINE_ELEMENTS_REMOVED: {
+    catalogDescriptor: CatalogEngineDescriptor;
     itemCollectionDescriptor: ItemCollectionDescriptor;
     itemIds: string[];
   };
   CATALOG_ENGINE_REMOVE_ELEMENTS_ERROR: {
+    catalogDescriptor: CatalogEngineDescriptor;
     itemCollectionId: string;
     error: unknown;
   };
   // GET Catalog content
-  CATALOG_ENGINE_GET_COLLECTION_CONTENT_REQUEST: { collectionId: string };
+  CATALOG_ENGINE_GET_COLLECTION_CONTENT_REQUEST: {
+    itemCollectionId: string;
+  };
   CATALOG_ENGINE_COLLECTION_CONTENT: {
+    catalogDescriptor: CatalogEngineDescriptor;
     itemCollectionDescriptor: ItemCollectionDescriptor;
     items: T[];
   };
   CATALOG_ENGINE_GET_COLLECTION_CONTENT_ERROR: {
+    catalogDescriptor: CatalogEngineDescriptor;
     itemCollectionId: string;
     error: unknown;
   };
   // Get Catalog Descriptor
-  CATALOG_ENGINE_GET_COLLECTION_DESCRIPTORS_REQUEST: {};
+  CATALOG_ENGINE_GET_COLLECTION_DESCRIPTORS_REQUEST: {
+    dataType: string;
+  };
   CATALOG_ENGINE_COLLECTION_DESCRIPTORS: {
-    catalogDescriptors: ItemCollectionDescriptor[];
+    catalogDescriptor: CatalogEngineDescriptor;
+    dataType: string;
+    itemCollectionDescriptors: ItemCollectionDescriptor[];
   };
   CATALOG_ENGINE_GET_COLLECTION_DESCRIPTORS_ERROR: { error: string };
   CATALOG_ENGINE_COLLECTION_ADDED: {
+    catalogDescriptor: CatalogEngineDescriptor;
     itemCollectionDescriptor: ItemCollectionDescriptor;
     items: T[];
   };
   CATALOG_ENGINE_COLLECTION_REMOVED: {
+    catalogDescriptor: CatalogEngineDescriptor;
     itemCollectionDescriptor: ItemCollectionDescriptor;
   };
 };
@@ -197,7 +231,10 @@ export abstract class CatalogEngine<
 
   protected override listenToEvents(): void {
     this.addListener('CATALOG_ENGINE_ADD_ELEMENTS_REQUEST', (arg) => {
-      this.onCATALOG_ENGINE_ADD_ELEMENTS_REQUEST(arg.collectionId, arg.items);
+      this.onCATALOG_ENGINE_ADD_ELEMENTS_REQUEST(
+        arg.itemCollectionId,
+        arg.items,
+      );
     });
     this.addListener('CATALOG_ENGINE_CLEAR_COLLECTION_REQUEST', (_arg) => {
       alert('onCATALOG_ENGINE_CLEAR_COLLECTION_REQUEST not implemented');
@@ -209,12 +246,13 @@ export abstract class CatalogEngine<
       },
     );
     this.addListener('CATALOG_ENGINE_GET_COLLECTION_CONTENT_REQUEST', (arg) => {
-      this.onCATALOG_ENGINE_GET_COLLECTION_CONTENT_REQUEST(arg.collectionId);
+      this.onCATALOG_ENGINE_GET_COLLECTION_CONTENT_REQUEST(
+        arg.itemCollectionId,
+      );
     });
 
     this.addListener('CATALOG_ENGINE_COLLECTION_CREATE_REQUEST', (arg) => {
       this.onCATALOG_ENGINE_COLLECTION_CREATE_REQUEST(
-        arg.dataType,
         arg.itemCollectionDescriptor,
         arg.items,
       );
@@ -222,11 +260,10 @@ export abstract class CatalogEngine<
   }
 
   private onCATALOG_ENGINE_COLLECTION_CREATE_REQUEST(
-    dataType: string,
     itemCollectionDescriptor: ItemCollectionDescriptor,
     items: T[],
   ) {
-    if (dataType !== this.getDataType()) return;
+    if (itemCollectionDescriptor.itemType !== this.getDataType()) return;
     this.createNewItemCollection(itemCollectionDescriptor.name, items);
   }
 
@@ -239,34 +276,38 @@ export abstract class CatalogEngine<
   }
 
   private onCATALOG_ENGINE_GET_COLLECTION_CONTENT_REQUEST(
-    collectionId: string,
+    itemCollectionId: string,
   ) {
-    this.emitItemCollectionContent(collectionId);
+    this.emitItemCollectionContent(itemCollectionId);
   }
 
   private onCATALOG_ENGINE_ADD_ELEMENTS_REQUEST(
-    collectionId: string,
+    itemCollectionId: string,
     items: T[],
   ) {
-    const cat: CatalogEngineEntry<T> = this.getCatalogEntry(collectionId);
-    if (!cat) {
-      this.emit('CATALOG_ENGINE_ADD_ELEMENTS_ERROR', {
-        collectionId: collectionId,
-        error: `collectionId=${collectionId} cannot be retrieved from item catalog collection to add items`,
+    const cat: CatalogEngineEntry<T> = this.getCatalogEntry(itemCollectionId);
+    // this catalog engine does not manage this collection, ignore
+    if (!cat) return;
+    const addedItemsCount: number = cat.collection.addItems(items);
+    this.synchronizeDataProvider(cat);
+    if (addedItemsCount !== 0) {
+      this.emit('CATALOG_ENGINE_ELEMENTS_ADDED', {
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+        itemCollectionDescriptor: cat.collection.getDescriptor(),
       });
-    } else {
-      const addedItemsCount: number = cat.collection.addItems(items);
-      if (addedItemsCount !== 0) {
-        this.emit('CATALOG_ENGINE_ELEMENTS_ADDED', {
-          itemCollectionDescriptor: cat.collection.getDescriptor(),
-        });
-      }
     }
   }
 
-  protected override async onStart(): Promise<void> {
-    await super.start();
-    this.emitItemCollectionsDescriptors();
+  private synchronizeDataProvider(cat: CatalogEngineEntry<T>) {
+    cat?.dataProvider?.setData(cat?.collection);
+  }
+
+  public getCatalogEngineDescriptor(): CatalogEngineDescriptor {
+    return {
+      id: this.getId(),
+      name: this.getName(),
+      dataType: this.getDataType(),
+    };
   }
 
   protected override async onStop(): Promise<void> {}
@@ -287,22 +328,29 @@ export abstract class CatalogEngine<
       });
     } else {
       this.emit('CATALOG_ENGINE_COLLECTION_DESCRIPTORS', {
-        catalogDescriptors: cats.map((cat: CatalogEngineEntry<T>) => {
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
+        dataType: this.getDataType(),
+        itemCollectionDescriptors: cats.map((cat: CatalogEngineEntry<T>) => {
           return cat.collection.getDescriptor();
         }),
       });
     }
   }
 
-  private emitItemCollectionContent(collectionId: string) {
-    const cat: CatalogEngineEntry<T> = this.getCatalogEntry(collectionId);
+  private emitItemCollectionContent(itemCollectionId: string) {
+    const cat: CatalogEngineEntry<T> = this.getCatalogEntry(itemCollectionId);
     if (!cat) {
       this.emit('CATALOG_ENGINE_GET_COLLECTION_CONTENT_ERROR', {
-        itemCollectionId: collectionId,
-        error: `collectionId=${collectionId} cannot be retrieved from item catalog collection to get catalog content`,
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
+        itemCollectionId: itemCollectionId,
+        error: `itemCollectionId=${itemCollectionId} cannot be retrieved from item catalog collection to get catalog content`,
       });
     } else {
       this.emit('CATALOG_ENGINE_COLLECTION_CONTENT', {
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
         itemCollectionDescriptor: cat.collection.getDescriptor(),
         items: Object.values(cat.collection.getItems()),
       });
@@ -314,17 +362,22 @@ export abstract class CatalogEngine<
    * @param item item to add
    * @returns true if added
    */
-  public clearItems(catId: string): boolean {
-    const cat: CatalogEngineEntry<T> = this.getCatalogEntry(catId);
+  public clearItems(itemCollectionId: string): boolean {
+    const cat: CatalogEngineEntry<T> = this.getCatalogEntry(itemCollectionId);
     if (!cat) {
       this.emit('CATALOG_ENGINE_CLEAR_COLLECTION_ERROR', {
-        error: `Cannot clear ${catId} which is not part of item catalog : Ids : ${this.getItemCollectionIds().join(', ')}`,
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
+        error: `Cannot clear ${itemCollectionId} which is not part of item catalog : Ids : ${this.getItemCollectionIds().join(', ')}`,
       });
       return false;
     }
     if (cat.collection.clearItems()) {
+      this.synchronizeDataProvider(cat);
       this.emit('CATALOG_ENGINE_COLLECTION_CLEARED', {
-        collectionId: catId,
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
+        itemCollectionId: itemCollectionId,
       });
     }
   }
@@ -334,19 +387,24 @@ export abstract class CatalogEngine<
    * @param item item to add
    * @returns true if added
    */
-  public addItem(collectionId: string, item: T): boolean {
+  public addItem(itemCollectionId: string, item: T): boolean {
     const itemCollection: CatalogEngineEntry<T> =
-      this.getCatalogEntry(collectionId);
+      this.getCatalogEntry(itemCollectionId);
     if (!itemCollection) {
       this.emit('CATALOG_ENGINE_ADD_ELEMENTS_ERROR', {
-        collectionId: collectionId,
-        error: `Cannot add ${collectionId} which is not part of item catalog : Ids : ${this.getItemCollectionIds().join(', ')}`,
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
+        itemCollectionId: itemCollectionId,
+        error: `Cannot add ${itemCollectionId} which is not part of item catalog : Ids : ${this.getItemCollectionIds().join(', ')}`,
       });
       return false;
     }
     const added: boolean = itemCollection.collection.addItem(item);
+    this.synchronizeDataProvider(itemCollection);
     if (!added) {
       this.emit('CATALOG_ENGINE_ELEMENTS_ADDED', {
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
         itemCollectionDescriptor: itemCollection.collection.getDescriptor(),
       });
     }
@@ -358,18 +416,23 @@ export abstract class CatalogEngine<
    * @param items items to add
    * @returns the list of added items indices
    */
-  public addItems(catId: string, items: T[]): number {
-    const coll: CatalogEngineEntry<T> = this.getCatalogEntry(catId);
+  public addItems(itemCollectionId: string, items: T[]): number {
+    const coll: CatalogEngineEntry<T> = this.getCatalogEntry(itemCollectionId);
     if (!coll) {
       this.emit('CATALOG_ENGINE_ADD_ELEMENTS_ERROR', {
-        collectionId: catId,
-        error: `Cannot add items in catalog: ${catId} which is not part of item catalog : Ids : ${this.getItemCollectionIds().join(', ')}`,
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
+        itemCollectionId: itemCollectionId,
+        error: `Cannot add items in catalog: ${itemCollectionId} which is not part of item catalog : Ids : ${this.getItemCollectionIds().join(', ')}`,
       });
       return null;
     }
     const nbAddedItems: number = coll.collection.addItems(items);
+    this.synchronizeDataProvider(coll);
     if (nbAddedItems) {
       this.emit('CATALOG_ENGINE_ELEMENTS_ADDED', {
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
         itemCollectionDescriptor: coll.collection.getDescriptor(),
       });
     }
@@ -381,19 +444,25 @@ export abstract class CatalogEngine<
    * @param items items to add
    * @returns the list of added items indices
    */
-  public setItems(catId: string, items: T[]): number {
-    const itemCollection: CatalogEngineEntry<T> = this.getCatalogEntry(catId);
+  public setItems(itemCollectionId: string, items: T[]): number {
+    const itemCollection: CatalogEngineEntry<T> =
+      this.getCatalogEntry(itemCollectionId);
     if (!itemCollection) {
       this.emit('CATALOG_ENGINE_SET_ELEMENTS_ERROR', {
-        collectionId: catId,
-        error: `Cannot set items in catalog: ${catId} which is not part of item catalog : Ids : ${this.getItemCollectionIds().join(', ')}`,
+        itemCollectionId: itemCollectionId,
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
+        error: `Cannot set items in catalog: ${itemCollectionId} which is not part of item catalog : Ids : ${this.getItemCollectionIds().join(', ')}`,
       });
       return null;
     }
     itemCollection.collection.clearItems();
     const nbAddedItems: number = itemCollection.collection.addItems(items);
+    this.synchronizeDataProvider(itemCollection);
     if (nbAddedItems > 0) {
       this.emit('CATALOG_ENGINE_ELEMENTS_SET', {
+        catalogDescriptor: this.getCatalogEngineDescriptor(),
+
         itemCollectionDescriptor: itemCollection.collection.getDescriptor(),
       });
     }
@@ -404,8 +473,8 @@ export abstract class CatalogEngine<
   /**
    * get all catalog items
    */
-  public getCollectionItems(catId: string): CatalogEngineEntry<T> {
-    return this.getCatalogEntry(catId);
+  public getCollectionItems(itemCollectionId: string): CatalogEngineEntry<T> {
+    return this.getCatalogEntry(itemCollectionId);
   }
 
   private createNewItemCollection(
@@ -424,30 +493,36 @@ export abstract class CatalogEngine<
 
   /**
    * Add acollection to catalog. check if catalog type is the same as the collection type
-   * @param coll
+   * @param itemCollection
    * @returns
    */
-  public addItemCollection(coll: ItemArray<T>): boolean {
-    if (!coll || !this._catalogEntries) return false;
-    if (coll.getItemType() !== this.getDataType()) return false;
-    if (this.contains(coll)) return false;
+  public addItemCollection(itemCollection: ItemArray<T>): boolean {
+    if (!itemCollection || !this._catalogEntries) return false;
+    if (itemCollection.getItemType() !== this.getDataType()) return false;
+    if (this.contains(itemCollection)) return false;
     const dataProvider: ZirconDataProvider<ItemArray<T>> =
       this.__dataProviderCreator(
-        coll.getName(),
-        coll.getItemType(),
-        coll.getItems(),
+        itemCollection.getName(),
+        itemCollection.getItemType(),
+        itemCollection.getItems(),
       );
     if (!dataProvider)
       throw new Error(
-        `Data provider cannot be created for collection ${coll.getName()} with data type ${coll.getItemType()}`,
+        `Data provider cannot be created for collection ${itemCollection.getName()} with data type ${itemCollection.getItemType()}`,
       );
     this.emit('REGISTER_DATA_PROVIDER_REQUEST', {
       dataProvider: dataProvider,
     });
-    this._catalogEntries[coll.getId()] = {
-      collection: coll,
+    this._catalogEntries[itemCollection.getId()] = {
+      collection: itemCollection,
       dataProvider: dataProvider,
     };
+    this.emit('CATALOG_ENGINE_COLLECTION_ADDED', {
+      catalogDescriptor: this.getCatalogEngineDescriptor(),
+
+      itemCollectionDescriptor: itemCollection.getDescriptor(),
+      items: itemCollection.getItems(),
+    });
     return true;
   }
 
@@ -456,9 +531,11 @@ export abstract class CatalogEngine<
    * @param coll
    * @returns
    */
-  public removeItemCollection(collId: string): ItemCollectionDescriptor {
-    if (!collId || !this._catalogEntries) return null;
-    const catEntry = this.getCatalogEntry(collId);
+  public removeItemCollection(
+    itemCollectionId: string,
+  ): ItemCollectionDescriptor {
+    if (!itemCollectionId || !this._catalogEntries) return null;
+    const catEntry = this.getCatalogEntry(itemCollectionId);
     if (!catEntry) return null;
     const itemCollectionDescriptor: ItemCollectionDescriptor =
       catEntry.collection.getDescriptor();
@@ -467,9 +544,11 @@ export abstract class CatalogEngine<
     this.emit('UNREGISTER_DATA_PROVIDER_REQUEST', {
       dataProviderId: dataProvider.getId(),
     });
-    delete this._catalogEntries[collId];
+    delete this._catalogEntries[itemCollectionId];
 
     this.emit('CATALOG_ENGINE_COLLECTION_REMOVED', {
+      catalogDescriptor: this.getCatalogEngineDescriptor(),
+
       itemCollectionDescriptor: itemCollectionDescriptor,
     });
     return itemCollectionDescriptor;
@@ -477,12 +556,12 @@ export abstract class CatalogEngine<
 
   /**
    * return if collection contains given item collection
-   * @param coll
+   * @param itemCollection
    * @returns
    */
-  public contains(coll: ItemCollection<T>): boolean {
-    if (!coll || !this._catalogEntries) return false;
-    return this._catalogEntries[coll.getId()] != null;
+  public contains(itemCollection: ItemCollection<T>): boolean {
+    if (!itemCollection || !this._catalogEntries) return false;
+    return this._catalogEntries[itemCollection.getId()] != null;
   }
 
   /**

@@ -6,11 +6,11 @@ import {
   ZirconInputReturnValue,
   ZirconModal,
 } from '../zirconium/zircon-ui/zircon-modal-input';
-import { ItemCollection } from '../libraries/collection/item-collection';
+import { ItemCollectionDescriptor } from '../libraries/collection/item-collection';
 
-// export type CollectionSelectorComponentEvents = {
-//   CREATE_NEW_CATALOG: { catalogName: string };
-//   CHANGE_SELECTED_CATALOG: { selectedCatalogId: string };
+// CATALOG_ENGINE_COLLECTION_CREATE_REQUEST: {
+//   itemCollectionDescriptor: ItemCollectionDescriptor;
+//   items?: T[];
 // };
 
 export class CollectionCatalogSelectorComponent {
@@ -22,7 +22,7 @@ export class CollectionCatalogSelectorComponent {
   private __createNewCollectionButtonIcon: HTMLElement = null;
   private __collectionIdLabel: HTMLLabelElement = null;
   private __catCountLabel: HTMLLabelElement = null;
-  private __itemCollections: ItemCollection[] = [];
+  private __itemCollectionDescriptors: ItemCollectionDescriptor[] = [];
   private __onCreateNewCollection: (collectionName: string) => void = null;
   private _onSelectedItemCollectionChange: (collectionId: string) => void =
     null;
@@ -38,14 +38,16 @@ export class CollectionCatalogSelectorComponent {
   /**
    * Set callback when a new catalog is created
    */
-  public onCreateNewCollection(cb: (catalogName: string) => void): void {
+  public onCreateNewCollection(cb: (itemCollectionName: string) => void): void {
     this.__onCreateNewCollection = cb;
   }
 
   /**
    * Set callback when a new catalog is created
    */
-  public onSelectedItemCollectionChange(cb: (catalogId: string) => void): void {
+  public onSelectedItemCollectionChange(
+    cb: (itemCollectionId: string) => void,
+  ): void {
     this._onSelectedItemCollectionChange = cb;
   }
 
@@ -138,20 +140,12 @@ export class CollectionCatalogSelectorComponent {
           },
         );
         if (modalReturn.button === 'ok') {
-          alert(
-            'Not yet implemented CollectionCatalogSelectorComponent::getCreateNewCatalogButton',
-          );
-          // this.requestCreateEmptyCollection?.(modalReturn.input);
+          this.__onCreateNewCollection?.(modalReturn.input);
         }
       },
     );
-
     return this.__createNewCollectionButton;
   }
-
-  // private addEmptyCollection(name: string): void {
-  //   this.emit('CREATE_NEW_COLLECTION', { catalogName: name });
-  // }
 
   public getItemCollectionSelect(): HTMLSelectElement {
     if (this.__collectionSelect) return this.__collectionSelect;
@@ -186,8 +180,10 @@ export class CollectionCatalogSelectorComponent {
    * @returns
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public setItemCollections(itemCollections: ItemCollection<any>[]): boolean {
-    this.__itemCollections = itemCollections;
+  public setItemCollectionDescriptors(
+    itemCollectionDescriptors: ItemCollectionDescriptor[],
+  ): boolean {
+    this.__itemCollectionDescriptors = itemCollectionDescriptors;
     this.updateOptions();
     return true;
   }
@@ -211,12 +207,13 @@ export class CollectionCatalogSelectorComponent {
     this.getItemCollectionSelect().innerHTML = '';
     // add options
     let newSelectedIndex: number = -1;
-    Object.values(this.__itemCollections).forEach(
-      (cat: ItemCollection<unknown>, index: number) => {
+    Object.values(this.__itemCollectionDescriptors).forEach(
+      (descriptor: ItemCollectionDescriptor, index: number) => {
         const option: HTMLOptionElement = document.createElement('option');
-        if (cat.getId() == previousSelectedCatalogId) newSelectedIndex = index;
-        option.value = cat.getId();
-        option.innerHTML = cat.getName();
+        if (descriptor.id == previousSelectedCatalogId)
+          newSelectedIndex = index;
+        option.value = descriptor.id;
+        option.innerHTML = descriptor.name;
         this.getItemCollectionSelect().appendChild(option);
       },
     );

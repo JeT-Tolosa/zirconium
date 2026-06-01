@@ -56,7 +56,7 @@ export type VizGroundStationLoaderEventRegistry = MergeZirconRegistries<
     incoming: {};
     outgoing: PickEvents<
       CatalogEngineEvents<GroundStation>,
-      'COLLECTION_CATALOG_CREATE_REQUEST'
+      'CATALOG_ENGINE_COLLECTION_CREATE_REQUEST'
     >;
   },
   ZirconVizEventRegistry
@@ -160,10 +160,13 @@ export class VizGroundStationLoader<
       const groundStations: GroundStation[] =
         await dataDescriptor.loader.getData();
 
-      this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
+      this.emit('CATALOG_ENGINE_COLLECTION_CREATE_REQUEST', {
         dataType: GROUND_STATION_TYPE,
-        catalogDescriptor: { name: dataDescriptor.name },
-        elements: groundStations,
+        itemCollectionDescriptor: {
+          itemType: GROUND_STATION_TYPE,
+          name: dataDescriptor.name,
+        },
+        items: groundStations,
       });
     });
 
