@@ -1,0 +1,37 @@
+.loader-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: 0px;
+}
+
+.loader-container > div {
+  padding: 5px 15px;
+}
+
+.loader-container > div select {
+  width: 100%;
+  padding: 5px 15px;
+}
+
+.loader-status {
+  margin-top: 8px;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+.loader-status.loading {
+  color: #9c9c9c;
+}
+
+.loader-status.success {
+  color: #4ea266;
+  background: rgba(26, 127, 55, 0.1);
+}
+
+.loader-status.error {
+  color: #d2575f;
+  background: rgba(209, 36, 47, 0.1);
+}

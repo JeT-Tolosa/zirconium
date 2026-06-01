@@ -204,27 +204,36 @@ export class CollectionCatalogSelectorComponent {
   public updateOptions(): void {
     const previousSelectedCatalogId: string =
       this.getSelectedItemCollectionId();
+
     this.getItemCollectionSelect().innerHTML = '';
-    // add options
-    let newSelectedIndex: number = -1;
+
+    let newSelectedIndex = -1;
+
     Object.values(this.__itemCollectionDescriptors).forEach(
       (descriptor: ItemCollectionDescriptor, index: number) => {
-        const option: HTMLOptionElement = document.createElement('option');
-        if (descriptor.id == previousSelectedCatalogId)
+        const option = document.createElement('option');
+
+        if (descriptor.id === previousSelectedCatalogId) {
           newSelectedIndex = index;
+        }
+
         option.value = descriptor.id;
         option.innerHTML = descriptor.name;
+
         this.getItemCollectionSelect().appendChild(option);
       },
     );
-    // reselect previous selection
+
+    // Restaurer la sélection précédente
     if (newSelectedIndex >= 0) {
       this.getItemCollectionSelect().selectedIndex = newSelectedIndex;
     }
-    // if (this._catColl?.getCatalogIds().length == 1) {
-    //   // special case if there is only one element onChange is not fired
-    //   this.__onSelectedCollectionChange?.(this._catColl?.getCatalogIds()[0]);
-    // }
+    // Première collection disponible => sélection automatique
+    else if (this.__itemCollectionDescriptors.length > 0) {
+      const firstId = this.__itemCollectionDescriptors[0].id;
+
+      this.selectItemCollection(firstId);
+    }
   }
 }
 

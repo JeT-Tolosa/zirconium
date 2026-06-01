@@ -1,8 +1,8 @@
+import { AIS } from '../../libraries/maritime/ais';
 import {
   VizCollectionCatalogTabulator,
   VizCollectionCatalogTabulatorState,
 } from '../catalog/viz-eye-catalog-tabulator';
-import { AIS } from '../../libraries/maritime/ais';
 
 export const VIZ_AIS_CATALOG_TABULATOR_TYPE = 'viz-ais-catalog-tabulator';
 
