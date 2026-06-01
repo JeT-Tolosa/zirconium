@@ -1,68 +1,82 @@
+/* Container principal */
+
 .provider-container {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 98%;
-  height: 98%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 2px;
-  color: black;
-}
-
-.provider-container > * {
-  margin: 2px;
-  border-radius: 5px;
-  border: 1px solid #666666;
-  font-size: 12px;
-}
-
-.provider-container select {
-  font-size: 1em;
-  padding: 10px;
-}
-
-.provider-input {
+  height: 100%;
   width: 100%;
-  height: 40px;
-  flex-grow: 0 0;
+
+  overflow: hidden;
 }
+
+/* Ligne supérieure */
+
+.provider-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+
+  flex-shrink: 0;
+
+  padding: 8px;
+}
+
+/* Select */
+
+.provider-selector {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Bouton refresh */
+
+.provider-refresh-button {
+  flex-shrink: 0;
+}
+
+/* Zone JSON */
+
+.provider-json-view {
+  flex: 1;
+
+  min-height: 0; /* IMPORTANT pour flex */
+  overflow: hidden;
+}
+
+/* JSONEditor doit occuper tout le div */
+
+.provider-json-view .jsoneditor {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* Barre de statut en bas */
 
 .provider-output {
-  width: 100%;
-  flex: 0 0;
+  flex-shrink: 0;
+
+  padding: 6px 10px;
+
+  border-top: 1px solid #ccc;
+
+  font-size: 0.9rem;
 }
 
-.provider-ouput.info {
-  background-color: #000000aa;
-  color: white;
-}
+/* Couleurs des messages */
 
-.provider-output.error {
-  background-color: #ff0000aa;
-  color: white;
-}
-
-.provider-output.warning {
-  background-color: #ffdd00aa;
-  color: black;
+.provider-output.info {
+  color: #444;
 }
 
 .provider-output.success {
-  background-color: #00dd00aa;
-  color: white;
+  color: green;
 }
 
-.provider-button {
-  font-size: 20px;
-  flex: 0 0;
+.provider-output.warning {
+  color: orange;
 }
 
-.provider-result {
-  width: 100%;
-  height: 80px;
-  flex: 1 0 60px;
-  resize: none;
+.provider-output.error {
+  color: red;
 }
