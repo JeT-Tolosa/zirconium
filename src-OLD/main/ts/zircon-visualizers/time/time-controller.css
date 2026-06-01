@@ -1,0 +1,89 @@
+.time-controller-range {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+}
+
+.time-controller-range .start-time,
+.time-controller-range .end-time {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+}
+
+.time-controller-range .date-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.time-controller-range .yime-factor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.time-controller-range .time-control {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.time-controller-range .time-control > div {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.time-controller-range .time-control .start {
+  background-color : lightblue;
+}
+.time-controller-range .time-control .stop {
+  background-color : lightgoldenrodyellow;
+}
+.time-controller-range .time-control .restart {
+  background-color : lightgreen;
+}
+.time-controller-range .time-control .reset {
+  background-color: lightgrey;
+}
+
+.time-controller-range .time-display {
+font-weight:bold;
+cursor:pointer;
+
+}
+
+.time-controller-range ion-button {
+  --padding: 1px;
+  --margin: 0;
+  white-space: nowrap;
+}
+
+.time-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+/* div du time factor */
+.time-control > :not(div:last-child) {
+  flex: 0 0 auto;
+}
+
+/* container des boutons */
+.time-control > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  flex: 1 1 auto;
+  min-width: 0;
+}
+

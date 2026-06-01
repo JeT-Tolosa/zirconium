@@ -44,23 +44,35 @@ export interface ZirconDataProviderState extends ZirconObjectState {
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export abstract class ZirconDataProvider<
+export class ZirconDataProvider<
   T = any,
   R extends ZirconDataProviderEventRegistry = ZirconDataProviderEventRegistry,
 > extends ZirconObject<R> {
+  private _dataType: string =null;
   private _data: T = null;
   private __onDataChangeCB: () => void = null;
 
-  constructor(name: string) {
+  constructor(name: string, dataType: string) {
     super({ name: name, type: ZIRCON_DATA_PROVIDER_TYPE });
+    this._dataType = dataType;  
   }
 
   public getData(): T {
     return this._data;
   }
 
-  public abstract getDataType(): string;
+  public getDataType(): string {
+    return this._dataType;
+  }
 
+  public setDataType(dataType: string): void {
+    this._dataType = dataType;
+  }
+
+  public getType(): string {
+    return ZIRCON_DATA_PROVIDER_TYPE;
+  }
+  
   protected override listenToEvents(): void {
     super.listenToEvents();
     this.addListener('DATA_PROVIDER_CONTENT_REQUEST', (arg) =>
@@ -93,20 +105,20 @@ export abstract class ZirconDataProvider<
     });
   }
 
-  /**
-   * Registers a callback invoked when the data source content changes.
-   * @param onChangeCB Callback function
-   */
-  public onDataChange(onDataChangeCB: () => void): void {
-    this.__onDataChangeCB = onDataChangeCB;
-  }
+  // /**
+  //  * Registers a callback invoked when the data source content changes.
+  //  * @param onChangeCB Callback function
+  //  */
+  // public onDataChange(onDataChangeCB: () => void): void {
+  //   this.__onDataChangeCB = onDataChangeCB;
+  // }
 
-  /**
-   * Notifies listeners that the source content has changed.
-   */
-  protected fireDataChanged(): void {
-    if (this.__onDataChangeCB) {
-      this.__onDataChangeCB();
-    }
-  }
+  // /**
+  //  * Notifies listeners that the source content has changed.
+  //  */
+  // protected fireDataChanged(): void {
+  //   if (this.__onDataChangeCB) {
+  //     this.__onDataChangeCB();
+  //   }
+  // }
 }

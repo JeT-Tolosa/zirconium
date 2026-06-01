@@ -82,6 +82,15 @@ export abstract class ZirconObject<
     this.listenToEvents();
   }
 
+  
+  /**
+   * // TODO: memory leak if setEventDispatcher is used (we should remove listeners !)
+   * Unset the event emitter to be used
+   */
+  public unsetEventDispatcher(): void {
+    this.setEventDispatcher(null);
+  }
+
   protected listenToEvents(): void {
     this.addListener('OBJECT_STATE_REGISTERED', (arg) => {
       this.onOBJECT_STATE_REGISTERED(arg.state);

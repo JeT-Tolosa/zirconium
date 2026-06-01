@@ -1,0 +1,62 @@
+.fetch-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 98%;
+  height: 98%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px;
+}
+
+.fetch-container > * {
+  margin: 2px;
+  border-radius: 5px;
+  border: 1px solid #666666;
+  font-size: 12px;
+}
+
+.fetch-input {
+  width: 100%;
+  height: 40px;
+  flex-grow: 0 0;
+}
+
+.fetch-output {
+  width: 100%;
+  flex: 0 0;
+}
+
+.fetch-ouput.info {
+  background-color: #000000aa;
+  color: white;
+}
+
+.fetch-output.error {
+  background-color: #ff0000aa;
+  color: white;
+}
+
+.fetch-output.warning {
+  background-color: #ffdd00aa;
+  color: black;
+}
+
+.fetch-output.success {
+  background-color: #00dd00aa;
+  color: white;
+}
+
+.fetch-button {
+  font-size: 20px;
+  flex: 0 0;
+}
+
+.fetch-result {
+  width: 100%;
+  height: 80px;
+  flex: 1 0 60px;
+  resize: none;
+}

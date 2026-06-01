@@ -1,0 +1,16 @@
+.groundstation-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: 0px;
+}
+
+.groundstation-container > div {
+  padding: 5px 15px;
+}
+
+.groundstation-container > div select {
+  width: 100%;
+  padding: 5px 15px;
+}

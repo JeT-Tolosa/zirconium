@@ -1,0 +1,36 @@
+import {
+  GroundStation,
+  GROUND_STATION_TYPE,
+} from '../../../libraries/spatial/ground-station/ground-station';
+import { CatalogEngine } from '../catalog-engine';
+import { groundStationIndexationMethod } from '../../../libraries/spatial/ground-station/ground-station-catalog';
+import { ZirconEngineState } from '../../../zirconium/zircon-core/zircon-engine';
+
+export interface GroundStationCatalogEngineState extends ZirconEngineState {
+  type: typeof GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE;
+}
+
+/**
+ * GroundStation Catalog Zircon Core object
+ */
+export class GroundStationCatalogEngine extends CatalogEngine<GroundStation> {
+  public static readonly GROUND_STATION_CATALOG_ENGINE_TYPE =
+    'ground-station-catalog-engine';
+
+  constructor(
+    name: string = GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE,
+  ) {
+    super(name, GROUND_STATION_TYPE, groundStationIndexationMethod);
+  }
+
+  public override getType(): string {
+    return GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE;
+  }
+
+  protected override onStart(): Promise<void> {
+    return Promise.resolve();
+  }
+  protected override onStop(): Promise<void> {
+    return Promise.resolve();
+  }
+}

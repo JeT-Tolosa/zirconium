@@ -17,6 +17,12 @@ export const ZIRCON_DATA_PROVIDER_MANAGER_TYPE =
   'zircon-data-provider-manager-type';
 
 export type ZirconDataProviderManagerEvents = {
+  REGISTER_DATA_PROVIDER_REQUEST: {
+    dataProvider: ZirconDataProvider;
+  };
+  UNREGISTER_DATA_PROVIDER_REQUEST: {
+    dataProviderId: string;
+  };
   DATA_PROVIDER_MANAGER_DESCRIPTORS: {
     dataTypes?: string[];
     dataProviderDescriptors: ZirconDataProviderDescriptor[];
@@ -24,10 +30,10 @@ export type ZirconDataProviderManagerEvents = {
   DATA_PROVIDER_MANAGER_DESCRIPTOR: {
     dataProviderId: string;
   };
-  DATA_PROVIDER_MANAGER_PROVIDER_ADDED: {
+  DATA_PROVIDER_MANAGER_PROVIDER_REGISTERED: {
     dataProviderDescriptor: ZirconDataProviderDescriptor;
   };
-  DATA_PROVIDER_MANAGER_PROVIDER_REMOVED: {
+  DATA_PROVIDER_MANAGER_PROVIDER_UNREGISTERED: {
     dataProviderDescriptor: ZirconDataProviderDescriptor;
   };
   DATA_PROVIDER_MANAGER_DESCRIPTORS_REQUEST: {
@@ -41,7 +47,9 @@ export type ZirconDataProviderManagerRegistry = MergeZirconRegistries<
       [
         PickEvents<
           ZirconDataProviderManagerEvents,
-          'DATA_PROVIDER_MANAGER_DESCRIPTORS_REQUEST'
+          'DATA_PROVIDER_MANAGER_DESCRIPTORS_REQUEST' |
+          'REGISTER_DATA_PROVIDER_REQUEST' |
+          'UNREGISTER_DATA_PROVIDER_REQUEST'
         >,
       ]
     >;
@@ -52,8 +60,8 @@ export type ZirconDataProviderManagerRegistry = MergeZirconRegistries<
           ZirconDataProviderManagerEvents,
           | 'DATA_PROVIDER_MANAGER_DESCRIPTOR'
           | 'DATA_PROVIDER_MANAGER_DESCRIPTORS'
-          | 'DATA_PROVIDER_MANAGER_PROVIDER_ADDED'
-          | 'DATA_PROVIDER_MANAGER_PROVIDER_REMOVED'
+          | 'DATA_PROVIDER_MANAGER_PROVIDER_REGISTERED'
+          | 'DATA_PROVIDER_MANAGER_PROVIDER_UNREGISTERED'
         >,
       ]
     >;
@@ -74,6 +82,11 @@ export class ZirconDataProviderManager<
   protected override listenToEvents(): void {
     this.addListener('DATA_PROVIDER_MANAGER_DESCRIPTORS_REQUEST', (arg) => {
       this.onDATA_PROVIDER_MANAGER_IDS_REQUEST(arg.dataTypes);
+    });
+    this.addListener('REGISTER_DATA_PROVIDER_REQUEST', (arg) => {
+      this.registerDataProvider(arg.dataProvider);
+    });    this.addListener('UNREGISTER_DATA_PROVIDER_REQUEST', (arg) => {
+      this.unregisterDataProvider(arg.dataProviderId);
     });
   }
 
@@ -107,7 +120,26 @@ export class ZirconDataProviderManager<
       return false;
     }
 
+    // connect data provider to app event bus
+    dataProvider.setEventDispatcher(this.getEventDispatcher());
     this.__registeredDataProviders[dataProvider.getId()] = dataProvider;
+    this.emit('DATA_PROVIDER_MANAGER_PROVIDER_REGISTERED', {
+      dataProviderDescriptor: dataProvider.getDescriptor(),
+    }); 
+    return true;
+  }
+
+    public unregisterDataProvider(dataProviderId: string): boolean {
+    if (!dataProviderId) return false;
+    const dataProvider = this.__registeredDataProviders[dataProviderId];
+    if (      !dataProvider)      return false;
+
+    // connect data provider to app event bus
+    dataProvider.unsetEventDispatcher();
+    delete this.__registeredDataProviders[dataProvider.getId()];
+    this.emit('DATA_PROVIDER_MANAGER_PROVIDER_UNREGISTERED', {
+      dataProviderDescriptor: dataProvider.getDescriptor(),
+    }); 
     return true;
   }
 

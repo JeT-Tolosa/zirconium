@@ -1,14 +1,14 @@
 import { Satellite } from '../../libraries/spatial/satellite/satellite';
 import {
-  VizCatalogCollectionTabulator,
-  VizCatalogCollectionTabulatorState,
+  VizCollectionCatalogTabulator,
+  VizCollectionCatalogTabulatorState,
 } from '../catalog/viz-eye-catalog-tabulator';
 
-export interface VizSatelliteCatalogTabulatorState extends VizCatalogCollectionTabulatorState {
+export interface VizSatelliteCatalogTabulatorState extends VizCollectionCatalogTabulatorState {
   type: typeof VizSatelliteCatalogTabulator.VIZ_SATELLITE_CATALOG_TABULATOR_TYPE;
 }
 
-export class VizSatelliteCatalogTabulator extends VizCatalogCollectionTabulator<Satellite> {
+export class VizSatelliteCatalogTabulator extends VizCollectionCatalogTabulator<Satellite> {
   public static readonly VIZ_SATELLITE_CATALOG_TABULATOR_TYPE =
     'VIZ_SATELLITE_CATALOG_TABULATOR_TYPE';
 

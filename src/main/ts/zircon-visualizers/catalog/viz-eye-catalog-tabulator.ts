@@ -2,40 +2,36 @@ import { v4 as uuid } from 'uuid';
 import './viz-eye-catalog-tabulator.css';
 import { TabulatorFull as Tabulator } from 'tabulator-tables';
 import 'tabulator-tables/dist/css/tabulator.min.css';
-import { CatalogCollectionSelectorComponent } from '../../catalog-ui/catalog-collection-component';
-import {
-  Catalog,
-  CatalogDescriptor,
-  CatalogEvents,
-} from '../../libraries/catalog/catalog';
+import { CollectionCatalogSelectorComponent } from '../../catalog-ui/collection-catalog-selector-component';
 
 import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
 } from '../../zirconium/zircon-event';
-import {
-  CatalogCollection,
-  CatalogCollectionEvents,
-} from '../../libraries/catalog/catalog-collection';
-import { CatalogEngineEvents } from '../../sharp-eye/engines/catalog-engine';
+
 import {
   ZirconViz,
   ZirconVizEventRegistry,
   ZirconVizState,
 } from '../../zirconium/zircon-ui/zircon-visualizer';
+import { ItemCollection, ItemCollectionDescriptor } from '../../libraries/collection/item-collection';
+import { CatalogEngineEvents } from '../../sharp-eye/engines/catalog-engine';
 
 /**
  * Events definition for Catalog Tabulator
  */
-export type VizCatalogTabulatorEvents<CatalogElement> = {
-  COLLECTION_GET_CATALOG_CONTENT_DONE: {
-    catalogDescriptor: CatalogDescriptor;
-    elements: CatalogElement[];
+export type VizCatalogTabulatorEvents<T> = {
+  COLLECTION_GET_CATALOG_CONTENT: {
+    itemCollectionDescriptor: ItemCollectionDescriptor;
+    elements: T[];
   };
-  COLLECTION_CATALOG_CREATED: {
-    catalogDescriptor: CatalogDescriptor;
-    elements: CatalogElement[];
+  CATALOG_COLLECTION_CREATED: {
+    itemCollectionDescriptor: ItemCollectionDescriptor;
+    items: T[];
+  };
+  CATALOG_COLLECTION_REMOVED: {
+    itemCollectionDescriptor: ItemCollectionDescriptor;
   };
   CATALOG_ITEM_SELECTED: {
     rowData: { [key: string]: unknown };
@@ -45,139 +41,160 @@ export type VizCatalogTabulatorEvents<CatalogElement> = {
 /**
  * Events Registry for Catalog Tabulator
  */
-export type VizCatalogTabulatorEventRegistry<CatalogElement> =
-  MergeZirconRegistries<
-    {
-      incoming: MergePickEvents<
-        [
+export type VizCatalogTabulatorEventRegistry<T> = MergeZirconRegistries<
+  {
+    incoming: MergePickEvents<
+      [
           PickEvents<
-            VizCatalogTabulatorEvents<CatalogElement>,
-            'COLLECTION_GET_CATALOG_CONTENT_DONE' | 'COLLECTION_CATALOG_CREATED'
-          >,
-          PickEvents<CatalogEvents, 'CATALOG_CONTENT_CHANGED'>,
-          PickEvents<
-            CatalogCollectionEvents,
-            'MANAGED_CATALOG_CONTENT_CHANGED'
-          >,
-        ]
-      >;
+          CatalogEngineEvents<T>,
+            | 'CATALOG_ENGINE_COLLECTION_ADDED'
+            | 'CATALOG_ENGINE_COLLECTION_REMOVED'
+            | 'CATALOG_ENGINE_COLLECTION_CREATED'
+            >,
 
-      outgoing: MergePickEvents<
-        [
-          PickEvents<
-            VizCatalogTabulatorEvents<CatalogElement>,
-            'CATALOG_ITEM_SELECTED'
-          >,
-          PickEvents<
-            CatalogEngineEvents<CatalogElement>,
-            | 'COLLECTION_GET_CATALOG_CONTENT_REQUEST'
-            | 'COLLECTION_CATALOG_CREATE_REQUEST'
-            | 'COLLECTION_ADD_ELEMENTS_REQUEST'
-            | 'COLLECTION_ADD_ELEMENTS_REQUEST'
-          >,
-        ]
-      >;
-    },
-    ZirconVizEventRegistry
-  >;
+      ]
+    >;
 
-export interface VizCatalogCollectionTabulatorState extends ZirconVizState {
+    outgoing: MergePickEvents<
+      [
+        PickEvents<
+          VizCatalogTabulatorEvents<T>,
+            'CATALOG_COLLECTION_CREATED'
+            | 'CATALOG_COLLECTION_REMOVED'
+            | 'CATALOG_ITEM_SELECTED'
+        >
+        // PickEvents<
+        //   VizCatalogTabulatorEvents<T>,
+        //   'CATALOG_ITEM_SELECTED'
+        // >,
+        // PickEvents<
+        //   CatalogEngineEvents<T>,
+        //   | 'COLLECTION_GET_CATALOG_CONTENT_REQUEST'
+        //   | 'COLLECTION_CATALOG_CREATE_REQUEST'
+        //   | 'COLLECTION_ADD_ELEMENTS_REQUEST'
+        // >,
+      ]
+    >;
+  },
+  ZirconVizEventRegistry
+>;
+
+export interface VizCollectionCatalogTabulatorState extends ZirconVizState {
   catalogId?: string;
 }
 
-export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
-  VizCatalogTabulatorEventRegistry<CatalogElement>
+export class VizCollectionCatalogTabulator<T> extends ZirconViz<
+  VizCatalogTabulatorEventRegistry<T>
 > {
+private _itemCollections: {
+    [id: string]: ItemCollection;
+  } = {};
+  private _dataType: string = 'unknown data type';
+    private _indexationMethod: (el: T) => string;
+
   private _div: HTMLDivElement = null;
   private _catalogTabulatorDiv: HTMLDivElement = null;
-  private _catalogSelector: CatalogCollectionSelectorComponent = null;
+  private _itemCollectionSelector: CollectionCatalogSelectorComponent = null;
   private _menu: HTMLDivElement = null;
   private _menuDiv: HTMLDivElement = null;
-  private _catColl: CatalogCollection<CatalogElement> = null;
-
   private _dataTable: Tabulator = null;
   private _local: boolean = true;
-  private _catalogType: string = null;
-  private _indexationMethod: (el: CatalogElement) => string;
 
   /**
    * constructor
    */
   constructor(
-    catalogType: string,
-    indexationMethod: (el: CatalogElement) => string,
-    state?: VizCatalogCollectionTabulatorState,
+    dataType: string,
+    indexationMethod: (el: T) => string,
+    state?: VizCollectionCatalogTabulatorState,
   ) {
     super(state);
-    this._indexationMethod = indexationMethod;
-    this._catalogType = catalogType;
-    this._catColl = new CatalogCollection(
-      this.getCatalogType(),
-      indexationMethod,
-    );
+    this.setIndexMethod(indexationMethod);
+    this._dataType = dataType;
   }
 
   protected override listenToEvents(): void {
-    this.addListener('COLLECTION_CATALOG_CREATED', (arg) => {
-      if (arg.catalogDescriptor?.type !== this.getCatalogType()) return;
-      this.onCOLLECTION_CATALOG_CREATED(arg.catalogDescriptor, arg.elements);
+    // this.addListener('ITEM_COLLECTION_CHANGED', (arg) => {
+    //   if (arg.itemCollectionDescriptor?.dataType !== this.getElementsType()) return;
+    //   this.onCATALOG_CHANGED(arg.itemCollectionDescriptor);
+    // });
+
+            // 'CATALOG_COLLECTION_CREATED'
+            // 'CATALOG_COLLECTION_REMOVED'
+            // 'CATALOG_ITEM_SELECTED'
+
+
+    this.addListener('CATALOG_ENGINE_COLLECTION_ADDED', (arg) => {
+      if (arg.itemCollectionDescriptor.id !== this.getId()) return;
+      this.onCATALOG_ENGINE_COLLECTION_CHANGED(arg.itemCollectionDescriptor);
     });
-    this.addListener('COLLECTION_GET_CATALOG_CONTENT_DONE', (arg) => {
-      this.onCOLLECTION_GET_CATALOG_DONE(arg.catalogDescriptor, arg.elements);
-    });
-    this.addListener('MANAGED_CATALOG_CONTENT_CHANGED', (arg) => {
-      this.onMANAGED_CATALOG_CONTENT_CHANGED(arg.catalogId);
-    });
+    // this.addListener('CATALOG_ENGINE_COLLECTION_REMOVED', (arg) => {
+    //   if (arg.itemCollectionDescriptor.id !== this.getId()) return;
+    //   this.onCCATALOG_ENGINE_COLLECTION_CHANGED(arg.itemCollectionDescriptor);
+    // });
+    // this.addListener('CATALOG_COLLECTION_REMOVED', (arg) => {
+    //   if (arg.id !== this.getId()) return;
+    //   this.onCATALOG_COLLECTION_REMOVED(arg.itemCollectionDescriptor);
+    // });
+    // this.addListener('COLLECTION_GET_CATALOG_CONTENT_DONE', (arg) => {
+    //   this.onCOLLECTION_GET_CATALOG_DONE(arg.itemCollectionDescriptor, arg.elements);
+    // });
+    // this.addListener('MANAGED_CATALOG_CONTENT_CHANGED', (arg) => {
+    //   this.onMANAGED_CATALOG_CONTENT_CHANGED(arg.catalogId);
+    // });
   }
 
-  public getCatalogType(): string {
-    return this._catalogType;
+  public getElementsType(): string {
+    return this._dataType;
   }
 
-  private onMANAGED_CATALOG_CONTENT_CHANGED(catalogId: string): void {
+  private onCATALOG_ENGINE_COLLECTION_CHANGED(itemCollectionDescriptor: ItemCollectionDescriptor): void {
     if (
-      this.getCatalogCollectionComponent().getSelectedCatalogId() === catalogId
+      this.getCollectionCatalogComponent().getSelectedItemCollectionId() ===
+      itemCollectionDescriptor.id
     ) {
-      this.emit('COLLECTION_GET_CATALOG_CONTENT_REQUEST', {
-        catalogId: catalogId,
+      this.emit('CATALOG_CONTENT_REQUEST', {
+        catalogId: itemCollectionDescriptor.id,
       });
     }
   }
 
-  private onCOLLECTION_CATALOG_CREATED(
-    catalogDescriptor: CatalogDescriptor,
-    elements: CatalogElement[],
-  ): void {
-    const cat = new Catalog<CatalogElement>(
-      this.getCatalogType(),
-      catalogDescriptor,
-      this._indexationMethod,
-    );
-    cat.setElements(elements);
-    this.getCatalogCollectionComponent().addCatalog(cat);
-    // select catalog if none is already selected
-    if (this.getCatalogCollectionComponent().getSelectedCatalogId() === null)
-      this.getCatalogCollectionComponent().selectCatalog(catalogDescriptor.id);
-  }
+  // private onCATALOG_ADDED(
+  //   itemCollectionDescriptor: ItemCollectionDescriptor,
+  //   items: T[],
+  // ): void {
+  //   const cat = new ItemArray<T>(
+  //     this.getElementsType(),
+  //     itemCollectionDescriptor,
+  //   );
+  //   cat.setItems(items);
+  //   this.getCollectionCatalogComponent().addCatalog(cat);
+  //   // select catalog if none is already selected
+  //   if (this.getCollectionCatalogComponent().getSelectedCatalogId() === null)
+  //     this.getCollectionCatalogComponent().selectItemCollection(itemCollectionDescriptor.id);
+  // }
 
-  private onCOLLECTION_GET_CATALOG_DONE(
-    catalogDescriptor: CatalogDescriptor,
-    elements: CatalogElement[],
-  ): void {
-    const cat: Catalog<CatalogElement> = this._catColl.getCatalog(
-      catalogDescriptor.id,
-    );
-    if (cat) cat.setElements(elements);
+  // private onCATALOG_CONTENT(
+  //   itemCollectionDescriptor: ItemCollectionDescriptor,
+  //   elements: T[],
+  // ): void {
+  //   if (this.getId() !== itemCollectionDescriptor.id) return;
+  //   if (this.getElementsType() !== itemCollectionDescriptor.type) return;
 
-    // TODO: ecouter catalog CONTENT_CHANGED
-    this.displaySelectedCatalogContent();
-  }
+  //   this._items = {};
+
+  //   elements?.forEach((el) => {
+  //     this._items[this._indexationMethod(el)] = el;
+  //   });
+
+  //   this.displaySelectedCatalogContent();
+  // }
 
   /**
    * Set indexation method
    * @param indexation
    */
-  private setIndexMethod(indexation: (el: CatalogElement) => string): void {
+  private setIndexMethod(indexation: (el: T) => string): void {
     this._indexationMethod = indexation;
   }
 
@@ -185,7 +202,7 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
    * Get indexation method
    * @return indexation method
    */
-  public getIndexMethod(): (el: CatalogElement) => string {
+  public getIndexMethod(): (el: T) => string {
     return this._indexationMethod;
   }
 
@@ -214,28 +231,32 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
   // }
 
   private displaySelectedCatalogContent(): void {
-    const catId: string =
-      this.getCatalogCollectionComponent().getSelectedCatalogId();
-    if (!catId) return;
-    const cat: Catalog<CatalogElement> = this._catColl.getCatalog(catId);
-    if (cat == null)
+    const itemCollectionId: string =
+      this.getCollectionCatalogComponent().getSelectedItemCollectionId();
+    if (!itemCollectionId) return;
+    const itemCollection: ItemCollection = this.getItemCollection(itemCollectionId);
+    if (itemCollection == null)
       throw new Error(
-        `catalog id ${catId} is not in element catalog collection`,
+        `catalog id ${itemCollectionId} is not in element catalog collection`,
       );
-    if (!cat.getElements()) {
+    if (!itemCollection.getItems()) {
       // ask for catalog content
       this.emit('COLLECTION_GET_CATALOG_CONTENT_REQUEST', {
-        catalogId: catId,
+        catalogId: itemCollectionId,
       });
     } else {
       // set stored values
-      this.setTabulatorData(Object.values(cat.getElements()));
+      this.setTabulatorData(Object.values(itemCollection.getItems() as T[]));
     }
   }
 
-  private setTabulatorData(elements: CatalogElement[]): Promise<void> {
+  private getItemCollection(itemCollectionId: string): ItemCollection {
+    return this._itemCollections[itemCollectionId];
+  }
+
+  private setTabulatorData(items: T[]): Promise<void> {
     const tabulatorData: unknown[] = [];
-    elements.forEach((element: CatalogElement) => {
+    items.forEach((element: T) => {
       tabulatorData.push(element);
     });
     this.getTabulator().setData(tabulatorData);
@@ -253,9 +274,8 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
    * @param parent  Parent element to dock chart into
    * @returns   true if chart was created and docked, false otherwise
    */
-  public override onDisplay(): boolean {
+  public override async onDisplay(): Promise<void> {
     this.getTabulator().on('tableBuilt', () => {});
-    return true;
   }
 
   private getTabulator(): Tabulator {
@@ -330,8 +350,8 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
       const data = JSON.parse(json) as Array<unknown>;
       // TODO: unsafe cast: Check data type
       this.emit('COLLECTION_ADD_ELEMENTS_REQUEST', {
-        catalogId: this.getCatalogCollectionComponent().getSelectedCatalogId(),
-        elements: data as CatalogElement[],
+        catalogId: this.getCollectionCatalogComponent().getSelectedItemCollectionId(),
+        elements: data as T[],
       });
     });
   }
@@ -426,25 +446,24 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
     return this._menuDiv;
   }
 
-  public getCatalogCollectionComponent(): CatalogCollectionSelectorComponent {
-    if (this._catalogSelector) return this._catalogSelector;
-    this._catalogSelector = new CatalogCollectionSelectorComponent();
-    this._catalogSelector.setCatalogCollection(this._catColl);
-    this._catalogSelector.getUI().classList.add('catalog-selector');
-    this._catalogSelector.onCreateNewCatalog((catalogName: string) => {
+  public getCollectionCatalogComponent(): CollectionCatalogSelectorComponent {
+    if (this._itemCollectionSelector) return this._itemCollectionSelector;
+    this._itemCollectionSelector = new CollectionCatalogSelectorComponent();
+    this._itemCollectionSelector.getUI().classList.add('catalog-selector');
+    this._itemCollectionSelector.onCreateNewCollection((collectionName: string) => {
       this.emit('COLLECTION_CATALOG_CREATE_REQUEST', {
-        dataType: this.getCatalogType(),
-        catalogDescriptor: { name: catalogName },
+        dataType: this.getElementsType(),
+        itemCollectionDescriptor: { name: collectionName },
       });
     });
-    this._catalogSelector.onSelectedCatalogChange((_: string) => {
+    this._itemCollectionSelector.onSelectedItemCollectionChange((_: string) => {
       this.displaySelectedCatalogContent();
     });
-    return this._catalogSelector;
+    return this._itemCollectionSelector;
   }
 
-  private selectCatalog(catId: string): boolean {
-    return this.getCatalogCollectionComponent().selectCatalog(catId);
+  private selectCatalog(collectionId: string): boolean {
+    return this.getCollectionCatalogComponent().selectItemCollection(collectionId);
   }
   /**
    * Get chart's div element
@@ -455,7 +474,7 @@ export class VizCatalogCollectionTabulator<CatalogElement> extends ZirconViz<
     this._div = document.createElement('div');
     this._div.id = uuid();
     this._div.classList.add('catalog-container');
-    this._div.appendChild(this.getCatalogCollectionComponent().getUI());
+    this._div.appendChild(this.getCollectionCatalogComponent().getUI());
     this._div.appendChild(this.getSatCatDiv());
     // document.body.appendChild(this.getContextMenuDiv());
 

@@ -1,0 +1,32 @@
+/* =========================================================
+   CONTAINER RESPONSIVE SANS LIMITE DE TAILLE
+   ========================================================= */
+.analog-clock-container {
+  /* Occupe l'intégralité de l'espace fourni par le composant parent */
+  width: 100%;
+  height: 100%;
+
+  /* Centre parfaitement le canvas verticalement et horizontalement */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* =========================================================
+   CANVAS FLUIDE ET ULTRA-NET (SANS MAX-WIDTH/HEIGHT)
+   ========================================================= */
+.clock-canvas {
+  display: block;
+
+  /* S'étire jusqu'à toucher le premier bord disponible du parent (largeur ou hauteur) */
+  width: 100%;
+  height: 100%;
+
+  /* Conserve un ratio 1:1 parfait pour que le cadran reste parfaitement rond */
+  object-fit: contain;
+
+  /* Ombre portée moderne et diffuse */
+  filter: drop-shadow(0 15px 35px rgba(15, 23, 42, 0.12));
+}

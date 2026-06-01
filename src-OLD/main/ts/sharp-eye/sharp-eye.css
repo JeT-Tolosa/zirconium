@@ -1,0 +1,41 @@
+@font-face {
+  font-family: 'Ethnocentric';
+  src: local('Ethnocentric'), url(./assets/fonts/Ethnocentric-Regular.otf);
+}
+
+@font-face {
+  font-family: 'Digital';
+  src: local('Digital'), url(./assets/fonts/DS-DIGI.TTF);
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  background: linear-gradient(0deg, #000 0%, #001 100%);
+  color: black;
+}
+
+/*
+
+
+.zircon-ui.sharp-eye-ui .desktops-selector {
+  position: fixed;
+  width: 50px;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: green;
+}
+*/
+.zircon-ui.sharp-eye-ui {
+  background-image: url(./assets/images/backgrounds/sharp-eye-bg1.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: black;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+.zircon-ui.sharp-eye-ui .desktops-container {
+  background-color: #00000000;
+}

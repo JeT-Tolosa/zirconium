@@ -1,0 +1,315 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  letter-spacing: 0.05em;
+  background: black;
+  margin: 0px;
+  padding: 0px;
+  width: 100vw;
+  height: 100vh;
+}
+
+.zircon-ui {
+  width: 100%;
+  height: 100%;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.5em;
+}
+
+.zircon-ui h1 {
+  font-size: 1em;
+}
+
+.zircon-ui h2 {
+  font-size: 0.9em;
+}
+
+.zircon-ui h3 {
+  font-size: 0.8em;
+}
+
+.zircon-ui .desktops-manager {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.zircon-ui .desktops-manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  overflow: auto;
+  padding: 0px;
+  gap: 10px;
+
+  /* effet glass */
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-bottom: solid 1px #ffffff55;
+  box-shadow: 0 10px 15px #00000099;
+}
+
+.zircon-ui .desktops-selector,
+.zircon-ui .toolbar-container {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  align-items: center;
+  box-shadow: 0 10px 15px #00000099;
+  height: 100%;
+  z-index: 1000;
+}
+
+.zircon-ui .desktops-container {
+  position: relative;
+  flex: 1;
+  overflow: auto;
+  background: #0e0e13;
+}
+
+.zircon-ui .desktop-selector {
+  position: relative;
+  padding: 10px 18px;
+  background: linear-gradient(90deg, transparent, #1a1a1a, transparent);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.zircon-ui .toolbar-container > div {
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.zircon-ui .desktops-manager-header > * > *::before,
+.zircon-ui .desktops-manager-header > * > *::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #ffffffee, transparent);
+  opacity: 0.8;
+}
+
+.zircon-ui .desktops-manager-header > * > *::before {
+  top: 0px;
+}
+
+.zircon-ui .desktops-manager-header > * > *::after {
+  bottom: 0px;
+}
+
+.zircon-ui .desktops-manager-header > * > *:hover {
+  background: linear-gradient(90deg, transparent, #333, transparent);
+  transform: scale(1.2);
+}
+
+/* .zircon-ui .desktop-selector:hover {
+  background: linear-gradient(90deg, transparent, #333, transparent);
+  transform: scale(1.1);
+} */
+
+.zircon-ui .desktop-selector.active {
+  background: linear-gradient(90deg, transparent, #233d93, transparent);
+}
+
+.zircon-ui .desktop {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.zircon-ui .desktop.active {
+  opacity: 1;
+  visibility: visible;
+
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.zircon-ui .desktop-name-container {
+  display: flex;
+}
+
+.zircon-ui .desktop-name {
+  opacity: 1;
+  pointer-events: all;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  margin: 20px;
+  align-items: center;
+  vertical-align: middle;
+  color: rgb(255, 255, 255);
+  font-size: 4em;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bolder;
+  letter-spacing: 0.08em;
+}
+
+.zircon-ui .desktop-name:hover {
+  color: red;
+}
+
+.zircon-ui select {
+  background-color: lightblue;
+  color: black;
+}
+
+.zircon-ui select > option {
+  background-color: lightblue;
+  color: black;
+}
+
+/** Add a pulse animation to elements with the "updated" class when they are updated
+  * This can be used to visually indicate that a component has been updated with new data */
+
+.highlight {
+  text-shadow: 0px 0px 30px white;
+}
+
+/***********************************************
+ *           ZIRCON COMMON WINDOW              *
+ ***********************************************/
+
+.zircon-ui .jsPanel {
+  box-shadow:
+    0 0 4px 2px #32315bff,
+    3px 3px 10px 3px black;
+}
+
+.zircon-ui .jsPanel-content {
+  color: white;
+  overflow: auto;
+}
+
+.zircon-ui .jsPanel,
+.zircon-ui .jsPanel-hdr,
+.zircon-ui .jsPanel-headerbar {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.zircon-ui .jsPanel-hdr::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 32px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffffffee, transparent);
+  opacity: 0.7;
+}
+
+.zircon-ui .jsPanel-controlbar button {
+  scale: 0.7;
+  width: 20px;
+}
+
+.zircon-ui .jsPanel-headerlogo img {
+  scale: 0.9;
+  width: 25px;
+}
+
+.zircon-ui fieldset {
+  border: 2px solid #666;
+  border-radius: 8px;
+  padding: 12px;
+  background-color: #2a396744;
+  box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/***********************************************
+ *        ZIRCON VISUALIZER WINDOW             *
+ ***********************************************/
+
+.zircon-viz .jsPanel {
+  border: 1px solid #2a3967;
+  box-shadow: 0 0 8px 4px rgb(49, 91, 56);
+}
+
+.zircon-viz .jsPanel-headerbar {
+  background: #32488b;
+}
+
+.zircon-viz .jsPanel-content {
+  box-shadow: inset 0 8px 32px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0);
+  background: linear-gradient(135deg, #13131c 0%, #0d121d 100%);
+  backdrop-filter: blur(10px);
+  overflow: auto;
+  font-family: 'Orbitron', sans-serif;
+  color: inherit;
+}
+
+.zircon-viz .jsPanel {
+  border: 1px solid #2a3967;
+}
+
+.zircon-viz .jsPanel,
+.zircon-viz .jsPanel-hdr {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.zircon-viz .jsPanel-hdr::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 32px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffffffee, transparent);
+  opacity: 0.7;
+}
+
+.zircon-viz .jsPanel-controlbar button {
+  scale: 0.7;
+  width: 20px;
+}
+
+.zircon-viz .jsPanel-headerlogo img {
+  scale: 0.9;
+  width: 25px;
+}
+
+/***********************************************
+ *        ZIRCON PARAMETER WINDOW              *
+ ***********************************************/
+
+.zircon-param .jsPanel-headerbar {
+  background: #328b3e;
+}
+.zircon-param .jsPanel-content {
+  background: linear-gradient(135deg, #21562e 0%, #273b2b 100%);
+}
+
+.zircon-param .jsPanel-hdr {
+  background-color: green;
+  background: green;
+}
+
+.zircon-param .jsPanel-content .jsoneditor {
+  color: black;
+}

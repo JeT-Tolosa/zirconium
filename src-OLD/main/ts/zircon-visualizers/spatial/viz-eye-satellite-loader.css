@@ -1,0 +1,16 @@
+.satcat-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: 0px;
+}
+
+.satcat-container > div {
+  padding: 5px 15px;
+}
+
+.satcat-container > div select {
+  width: 100%;
+  padding: 5px 15px;
+}

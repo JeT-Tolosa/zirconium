@@ -1,14 +1,14 @@
+import { GroundStation } from '../../libraries/spatial/ground-station/ground-station';
 import {
-  VizCatalogCollectionTabulator,
-  VizCatalogCollectionTabulatorState,
+  VizCollectionCatalogTabulator,
+  VizCollectionCatalogTabulatorState,
 } from '../catalog/viz-eye-catalog-tabulator';
-import { GroundStation } from '../../libraries/spatial/ground-station';
 
-export interface VizGroundStationCatalogTabulatorState extends VizCatalogCollectionTabulatorState {
+export interface VizGroundStationCatalogTabulatorState extends VizCollectionCatalogTabulatorState {
   type: typeof VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE;
 }
 
-export class VizGroundStationCatalogTabulator extends VizCatalogCollectionTabulator<GroundStation> {
+export class VizGroundStationCatalogTabulator extends VizCollectionCatalogTabulator<GroundStation> {
   public static readonly VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE =
     'VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE';
 

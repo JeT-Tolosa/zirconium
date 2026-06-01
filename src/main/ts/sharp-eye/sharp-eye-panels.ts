@@ -4,7 +4,6 @@ import { ChartData } from 'chart.js';
 import { VizCesium } from '../zircon-visualizers/cesium/viz-eye-cesium';
 import { VizCubeSampleThreeJS } from '../zircon-visualizers/threeJS/viz-eye-cube-sample-threeJS';
 import { VizFetch } from '../zircon-visualizers/fetch/viz-eye-fetch';
-import { VizCatalogCollectionTabulator } from '../zircon-visualizers/catalog/viz-eye-catalog-tabulator';
 import { VizThreeJS } from '../zircon-visualizers/threeJS/viz-eye-threeJS';
 import { VizHelmetSampleThreeJS } from '../zircon-visualizers/threeJS/viz-eye-helmet-sample-threeJS';
 import { VizLeaflet } from '../zircon-visualizers/leaflet/viz-eye-leaflet';
@@ -15,20 +14,15 @@ import {
   Satellite,
   SATELLITE_TYPE,
 } from '../libraries/spatial/satellite/satellite';
-import { satelliteIndexationMethod } from '../libraries/spatial/satellite/satellite-catalog';
 import {
   GROUND_STATION_TYPE,
   GroundStation,
 } from '../libraries/spatial/ground-station/ground-station';
-import { groundStationIndexationMethod } from '../libraries/spatial/ground-station/ground-station-catalog';
+import { VizSatelliteCatalogTabulator } from '../zircon-visualizers/spatial/viz-eye-satellite-catalog-tabulator';
+import { VizGroundStationCatalogTabulator } from '../zircon-visualizers/spatial/viz-eye-ground-station-catalog-tabulator';
 
-export function createVisualizerSatelliteCatalog(): VizCatalogCollectionTabulator<Satellite> {
-  const viz: VizCatalogCollectionTabulator<Satellite> =
-    new VizCatalogCollectionTabulator(
-      SATELLITE_TYPE,
-      satelliteIndexationMethod,
-    );
-
+export function createVisualizerSatelliteCatalog(): VizSatelliteCatalogTabulator {
+  const viz: VizSatelliteCatalogTabulator = new VizSatelliteCatalogTabulator();
   return viz;
 }
 
@@ -111,13 +105,9 @@ export function createVisualizerHelmetThreeJS(): VizThreeJS {
   return viz;
 }
 
-export function createVisualizerGroundStationCatalog(): VizCatalogCollectionTabulator<GroundStation> {
-  const viz: VizCatalogCollectionTabulator<GroundStation> =
-    new VizCatalogCollectionTabulator(
-      GROUND_STATION_TYPE,
-      groundStationIndexationMethod,
-    );
-
+export function createVisualizerGroundStationCatalog(): VizGroundStationCatalogTabulator {
+  const viz: VizGroundStationCatalogTabulator =
+    new VizGroundStationCatalogTabulator();
   return viz;
 }
 
