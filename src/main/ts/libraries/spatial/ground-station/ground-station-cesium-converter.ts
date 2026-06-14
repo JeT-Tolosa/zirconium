@@ -1,15 +1,15 @@
-import { CesiumPrimitiveAdapter } from '../globe-viewer/cesium-primitive-adapter';
+import { ToCesiumPrimitiveConverter } from '../globe-viewer/cesium-primitive-converter';
 import { GroundStation } from './ground-station';
 import * as Cesium from 'cesium';
 
-export class GroundStationCesiumAdapter extends CesiumPrimitiveAdapter<GroundStation> {
+export class GroundStationToCesiumConverter extends ToCesiumPrimitiveConverter<GroundStation> {
   public async createPrimitive(
     station: GroundStation,
   ): Promise<Cesium.Billboard> {
-    return this.groundStationToBillboard(station);
+    return GroundStationToCesiumConverter.groundStationToBillboard(station);
   }
 
-  private async groundStationToBillboard(
+  public static async groundStationToBillboard(
     station: GroundStation,
   ): Promise<Cesium.Billboard> {
     let image = '/icons/unknown-country.png';

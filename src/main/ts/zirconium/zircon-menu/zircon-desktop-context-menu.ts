@@ -20,25 +20,38 @@ export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
   }
 
   private getAssociatedZirconDesktop(element: Element): ZirconDesktop {
-    if (!element) return null;
-    if (!(element instanceof HTMLElement)) return null;
+    if (!element) {
+      return null;
+    }
+    if (!(element instanceof HTMLElement)) {
+      return null;
+    }
     const htmlElement: HTMLElement = element;
-    if (!htmlElement.checkVisibility({ opacityProperty: true })) return;
+    if (!htmlElement.checkVisibility({ opacityProperty: true })) {
+      return;
+    }
     const zirconObjectId = htmlElement.getAttribute(
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
     );
-    if (!zirconObjectId) return null;
+    if (!zirconObjectId) {
+      return null;
+    }
     const obj: ZirconObject = this.getApplication()
       .getObjectManager()
       .getExistingInstance(zirconObjectId);
-    if (!obj) return null;
+    if (!obj) {
+      return null;
+    }
     if (
       !this.getApplication()
         .getObjectManager()
         .isTypeOf(obj.getType(), ZIRCON_DESKTOP_TYPE)
-    )
+    ) {
       return null;
-    if (!(obj instanceof ZirconDesktop)) return null;
+    }
+    if (!(obj instanceof ZirconDesktop)) {
+      return null;
+    }
     return obj;
   }
 
@@ -48,7 +61,9 @@ export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
 
   public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
     const desktop: ZirconDesktop = this.getAssociatedZirconDesktop(element);
-    if (!desktop) return null;
+    if (!desktop) {
+      return null;
+    }
     return [
       {
         label: `Desktop ${desktop.getName()}`,
@@ -86,8 +101,11 @@ export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
     });
 
     const desktopState: ZirconDesktopState = desktop.generateCurrentState();
-    if (desktopState.windowIds) desktopState.windowIds.push(windowState.id);
-    else desktopState.windowIds = [windowState.id];
+    if (desktopState.windowIds) {
+      desktopState.windowIds.push(windowState.id);
+    } else {
+      desktopState.windowIds = [windowState.id];
+    }
     this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
       objectId: desktop.getId(),
       state: desktopState,

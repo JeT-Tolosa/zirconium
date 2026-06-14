@@ -4,12 +4,14 @@ import {
   ZirconObjectState,
 } from '../zircon-core/zircon-object';
 import {
+  ZIRCON_DATA_PROVIDER_DEFAULT_TYPE,
+  ZIRCON_DATA_PROVIDER_TYPE,
+} from '../zircon-core/zircon-types';
+import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
 } from '../zircon-event';
-
-export const ZIRCON_DATA_PROVIDER_TYPE = 'zircon-data-provider-type';
 
 export interface ZirconDataProviderDescriptor {
   id: string;
@@ -18,22 +20,59 @@ export interface ZirconDataProviderDescriptor {
   dataType: string;
 }
 
+export interface DiffData {
+  baseVersion: number;
+  newVersion: number;
+  added: unknown[];
+  removed: unknown[];
+  modified: unknown[]; // modified are usefull only if you can identify items (e.g., by id) and want to send only the changed properties
+}
+
 export type ZirconDataProviderEvents = {
-  DATA_PROVIDER_CONTENT_REQUEST: { dataProviderId: string };
-  DATA_PROVIDER_CONTENT: {
+  DATA_PROVIDER_FULL_CONTENT_REQUEST: { dataProviderId: string };
+  DATA_PROVIDER_DIFF_CONTENT_REQUEST: {
+    dataProviderId: string;
+    baseVersion: number;
+  };
+
+  DATA_PROVIDER_FULL_CONTENT: {
     dataProviderDescriptor: ZirconDataProviderDescriptor;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any;
+    data: unknown;
+    version: number;
+  };
+
+  DATA_PROVIDER_DIFF_CONTENT: {
+    dataProviderDescriptor: ZirconDataProviderDescriptor;
+    diffData: DiffData;
+    baseVersion: number;
+    version: number;
+  };
+
+  DATA_PROVIDER_CHANGED: {
+    dataProviderDescriptor: ZirconDataProviderDescriptor;
+    version: number;
   };
 };
-
 export type ZirconDataProviderEventRegistry = MergeZirconRegistries<
   {
     incoming: MergePickEvents<
-      [PickEvents<ZirconDataProviderEvents, 'DATA_PROVIDER_CONTENT_REQUEST'>]
+      [
+        PickEvents<
+          ZirconDataProviderEvents,
+          | 'DATA_PROVIDER_FULL_CONTENT_REQUEST'
+          | 'DATA_PROVIDER_DIFF_CONTENT_REQUEST'
+        >,
+      ]
     >;
     outgoing: MergePickEvents<
-      [PickEvents<ZirconDataProviderEvents, 'DATA_PROVIDER_CONTENT'>]
+      [
+        PickEvents<
+          ZirconDataProviderEvents,
+          | 'DATA_PROVIDER_FULL_CONTENT'
+          | 'DATA_PROVIDER_DIFF_CONTENT'
+          | 'DATA_PROVIDER_CHANGED'
+        >,
+      ]
     >;
   },
   ZirconObjectEventRegistry
@@ -44,22 +83,76 @@ export interface ZirconDataProviderState extends ZirconObjectState {
   dataType: string;
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+function compareDefaultData<T>(a: T, b: T): number {
+  if (a === undefined && b === undefined) {
+    return 0;
+  }
+  if (a === undefined && b !== undefined) {
+    return 1;
+  }
+  if (a !== undefined && b === undefined) {
+    return -1;
+  }
+  if (a === null && b === null) {
+    return 0;
+  }
+  if (a === null && b !== null) {
+    return 1;
+  }
+  if (a !== null && b === null) {
+    return -1;
+  }
+  return JSON.stringify(a) === JSON.stringify(b) ? 0 : -1;
+}
+
 export class ZirconDataProvider<
-  T = any,
+  T = unknown,
   R extends ZirconDataProviderEventRegistry = ZirconDataProviderEventRegistry,
 > extends ZirconObject<R> {
-  private _dataType: string = null;
-  private _data: T = null;
-  private __onDataChangeCB: () => void = null;
+  private _dataType: string = null; // output data type
+  private __data: T = null;
+  private __version: number = 0;
+  private __compareElements: (a: T, b: T) => number = compareDefaultData;
 
-  constructor(name: string, dataType: string) {
-    super({ name: name, type: ZIRCON_DATA_PROVIDER_TYPE });
-    this._dataType = dataType;
+  constructor(
+    outDataType: string,
+    state: ZirconDataProviderState,
+    compareElements: (a: T, b: T) => number = compareDefaultData,
+  ) {
+    super(state);
+    this._dataType = outDataType;
+    if (compareElements) {
+      this.__compareElements = compareElements;
+    }
+    if (!state) {
+      return;
+    }
+    if (!state.dataType) {
+      throw new Error(
+        `state dataType ${state.dataType} is not defined but should be ${outDataType}`,
+      );
+    }
+        if (state.dataType !== outDataType) {
+      throw new Error(
+        `state dataType ${state.dataType} does not match provided dataType ${this._dataType} in ${this.constructor.name} constructor`,
+      );
+    }
+
   }
 
-  public getData(): T {
-    return this._data;
+  // -----------------------
+  // CORE DATA
+  // -----------------------
+
+  public async getData(): Promise<T> {
+    return this.__data;
+  }
+
+  public getSnapshot(): { data: T; version: number } {
+    return {
+      data: this.__data,
+      version: this.__version,
+    };
   }
 
   public getDataType(): string {
@@ -74,21 +167,96 @@ export class ZirconDataProvider<
     return ZIRCON_DATA_PROVIDER_TYPE;
   }
 
+  public getDataProviderSubtype(): string {
+    return ZIRCON_DATA_PROVIDER_DEFAULT_TYPE;
+  }
+
+  // -----------------------
+  // EVENTS
+  // -----------------------
+
   protected override listenToEvents(): void {
     super.listenToEvents();
-    this.addListener('DATA_PROVIDER_CONTENT_REQUEST', (arg) =>
-      this.onDATA_PROVIDER_CONTENT_REQUEST(arg.dataProviderId),
+
+    this.addListener('DATA_PROVIDER_FULL_CONTENT_REQUEST', (arg) =>
+      this.onContentRequest(arg.dataProviderId),
+    );
+    this.addListener('DATA_PROVIDER_DIFF_CONTENT_REQUEST', (arg) =>
+      this.onDiffContentRequest(arg.baseVersion, arg.dataProviderId),
     );
   }
 
-  private onDATA_PROVIDER_CONTENT_REQUEST(dataProviderId: string): void {
-    if (dataProviderId === this.getId()) {
-      this.emit('DATA_PROVIDER_CONTENT', {
-        dataProviderDescriptor: this.getDescriptor(),
-        data: this.getData(),
-      });
+  private onContentRequest(dataProviderId: string): void {
+    if (dataProviderId !== this.getId()) {
+      return;
     }
+
+    this.emit('DATA_PROVIDER_FULL_CONTENT', {
+      dataProviderDescriptor: this.getDescriptor(),
+      data: this.__data,
+      version: this.__version,
+    });
   }
+
+  private onDiffContentRequest(
+    baseVersion: number,
+    dataProviderId: string,
+  ): void {
+    if (dataProviderId !== this.getId()) {
+      return;
+    }
+    if (baseVersion === this.__version) {
+      return; // no change
+    }
+
+    const diffData: DiffData = this.computeDiff(baseVersion, this.__data);
+    if (!diffData) {
+      // if no diff data, send full content
+      this.onContentRequest(dataProviderId);
+      return;
+    }
+
+    this.emit('DATA_PROVIDER_DIFF_CONTENT', {
+      dataProviderDescriptor: this.getDescriptor(),
+      diffData: diffData,
+      baseVersion,
+      version: this.__version,
+    });
+  }
+
+  private computeDiff<T extends {}>(baseVersion: number, _data: T): DiffData {
+    throw new Error(
+      'computeDiff method not implemented for version ' + baseVersion,
+    );
+  }
+
+  // -----------------------
+  // UPDATE DATA (IMPORTANT)
+  // -----------------------
+
+  public setData(data: T): void {
+    this.__data = data;
+    this.__version++;
+
+    const descriptor = this.getDescriptor();
+
+    // 1. event change léger (for Cesium diff systems)
+    this.emit('DATA_PROVIDER_CHANGED', {
+      dataProviderDescriptor: descriptor,
+      version: this.__version,
+    });
+
+    // 2. full payload (legacy compatibility)
+    this.emit('DATA_PROVIDER_FULL_CONTENT', {
+      dataProviderDescriptor: descriptor,
+      data: this.__data,
+      version: this.__version,
+    });
+  }
+
+  // -----------------------
+  // DESCRIPTOR
+  // -----------------------
 
   public getDescriptor(): ZirconDataProviderDescriptor {
     return {
@@ -98,29 +266,4 @@ export class ZirconDataProvider<
       dataType: this.getDataType(),
     };
   }
-
-  public setData(data: T): void {
-    this._data = data;
-    this.emit('DATA_PROVIDER_CONTENT', {
-      dataProviderDescriptor: this.getDescriptor(),
-      data: this.getData(),
-    });
-  }
-
-  // /**
-  //  * Registers a callback invoked when the data source content changes.
-  //  * @param onChangeCB Callback function
-  //  */
-  // public onDataChange(onDataChangeCB: () => void): void {
-  //   this.__onDataChangeCB = onDataChangeCB;
-  // }
-
-  // /**
-  //  * Notifies listeners that the source content has changed.
-  //  */
-  // protected fireDataChanged(): void {
-  //   if (this.__onDataChangeCB) {
-  //     this.__onDataChangeCB();
-  //   }
-  // }
 }

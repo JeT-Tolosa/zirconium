@@ -6,7 +6,6 @@ import {
 import { MergeZirconRegistries, PickEvents } from '../zircon-event';
 import { ZirconVizWindow } from './zircon-viz-window';
 import { ZIRCON_VISUALIZER_TYPE } from '../zircon-core/zircon-types';
-
 /**
  * Base state for all zircon objects UI
  */
@@ -55,7 +54,9 @@ export abstract class ZirconViz<
   }
 
   private onVISUALIZER_REFRESH_REQUEST(vizId: string): void {
-    if (this.getId() !== vizId) return;
+    if (this.getId() !== vizId) {
+      return;
+    }
     if (this.refreshDisplay()) {
       this.emit('VISUALIZER_DISPLAYED', {
         vizId: vizId,
@@ -83,15 +84,19 @@ export abstract class ZirconViz<
   }
 
   /**
-   * @returns   true if chart was created and docked, false otherwise
+   * @returns   true if visualizer was created and docked, false otherwise
    */
   public async displayIn(parentWindow: ZirconVizWindow): Promise<boolean> {
-    if (this.__parentWindow === parentWindow) return false;
+    if (this.__parentWindow === parentWindow) {
+      return false;
+    }
     if (this.__parentWindow) {
-      this.removeFromParent();
+      await this.undisplayFromParent();
     }
     this.__parentWindow = parentWindow;
-    if (!this.__parentWindow?.getWindowContent()) return false;
+    if (!this.__parentWindow?.getWindowContent()) {
+      return false;
+    }
     this.__parentWindow?.getWindowContent().appendChild(this.getContainer());
     await this.onDisplay();
     return true;
@@ -101,8 +106,10 @@ export abstract class ZirconViz<
    * Remove visualizer from Parent (Visualizer not stopped)
    * @returns
    */
-  public removeFromParent(): boolean {
-    if (!this.__parentWindow) return false;
+  public async undisplayFromParent(): Promise<boolean> {
+    if (!this.__parentWindow) {
+      return false;
+    }
     this.__parentWindow.getWindowContent()?.removeChild(this.getContainer());
     const windowState = this.__parentWindow.generateCurrentState();
     windowState.vizId = null;
@@ -111,6 +118,7 @@ export abstract class ZirconViz<
       vizId: this.__parentWindow.getVisualizerId(),
     });
     this.__parentWindow = null;
+    return true;
   }
 
   public override getType(): string {

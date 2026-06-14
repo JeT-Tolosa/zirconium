@@ -8,14 +8,12 @@ import {
   VizSatelliteCatalogTabulator,
   VizSatelliteCatalogTabulatorState,
 } from '../../zircon-visualizers/spatial/viz-eye-satellite-catalog-tabulator';
-import {
-  VizSatCatLoader,
-  VizSatCatLoaderState,
-} from '../../zircon-visualizers/spatial/viz-eye-satellite-loader';
+import { VizSatCatLoader } from '../../zircon-visualizers/spatial/viz-eye-satellite-loader';
 import {
   ZIRCON_DESKTOP_TYPE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
 } from '../../zirconium/zircon-core/zircon-types';
+import { VizLoaderState } from '../../zircon-visualizers/data-loader/viz-loader';
 
 /**
  * DESKTOP3
@@ -27,7 +25,7 @@ export async function createDesktop3(
   await app.registerObjectFactory(new VizSatelliteCatalogTabulatorFactory());
 
   // Spatial Loaders
-  const vizSatCatLoader: VizSatCatLoaderState = {
+  const vizSatCatLoader: VizLoaderState = {
     id: 'satelliteLoaderVizId',
     type: VizSatCatLoader.VIZ_SAT_CAT_LOADER_TYPE,
     name: 'Satellite Loader',

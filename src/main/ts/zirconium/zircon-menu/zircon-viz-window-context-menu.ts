@@ -22,24 +22,35 @@ export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory 
   }
 
   private getAssociatedZirconVizWindow(element: Element): ZirconVizWindow {
-    if (!element) return null;
-    if (!(element instanceof HTMLElement)) return null;
+    if (!element) {
+      return null;
+    }
+    if (!(element instanceof HTMLElement)) {
+      return null;
+    }
     const htmlElement: HTMLElement = element;
     const zirconObjectId = htmlElement.getAttribute(
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
     );
-    if (!zirconObjectId) return null;
+    if (!zirconObjectId) {
+      return null;
+    }
     const obj: ZirconObject = this.getApplication()
       .getObjectManager()
       .getExistingInstance(zirconObjectId);
-    if (!obj) return null;
+    if (!obj) {
+      return null;
+    }
     if (
       !this.getApplication()
         .getObjectManager()
         .isTypeOf(obj.getType(), ZIRCON_VISUALIZER_WINDOW_TYPE)
-    )
+    ) {
       return null;
-    if (!(obj instanceof ZirconVizWindow)) return null;
+    }
+    if (!(obj instanceof ZirconVizWindow)) {
+      return null;
+    }
     return obj;
   }
 
@@ -49,7 +60,9 @@ export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory 
 
   public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
     const window: ZirconVizWindow = this.getAssociatedZirconVizWindow(element);
-    if (!window) return null;
+    if (!window) {
+      return null;
+    }
     return [
       {
         label: `viz window ${window.getName()}`,

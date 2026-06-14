@@ -7,8 +7,6 @@ export default defineConfig({
   },
 
   optimizeDeps: {
-    esbuildOptions: {
-      target: 'esnext',
-    },
+    exclude: ['@ionic/core'],
   },
 });

@@ -1,6 +1,7 @@
 import { PickEvents } from '../../zirconium/zircon-event';
 import {
   ItemCollection,
+  ItemCollectionDescriptor,
   ItemCollectionEventRegistry,
   MergeItemCollectionRegistries,
 } from './item-collection';
@@ -11,7 +12,6 @@ export type ItemDictionaryEvents<T> = {
   };
   ITEM_DICTIONARY_CONTENT: {
     descriptor: ItemDictionaryDescriptor;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     items: T[];
   };
 };
@@ -27,13 +27,10 @@ export type ItemDictionaryEventRegistry<T> = MergeItemCollectionRegistries<
   }
 >;
 
-export interface ItemDictionaryDescriptor {
-  id?: string;
-  name?: string;
-  type: string;
-}
+export interface ItemDictionaryDescriptor extends ItemCollectionDescriptor {}
 
-export class ItemDictionary<T> extends ItemCollection<T,
+export class ItemDictionary<T> extends ItemCollection<
+  T,
   ItemDictionaryEventRegistry<T>
 > {
   private _items: { [index: string]: T } = {};
@@ -44,11 +41,10 @@ export class ItemDictionary<T> extends ItemCollection<T,
    * @param indexation indexation method
    */
   constructor(
-    itemType: string,
     descriptor: ItemDictionaryDescriptor,
     indexation: (item: T) => string,
   ) {
-    super(itemType, descriptor);
+    super(descriptor);
     this.setIndexMethod(indexation);
   }
 
@@ -61,7 +57,9 @@ export class ItemDictionary<T> extends ItemCollection<T,
   }
 
   public getElementCount(): number {
-    if (!this._items) return 0;
+    if (!this._items) {
+      return 0;
+    }
     return Object.keys(this._items).length;
   }
 
@@ -70,8 +68,7 @@ export class ItemDictionary<T> extends ItemCollection<T,
    */
   public duplicate(name: string): ItemDictionary<T> {
     const cat: ItemDictionary<T> = new ItemDictionary(
-      this.getItemType(),
-      { ...this.getDescriptor(), name: name }, // override name
+      { ...this.getDescriptor(), itemType: this.getItemType(), name: name }, // override name & item type
       this._indexationMethod,
     );
     cat.addItems(Object.values(this.getItems()));
@@ -84,7 +81,9 @@ export class ItemDictionary<T> extends ItemCollection<T,
    * @returns index as string
    */
   private getIndex(item: T): string {
-    if (!item) return null;
+    if (!item) {
+      return null;
+    }
     return this._indexationMethod(item);
   }
 
@@ -94,11 +93,16 @@ export class ItemDictionary<T> extends ItemCollection<T,
    * @returns index if added, null if not
    */
   public addItem(item: T): string {
-    if (!item) return null;
-    const index = this.getIndex(item);
-    if (!index) return null;
-    if (JSON.stringify(this._items[index]) === JSON.stringify(item))
+    if (!item) {
       return null;
+    }
+    const index = this.getIndex(item);
+    if (!index) {
+      return null;
+    }
+    if (JSON.stringify(this._items[index]) === JSON.stringify(item)) {
+      return null;
+    }
     this._items[index] = item;
     this.emit('ITEM_DICTIONARY_CHANGED', {
       descriptor: this.getDescriptor(),
@@ -112,19 +116,24 @@ export class ItemDictionary<T> extends ItemCollection<T,
    * @returns the collection of added indices
    */
   public addItems(els: T[]): string[] {
-    if (!els) return null;
+    if (!els) {
+      return null;
+    }
     const addedIndices: string[] = [];
     const emission: boolean = this.areEventsAllowed();
     this.allowEvents(false); // disable event emission
     els.forEach((el: T) => {
       const index: string = this.addItem(el);
-      if (index) addedIndices.push(index);
+      if (index) {
+        addedIndices.push(index);
+      }
     });
     this.allowEvents(emission); // reset event emission
-    if (addedIndices.length > 0)
+    if (addedIndices.length > 0) {
       this.emit('ITEM_DICTIONARY_CHANGED', {
         descriptor: this.getDescriptor(),
       });
+    }
     return addedIndices;
   }
 
@@ -154,8 +163,10 @@ export class ItemDictionary<T> extends ItemCollection<T,
    */
   public contains(item: T): boolean {
     const index = this.getIndex(item);
-    if (!index) return false;
-    return this._items[index] != null;
+    if (!index) {
+      return false;
+    }
+    return this._items[index] !== undefined && this._items[index] !== null;
   }
 
   /**
@@ -178,7 +189,9 @@ export class ItemDictionary<T> extends ItemCollection<T,
    * @returns
    */
   public clearItems(): boolean {
-    if (this._items && Object.keys(this._items).length == 0) return false;
+    if (this._items && Object.keys(this._items).length === 0) {
+      return true;
+    }
     this._items = {};
     this.emit('ITEM_DICTIONARY_CHANGED', {
       descriptor: this.getDescriptor(),

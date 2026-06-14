@@ -69,10 +69,14 @@ export class ZirconContextMenu<
     const li: HTMLElement = (e.target as HTMLElement).closest(
       'li',
     ) as HTMLElement;
-    if (!li) return;
+    if (!li) {
+      return;
+    }
 
     const submenu = li.querySelector(':scope > ul') as HTMLElement;
-    if (!submenu) return;
+    if (!submenu) {
+      return;
+    }
 
     submenu.classList.remove('open-left');
 
@@ -104,7 +108,9 @@ export class ZirconContextMenu<
    */
   public addContextMenu(parentElement: HTMLElement): void {
     this._parentElement = parentElement;
-    if (!this._parentElement) return;
+    if (!this._parentElement) {
+      return;
+    }
 
     parentElement.addEventListener('contextmenu', (e) => {
       e.preventDefault();
@@ -135,11 +141,14 @@ export class ZirconContextMenu<
     items.forEach((item) => {
       const li = document.createElement('li');
       li.textContent = item.label;
-      if (item.classes)
+      if (item.classes) {
         item.classes.forEach((clazz) => {
           li.classList.add(clazz);
         });
-      if (item.unavailable) li.setAttribute('disabled', 'true');
+      }
+      if (item.unavailable) {
+        li.setAttribute('disabled', 'true');
+      }
       if (item.children) {
         li.classList.add('has-children');
         li.classList.add('zircon-context-menu-item');
@@ -151,7 +160,9 @@ export class ZirconContextMenu<
 
       li.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (item.action) item.action();
+        if (item.action) {
+          item.action();
+        }
         this.hideMenu();
       });
 
@@ -183,12 +194,18 @@ export class ZirconContextMenu<
         .getContextMenuFactories();
 
       factories?.forEach((factory) => {
-        if (!factory?.handledThisElement(element)) return;
+        if (!factory?.handledThisElement(element)) {
+          return;
+        }
         const objItems: ZirconContextMenuItem[] =
           factory.getContextMenuElements(element);
-        if (!objItems) return;
+        if (!objItems) {
+          return;
+        }
         objItems.forEach((objItem) => {
-          if (objItem) menuItems.push(objItem);
+          if (objItem) {
+            menuItems.push(objItem);
+          }
         });
       });
     }

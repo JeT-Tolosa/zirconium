@@ -27,7 +27,7 @@ export class AnalogClock extends AbstractClock {
   // =========================================================
 
   public getContainer(): HTMLDivElement {
-    if (this.__mainDiv) return this.__mainDiv;
+    if (this.__mainDiv) {return this.__mainDiv;}
 
     this.__mainDiv = document.createElement('div');
     this.__mainDiv.id = uuid();
@@ -55,7 +55,7 @@ export class AnalogClock extends AbstractClock {
   // =========================================================
 
   private __resizeCanvas(): void {
-    if (!this.__canvas || !this.__mainDiv) return;
+    if (!this.__canvas || !this.__mainDiv) {return;}
 
     // On récupère la taille du conteneur parent
     const rect = this.__mainDiv.getBoundingClientRect();
@@ -85,7 +85,7 @@ export class AnalogClock extends AbstractClock {
   protected displayTime(day: Date): void {
     this.__lastDate = day;
 
-    if (!this.__canvas || !this.__ctx) return;
+    if (!this.__canvas || !this.__ctx) {return;}
 
     const ctx = this.__ctx;
     const size = this.__canvas.width / (window.devicePixelRatio || 1);

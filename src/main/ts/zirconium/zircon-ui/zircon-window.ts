@@ -136,23 +136,33 @@ export abstract class ZirconWindow<
   }
 
   private onWINDOW_NORMALIZE_REQUEST(windowId: string): void {
-    if (this.getId() === windowId) this.__panel?.normalize();
+    if (this.getId() === windowId) {
+      this.__panel?.normalize();
+    }
   }
 
   private onWINDOW_MAXIMIZE_REQUEST(windowId: string): void {
-    if (this.getId() === windowId) this.__panel?.maximize();
+    if (this.getId() === windowId) {
+      this.__panel?.maximize();
+    }
   }
 
   private onWINDOW_MINIMIZE_REQUEST(windowId: string): void {
-    if (this.getId() === windowId) this.__panel?.minimize();
+    if (this.getId() === windowId) {
+      this.__panel?.minimize();
+    }
   }
 
   private onWINDOW_CLOSE_REQUEST(windowId: string): void {
-    if (this.getId() === windowId) this.__panel?.close();
+    if (this.getId() === windowId) {
+      this.__panel?.close();
+    }
   }
 
   protected override async setState(state: ZirconWindowState): Promise<void> {
-    if (!state) return;
+    if (!state) {
+      return;
+    }
     await super.setState(state);
     this.setTitle(state.title);
     this.setPosition(state.left, state.top);
@@ -184,7 +194,9 @@ export abstract class ZirconWindow<
   }
 
   private createPanel(): IJSPanelInstance {
-    if (this.__panel) return this.__panel;
+    if (this.__panel) {
+      return this.__panel;
+    }
     // this.__panel is set in callback() method which is called when creation
     // is fully terminated and the panel is in the DOM.
     jsPanel.create({
@@ -251,13 +263,17 @@ export abstract class ZirconWindow<
           this.getApplication()
             .getDesktopManager()
             .temporaryUnmoveWindowPanelFromDesktopManager(this);
-          if (!event || !event.target) return;
+          if (!event || !event.target) {
+            return;
+          }
           let targetDesktopId: string = null;
           // look for targetDekstopId in parents
           let el: HTMLElement = event.target as HTMLElement;
           while (!targetDesktopId && el) {
             targetDesktopId = el.getAttribute(ZIRCON_TARGET_DESKTOP_ID);
-            if (el) el = el.parentElement;
+            if (el) {
+              el = el.parentElement;
+            }
           }
 
           if (!targetDesktopId) {
@@ -308,9 +324,9 @@ export abstract class ZirconWindow<
         this.emit('WINDOW_NORMALIZED', { windowId: this.getId() }),
       onclosed: () => this.emit('WINDOW_CLOSED', { windowId: this.getId() }),
 
-      callback: (panel: IJSPanelInstance) => {
+      callback: async (panel: IJSPanelInstance) => {
         this.__panel = panel;
-        this.onPanelCreated(panel);
+        await this.onPanelCreated(panel);
         this.emit('WINDOW_DISPLAYED', { windowId: this.getId() });
       },
       theme: 'primary',
@@ -323,22 +339,26 @@ export abstract class ZirconWindow<
     return this.__panel;
   }
 
-  protected abstract onPanelCreated(panel: IJSPanelInstance): void;
+  protected abstract onPanelCreated(panel: IJSPanelInstance): Promise<void>;
 
   public getContainer(): HTMLElement {
-    if (this.__panel) return this.__panel;
+    if (this.__panel) {
+      return this.__panel;
+    }
     this.createPanel();
     return this.__panel;
   }
 
   public getWindowContent(): HTMLDivElement {
-    if (this.__panel) return this.__panel.content;
+    if (this.__panel) {
+      return this.__panel.content;
+    }
     this.createPanel();
     return this.__panel.content;
   }
 
   public isDisplayed(): boolean {
-    return this.__panel?.content != null;
+    return this.__panel?.content !== null;
   }
 
   public getLeft(): number {
@@ -362,17 +382,20 @@ export abstract class ZirconWindow<
    * @returns
    */
   public setPosition(x: number, y: number): boolean {
-    if (this._left === x && this._top === y) return false;
+    if (this._left === x && this._top === y) {
+      return false;
+    }
     this._left = x;
     this._top = y;
     // change graphic position if window is displayed
-    if (this.__panel)
+    if (this.__panel) {
       this.__panel.reposition({
         at: 'left-top',
         my: 'left-top',
         offsetX: x,
         offsetY: y,
       });
+    }
 
     this.emit('WINDOW_POSITION_CHANGED', {
       windowId: this.getId(),
@@ -390,10 +413,14 @@ export abstract class ZirconWindow<
    * @returns
    */
   public setDimension(width: number, height: number): boolean {
-    if (this._width === width && this._height === height) return false;
+    if (this._width === width && this._height === height) {
+      return false;
+    }
     this._width = width;
     this._height = height;
-    if (this.__panel) this.__panel.resize({ width: width, height: height });
+    if (this.__panel) {
+      this.__panel.resize({ width: width, height: height });
+    }
     this.emit('WINDOW_DIMENSION_CHANGED', {
       windowId: this.getId(),
       width: this._width,
@@ -413,9 +440,13 @@ export abstract class ZirconWindow<
    * @returns
    */
   public setTitle(title: string): boolean {
-    if (this._title === title) return false;
+    if (this._title === title) {
+      return false;
+    }
     this._title = title;
-    if (this.__panel) this.__panel.title = this._title;
+    if (this.__panel) {
+      this.__panel.title = this._title;
+    }
     this.emit('WINDOW_TITLE_CHANGED', {
       windowId: this.getId(),
       title: this._title,

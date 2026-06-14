@@ -95,14 +95,14 @@ export class VizFetch extends ZirconViz {
   }
 
   private getTextArea(): HTMLTextAreaElement {
-    if (this._textArea) return this._textArea;
+    if (this._textArea) {return this._textArea;}
     this._textArea = document.createElement('textarea');
     this._textArea.classList.add('fetch-result');
     return this._textArea;
   }
 
   public getFetchButton(): HTMLButtonElement {
-    if (this._fetchButton) return this._fetchButton;
+    if (this._fetchButton) {return this._fetchButton;}
     this._fetchButton = document.createElement('button');
     this._fetchButton.classList.add('fetch-button');
     this._fetchButton.innerText = 'Fetch';
@@ -112,7 +112,7 @@ export class VizFetch extends ZirconViz {
   }
 
   public getInputElement(): HTMLInputElement {
-    if (this._urlInput) return this._urlInput;
+    if (this._urlInput) {return this._urlInput;}
     this._urlInput = document.createElement('input');
     this._urlInput.setAttribute('type', 'text');
     this._urlInput.classList.add('fetch-imput');
@@ -121,7 +121,7 @@ export class VizFetch extends ZirconViz {
   }
 
   public getURLSelector(): HTMLSelectElement {
-    if (this._urlSelect) return this._urlSelect;
+    if (this._urlSelect) {return this._urlSelect;}
     this._urlSelect = document.createElement('select');
     Object.entries(URLS_DICTIONARY).forEach(([key, url]) => {
       const option = document.createElement('option');
@@ -139,7 +139,7 @@ export class VizFetch extends ZirconViz {
   }
 
   public getOutputElement(): HTMLParagraphElement {
-    if (this._output) return this._output;
+    if (this._output) {return this._output;}
     this._output = document.createElement('p');
     this._output.classList.add('fetch-output');
     this._output.innerText = '';
@@ -151,7 +151,7 @@ export class VizFetch extends ZirconViz {
    * @returns   Chart's div element
    */
   public getContainer(): HTMLDivElement {
-    if (this._div) return this._div;
+    if (this._div) {return this._div;}
     this._div = document.createElement('div');
     this._div.id = uuid();
     this._div.classList.add('fetch-container');

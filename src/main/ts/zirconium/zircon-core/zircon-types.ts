@@ -9,6 +9,12 @@ export const ZIRCON_PARAMETER_WINDOW_TYPE: string = 'zircon-param-window';
 export const ZIRCON_ENGINE_TYPE: string = 'zircon-engine';
 export const ZIRCON_ENGINE_MANAGER_TYPE: string = 'zircon-engine-manager';
 export const ZIRCON_OBJECT_MANAGER_TYPE: string = 'zircon-object-manager';
+export const ZIRCON_PLUGIN_TYPE: string = 'zircon-plugin';
+export const ZIRCON_PLUGIN_MANAGER_TYPE: string = 'zircon-plugin-manager';
+export const ZIRCON_DATA_PROVIDER_TYPE: string = 'zircon-data-provider';
+export const ZIRCON_DATA_PROVIDER_DEFAULT_TYPE: string =
+  'zircon-data-provider-default';
+export const ZIRCON_DATA_ADAPTER_TYPE: string = 'zircon-data-adapter';
 
 export const DESKTOPS_MANAGER_CLASS = 'desktops-manager';
 export const DESKTOPS_MANAGER_HEADER_CLASS = 'desktops-manager-header';

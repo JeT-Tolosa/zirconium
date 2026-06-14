@@ -24,7 +24,7 @@ export class AnalogClock extends AbstractClock {
   }
 
   public getContainer(): HTMLDivElement {
-    if (this.__mainDiv) return this.__mainDiv;
+    if (this.__mainDiv) {return this.__mainDiv;}
     this.__mainDiv = document.createElement('div');
     this.__mainDiv.id = uuid();
     this.__mainDiv.classList.add('analog-clock-container');
@@ -33,7 +33,7 @@ export class AnalogClock extends AbstractClock {
   }
 
   public getClockDiv(): HTMLDivElement {
-    if (this.__clockDiv) return this.__mainDiv;
+    if (this.__clockDiv) {return this.__mainDiv;}
     this.__clockDiv = document.createElement('div');
     this.__clockDiv.id = uuid();
     this.__clockDiv.classList.add('clock');

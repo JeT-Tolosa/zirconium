@@ -91,7 +91,9 @@ export class AISLoaderAISStreamLocalJson extends ItemLoader<AIS> {
     const data = await Promise.resolve(this._jsonContent);
     // await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate loading time
     const result = AISStreamFileSchema.safeParse(data);
-    if (!result.success) throw new Error(result.error.toString());
+    if (!result.success) {
+      throw new Error(result.error.toString());
+    }
     return AISStreamToAIS(result.data);
   }
 }

@@ -2,7 +2,10 @@ import {
   GroundStation,
   GROUND_STATION_TYPE,
 } from '../../../libraries/spatial/ground-station/ground-station';
-import { CatalogEngine, DataProviderCreatorFunction } from '../catalog-engine';
+import {
+  CatalogEngine,
+  ItemArrayDataProviderCreatorFunction,
+} from '../catalog-engine';
 import { ZirconEngineState } from '../../../zirconium/zircon-core/zircon-engine';
 import { ItemArray } from '../../../libraries/collection/item-array';
 import { ZirconDataProvider } from '../../../zirconium/zircon-data/zircon-data-provider';
@@ -11,7 +14,7 @@ export interface GroundStationCatalogEngineState extends ZirconEngineState {
   type: typeof GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE;
 }
 
-const groundStationArrayDataProviderCreator: DataProviderCreatorFunction<
+const groundStationArrayDataProviderCreator: ItemArrayDataProviderCreatorFunction<
   GroundStation
 > = (
   dataProviderName: string,
@@ -19,8 +22,8 @@ const groundStationArrayDataProviderCreator: DataProviderCreatorFunction<
   items: GroundStation[] = [],
 ): ZirconDataProvider<ItemArray<GroundStation>> => {
   const dataProvider = new ZirconDataProvider<ItemArray<GroundStation>>(
-    dataProviderName,
     dataType,
+    { type: dataProviderName, dataType: GROUND_STATION_TYPE },
   );
   const itemArray = new ItemArray<GroundStation>({
     itemType: GROUND_STATION_TYPE,
@@ -28,7 +31,7 @@ const groundStationArrayDataProviderCreator: DataProviderCreatorFunction<
   });
   itemArray.setItems(items);
   dataProvider.setData(itemArray);
-  dataProvider.setEventDispatcher;
+  // dataProvider.setEventDispatcher;
   return dataProvider;
 };
 

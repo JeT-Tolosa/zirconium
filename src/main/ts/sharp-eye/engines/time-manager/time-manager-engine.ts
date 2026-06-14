@@ -127,17 +127,17 @@ export class TimeManagerEngine<
     timeSource: string,
     timeDescriptor: TimeDescriptor,
   ): void {
-    if (this._timeRunners[timeSource]) return;
+    if (this._timeRunners[timeSource]) {return;}
     this.setTimeDescriptor(timeSource, timeDescriptor);
   }
 
   private onSIMULATED_TIME_SOURCE_DELETE_REQUEST(timeSource: string): void {
-    if (this._timeRunners[timeSource]) return;
+    if (this._timeRunners[timeSource]) {return;}
     this.removeTimeSource(timeSource);
   }
 
   private onSIMULATED_TIMEDESCRIPTOR_REQUEST(timeSource: string): void {
-    if (!this._timeRunners[timeSource]) return;
+    if (!this._timeRunners[timeSource]) {return;}
     this.emit('SIMULATED_TIMEDESCRIPTOR', {
       timeSource: timeSource,
       timeDescriptor: this._timeRunners[timeSource].getTimeDescriptor(),
@@ -154,7 +154,7 @@ export class TimeManagerEngine<
   protected override async setState(
     state: TimeManagerEngineState,
   ): Promise<void> {
-    if (!state) return;
+    if (!state) {return;}
     await super.setState(state);
     this.setTimeDescriptors(state?.timeDescriptors);
   }
@@ -163,7 +163,7 @@ export class TimeManagerEngine<
     [timeSource: string]: TimeDescriptor;
   }): void {
     // always set default time runner
-    if (!timeDescriptors) timeDescriptors = {};
+    if (!timeDescriptors) {timeDescriptors = {};}
     timeDescriptors[TimeManagerEngine.DEFAULT_TIME_SOURCE] =
       TimeManagerEngine.DEFAULT_TIME_RUNNER.getTimeDescriptor();
 
@@ -184,7 +184,7 @@ export class TimeManagerEngine<
   }
 
   private removeTimeSource(timeSource: string): void {
-    if (!this._timeRunners[timeSource]) return;
+    if (!this._timeRunners[timeSource]) {return;}
     this._timeRunners[timeSource]?.stop();
     delete this._timeRunners[timeSource];
     this.emit('SIMULATED_TIME_SOURCE_DELETED', { timeSource: timeSource });
@@ -215,11 +215,11 @@ export class TimeManagerEngine<
     timeDescriptor: TimeDescriptor,
   ): void {
     if (!this._timeRunners[timeSource])
-      this._timeRunners[timeSource] = new TimeRunner();
+      {this._timeRunners[timeSource] = new TimeRunner();}
     if (this._timeRunners[timeSource].setTimeDescriptor(timeDescriptor))
-      this.getEventDispatcher()?.emit('SIMULATED_TIMEDESCRIPTOR', {
+      {this.getEventDispatcher()?.emit('SIMULATED_TIMEDESCRIPTOR', {
         timeSource: timeSource,
         timeDescriptor: timeDescriptor,
-      });
+      });}
   }
 }

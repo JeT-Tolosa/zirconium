@@ -72,7 +72,9 @@ export abstract class ItemCollection<
     event: K,
     arg: R['outgoing'][K],
   ): boolean {
-    if (!this.areEventsAllowed()) return false;
+    if (!this.areEventsAllowed()) {
+      return false;
+    }
     this._eventEmitter.emit(String(event), arg);
     return true;
   }

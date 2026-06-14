@@ -9,8 +9,6 @@ export default defineConfig({
   plugins: [cesium()],
 
   optimizeDeps: {
-    esbuildOptions: {
-      target: 'esnext',
-    },
+    exclude: ['@ionic/core'],
   },
 });

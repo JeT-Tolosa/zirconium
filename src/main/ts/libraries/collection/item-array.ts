@@ -51,7 +51,9 @@ export class ItemArray<T> extends ItemCollection<T, ItemArrayEventRegistry> {
   }
 
   public getElementCount(): number {
-    if (!this._items) return 0;
+    if (!this._items) {
+      return 0;
+    }
     return this._items.length;
   }
 
@@ -72,7 +74,9 @@ export class ItemArray<T> extends ItemCollection<T, ItemArrayEventRegistry> {
    * @returns index if added, null if not
    */
   public addItem(item: T): boolean {
-    if (!item) return false;
+    if (!item) {
+      return false;
+    }
     this._items.push(item);
     this.emit('ITEM_ARRAY_CHANGED', {
       catalogDescriptor: this.getDescriptor(),
@@ -86,7 +90,9 @@ export class ItemArray<T> extends ItemCollection<T, ItemArrayEventRegistry> {
    * @returns the array of added indices
    */
   public addItems(items: T[]): number {
-    if (!items) return null;
+    if (!items) {
+      return null;
+    }
     let nbItemsAdded: number = 0;
     const emission: boolean = this.areEventsAllowed();
     this.allowEvents(false); // disable event emission
@@ -96,10 +102,11 @@ export class ItemArray<T> extends ItemCollection<T, ItemArrayEventRegistry> {
       }
     });
     this.allowEvents(emission); // reset event emission
-    if (nbItemsAdded > 0)
+    if (nbItemsAdded > 0) {
       this.emit('ITEM_ARRAY_CHANGED', {
         catalogDescriptor: this.getDescriptor(),
       });
+    }
     return nbItemsAdded;
   }
 
@@ -121,7 +128,9 @@ export class ItemArray<T> extends ItemCollection<T, ItemArrayEventRegistry> {
    * @returns
    */
   public getItem(index: number): T {
-    if (index < 0 || index >= this._items.length) return null;
+    if (index < 0 || index >= this._items.length) {
+      return null;
+    }
     return this._items[index];
   }
 
@@ -138,7 +147,9 @@ export class ItemArray<T> extends ItemCollection<T, ItemArrayEventRegistry> {
    * @returns
    */
   public clearItems(): boolean {
-    if (this._items && this._items.length == 0) return false;
+    if (this._items && this._items.length === 0) {
+      return false;
+    }
     this._items = [];
     this.emit('ITEM_ARRAY_CHANGED', {
       catalogDescriptor: this.getDescriptor(),

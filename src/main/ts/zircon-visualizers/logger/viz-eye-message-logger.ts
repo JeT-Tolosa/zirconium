@@ -96,7 +96,7 @@ export class VizMessageLogger extends ZirconViz {
    * Get Logger's div element
    */
   public getContainer(): HTMLDivElement {
-    if (this._mainDiv) return this._mainDiv;
+    if (this._mainDiv) {return this._mainDiv;}
     this._mainDiv = document.createElement('div');
     this._mainDiv.id = uuid();
     this._mainDiv.classList.add('logger-container');
@@ -109,7 +109,7 @@ export class VizMessageLogger extends ZirconViz {
    * @returns Logs div element
    */
   public getLoggerDiv(): HTMLDivElement {
-    if (this._loggerDiv) return this._loggerDiv;
+    if (this._loggerDiv) {return this._loggerDiv;}
     this._loggerDiv = document.createElement('div');
     this._loggerDiv.classList.add('logger');
     return this._loggerDiv;
@@ -119,7 +119,7 @@ export class VizMessageLogger extends ZirconViz {
    * @returns Log detail div element
    */
   public getDetailDiv(): HTMLDivElement {
-    if (this._detailDiv) return this._detailDiv;
+    if (this._detailDiv) {return this._detailDiv;}
     this._detailDiv = document.createElement('div');
     this._detailDiv.classList.add('log-detail');
     return this._detailDiv;

@@ -24,7 +24,7 @@ import {
  * Catalog engine is designed to be used as a core engine for catalog management in zircon applications.
  */
 
-export type DataProviderCreatorFunction<T> = (
+export type ItemArrayDataProviderCreatorFunction<T> = (
   dataProviderName: string,
   dataType: string,
   data: T[],
@@ -213,13 +213,13 @@ export abstract class CatalogEngine<
     [id: string]: CatalogEngineEntry<T>;
   } = {};
   private _dataType: string = 'unknown data type';
-  private __dataProviderCreator: DataProviderCreatorFunction<T> = null;
+  private __dataProviderCreator: ItemArrayDataProviderCreatorFunction<T> = null;
   // private _indexationmethod: (el: T) => string;
 
   constructor(
     name: string,
     dataType: string,
-    dataProviderCreator: DataProviderCreatorFunction<T>,
+    dataProviderCreator: ItemArrayDataProviderCreatorFunction<T>,
     // indexationMethod: (el: T) => string,
   ) {
     super();
@@ -263,7 +263,9 @@ export abstract class CatalogEngine<
     itemCollectionDescriptor: ItemCollectionDescriptor,
     items: T[],
   ) {
-    if (itemCollectionDescriptor.itemType !== this.getDataType()) return;
+    if (itemCollectionDescriptor.itemType !== this.getDataType()) {
+      return;
+    }
     this.createNewItemCollection(itemCollectionDescriptor.name, items);
   }
 
@@ -287,7 +289,9 @@ export abstract class CatalogEngine<
   ) {
     const cat: CatalogEngineEntry<T> = this.getCatalogEntry(itemCollectionId);
     // this catalog engine does not manage this collection, ignore
-    if (!cat) return;
+    if (!cat) {
+      return;
+    }
     const addedItemsCount: number = cat.collection.addItems(items);
     this.synchronizeDataProvider(cat);
     if (addedItemsCount !== 0) {
@@ -497,21 +501,28 @@ export abstract class CatalogEngine<
    * @returns
    */
   public addItemCollection(itemCollection: ItemArray<T>): boolean {
-    if (!itemCollection || !this._catalogEntries) return false;
-    if (itemCollection.getItemType() !== this.getDataType()) return false;
-    if (this.contains(itemCollection)) return false;
+    if (!itemCollection || !this._catalogEntries) {
+      return false;
+    }
+    if (itemCollection.getItemType() !== this.getDataType()) {
+      return false;
+    }
+    if (this.contains(itemCollection)) {
+      return false;
+    }
     const dataProvider: ZirconDataProvider<ItemArray<T>> =
       this.__dataProviderCreator(
         itemCollection.getName(),
         itemCollection.getItemType(),
         itemCollection.getItems(),
       );
-    if (!dataProvider)
+    if (!dataProvider) {
       throw new Error(
         `Data provider cannot be created for collection ${itemCollection.getName()} with data type ${itemCollection.getItemType()}`,
       );
+    }
     this.emit('REGISTER_DATA_PROVIDER_REQUEST', {
-      dataProvider: dataProvider,
+      dataProvider: dataProvider as ZirconDataProvider<unknown>,
     });
     this._catalogEntries[itemCollection.getId()] = {
       collection: itemCollection,
@@ -534,9 +545,13 @@ export abstract class CatalogEngine<
   public removeItemCollection(
     itemCollectionId: string,
   ): ItemCollectionDescriptor {
-    if (!itemCollectionId || !this._catalogEntries) return null;
+    if (!itemCollectionId || !this._catalogEntries) {
+      return null;
+    }
     const catEntry = this.getCatalogEntry(itemCollectionId);
-    if (!catEntry) return null;
+    if (!catEntry) {
+      return null;
+    }
     const itemCollectionDescriptor: ItemCollectionDescriptor =
       catEntry.collection.getDescriptor();
     const dataProvider: ZirconDataProvider<ItemArray<T>> =
@@ -560,8 +575,10 @@ export abstract class CatalogEngine<
    * @returns
    */
   public contains(itemCollection: ItemCollection<T>): boolean {
-    if (!itemCollection || !this._catalogEntries) return false;
-    return this._catalogEntries[itemCollection.getId()] != null;
+    if (!itemCollection || !this._catalogEntries) {
+      return false;
+    }
+    return this._catalogEntries[itemCollection.getId()] !== undefined;
   }
 
   /**
@@ -585,7 +602,9 @@ export abstract class CatalogEngine<
    * @returns
    */
   public getCatalogEntry(id: string): CatalogEngineEntry<T> {
-    if (!id || !this._catalogEntries) return null;
+    if (!id || !this._catalogEntries) {
+      return null;
+    }
     return this._catalogEntries[id];
   }
 }

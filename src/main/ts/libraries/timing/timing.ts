@@ -22,10 +22,11 @@ export class TimingHelper {
     currentSimulatedTime: number,
     timeFactor: number,
   ): number {
-    if (Math.abs(timeFactor) < TimeRunner.MIN_TIME_FACTOR)
+    if (Math.abs(timeFactor) < TimeRunner.MIN_TIME_FACTOR) {
       throw new Error(
         `time factor = ${timeFactor} but cannot be lower than ${TimeRunner.MIN_TIME_FACTOR}`,
       );
+    }
     return (
       Date.now() - (currentSimulatedTime - startSimulatedTime) / timeFactor
     );
@@ -74,7 +75,9 @@ export class TimeRunner {
    * @return true if the time descriptor was changed, false otherwise
    */
   public setTimeDescriptor(timeDescriptor: TimeDescriptor): boolean {
-    if (timeDescriptor === this._timeDescriptor) return false;
+    if (timeDescriptor === this._timeDescriptor) {
+      return false;
+    }
     this._timeDescriptor = timeDescriptor;
     this.run();
     return true;
@@ -102,7 +105,9 @@ export class TimeRunner {
    * @returns simulated time
    */
   public getSimulatedTime(_realTime: number): number {
-    if (!this._timeDescriptor) throw Error('No time descriptor set');
+    if (!this._timeDescriptor) {
+      throw Error('No time descriptor set');
+    }
     const currentRealTime: number = Date.now();
     return (
       this._timeDescriptor.simulatedStartTime +
@@ -123,7 +128,9 @@ export class TimeRunner {
    * Stop time runner
    */
   public stop(): void {
-    if (!this._intervalId) return;
+    if (!this._intervalId) {
+      return;
+    }
     clearInterval(this._intervalId);
     this._intervalId = null;
   }
@@ -143,16 +150,24 @@ export class TimeRunner {
    * Start time runner
    */
   private run(): void {
-    if (this._intervalId) this.stop();
+    if (this._intervalId) {
+      this.stop();
+    }
 
-    if (!this._timeDescriptor) return;
+    if (!this._timeDescriptor) {
+      return;
+    }
     this._intervalId = setInterval(() => {
       // launch all callbacks
       this._timeChangeCallbacks.forEach((callback) => callback(this));
       // check if we are still running
-      if (!this._timeDescriptor.running) this.stop();
+      if (!this._timeDescriptor.running) {
+        this.stop();
+      }
       // check if we reached the end of the simulation
-      if (this.isSimulatedTimeReached()) this.stop();
+      if (this.isSimulatedTimeReached()) {
+        this.stop();
+      }
     }, 100);
   }
 }

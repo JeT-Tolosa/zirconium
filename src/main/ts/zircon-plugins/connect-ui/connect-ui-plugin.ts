@@ -28,7 +28,7 @@ export class UserConnectUIZirconPlugin extends ZirconPlugin {
   }
 
   private getConnectUI(): UserConnectUIOAuth {
-    if (this.__connectUI) return this.__connectUI;
+    if (this.__connectUI) {return this.__connectUI;}
     this.__connectUI = new UserConnectUIOAuth(this.__auth);
     return this.__connectUI;
   }
@@ -53,7 +53,7 @@ export class UserConnectUIZirconPlugin extends ZirconPlugin {
         this.getConnectUI().start();
       } catch (error: unknown) {
         if (error instanceof AuthError)
-          switch (error.code) {
+          {switch (error.code) {
             case 'NETWORK_ERROR':
               showToast('Serveur inaccessible');
               break;
@@ -65,7 +65,7 @@ export class UserConnectUIZirconPlugin extends ZirconPlugin {
             case 'POPUP_CLOSED':
               showToast('Connexion annulée');
               break;
-          }
+          }}
       }
     });
     return loginIcon;

@@ -1,20 +1,19 @@
 import { v4 as uuid } from 'uuid';
 import { ZirconApplication } from '../zircon-core/zircon-app';
 import { ZirconObject } from '../zircon-core/zircon-object';
-
-export const ZIRCON_PLUGIN = 'zircon-plugin';
+import { ZIRCON_PLUGIN_TYPE } from '../zircon-core/zircon-types';
 
 export abstract class ZirconPlugin extends ZirconObject {
   constructor(name: string) {
     super({
       id: `plugin-${uuid()}`,
       name: name,
-      type: ZIRCON_PLUGIN,
+      type: ZIRCON_PLUGIN_TYPE,
     });
   }
 
   public override getType(): string {
-    return ZIRCON_PLUGIN;
+    return ZIRCON_PLUGIN_TYPE;
   }
 
   public abstract plugInApplication(app: ZirconApplication): Promise<void>;

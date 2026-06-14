@@ -43,7 +43,9 @@ export class VizLeaflet extends ZirconViz {
   }
 
   public createMap(): void {
-    if (this._map) return;
+    if (this._map) {
+      return;
+    }
     this._map = Leaflet.map(this.getContainer().id).setView(
       [51.505, -0.09],
       13,
@@ -76,8 +78,8 @@ export class VizLeaflet extends ZirconViz {
     // }).addTo(map);
   }
 
-  public override onDisplay(): void {
-    this.createMap();
+  public override async onDisplay(): Promise<void> {
+    await this.createMap();
   }
 
   /**
@@ -85,7 +87,9 @@ export class VizLeaflet extends ZirconViz {
    * @returns   Chart's div element
    */
   public getContainer(): HTMLDivElement {
-    if (this._mainDiv) return this._mainDiv;
+    if (this._mainDiv) {
+      return this._mainDiv;
+    }
     this._mainDiv = document.createElement('div');
     this._mainDiv.style.width = '100%';
     this._mainDiv.style.height = '100%';

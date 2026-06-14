@@ -87,7 +87,7 @@ export class VizLoader<
   // ---------------------------
 
   private getStatusDiv(): HTMLDivElement {
-    if (this._statusDiv) return this._statusDiv;
+    if (this._statusDiv) {return this._statusDiv;}
 
     this._statusDiv = document.createElement('div');
     this._statusDiv.classList.add('loader-status');
@@ -120,7 +120,7 @@ export class VizLoader<
   // ---------------------------
 
   protected getDataSelector(): HTMLSelectElement {
-    if (this._dataSelector) return this._dataSelector;
+    if (this._dataSelector) {return this._dataSelector;}
 
     this._dataSelector = document.createElement('select');
 
@@ -149,10 +149,10 @@ export class VizLoader<
     const select = this.getDataSelector();
     const descriptorId = select.options[select.selectedIndex]?.value;
 
-    if (!descriptorId) return;
+    if (!descriptorId) {return;}
 
     const descriptor = this._loaderDescriptors[descriptorId];
-    if (!descriptor) return;
+    if (!descriptor) {return;}
 
     this.setStatusIdle(`Click to load "${descriptor.name}"`);
   }
@@ -162,7 +162,7 @@ export class VizLoader<
   // ---------------------------
 
   protected getFetchButton(): HTMLElement {
-    if (this._fetchButton) return this._fetchButton;
+    if (this._fetchButton) {return this._fetchButton;}
 
     this._fetchButton = document.createElement('ion-button');
     this._fetchButton.classList.add('loader-button');
@@ -193,7 +193,7 @@ export class VizLoader<
         );
 
         this.setStatusSuccess(
-          `${descriptor.name} loaded (${items.length} items) in ${duration}`,
+          `${descriptor.name} loaded (${items.length} items) in ${duration}. Id=${descriptorId}`,
         );
 
         this.emit('CATALOG_ENGINE_COLLECTION_CREATE_REQUEST', {
@@ -228,11 +228,11 @@ export class VizLoader<
   // ---------------------------
 
   private formatDuration(ms: number): string {
-    if (ms < 1000) return `${Math.round(ms)}ms`;
+    if (ms < 1000) {return `${Math.round(ms)}ms`;}
 
     const sec = ms / 1000;
 
-    if (sec < 60) return `${sec.toFixed(2)}s`;
+    if (sec < 60) {return `${sec.toFixed(2)}s`;}
 
     const min = Math.floor(sec / 60);
     const remainingSec = Math.round(sec % 60);
@@ -245,7 +245,7 @@ export class VizLoader<
   // ---------------------------
 
   public getContainer(): HTMLDivElement {
-    if (this._div) return this._div;
+    if (this._div) {return this._div;}
 
     this._div = document.createElement('div');
     this._div.id = uuid();

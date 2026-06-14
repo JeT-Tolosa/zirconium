@@ -35,7 +35,9 @@ export class VizHelmetSampleThreeJS extends VizThreeJS {
   /**
    */
   public async createScene(): Promise<void> {
-    if (this._scene) return;
+    if (this._scene) {
+      return;
+    }
 
     this._scene = new THREE.Scene();
     this._camera = new THREE.PerspectiveCamera(45, 1, 0.25, 20);
@@ -106,8 +108,8 @@ export class VizHelmetSampleThreeJS extends VizThreeJS {
 
   public render() {
     if (
-      this._renderer.domElement.width != this.getContainer().clientWidth ||
-      this._renderer.domElement.height != this.getContainer().clientHeight
+      this._renderer.domElement.width !== this.getContainer().clientWidth ||
+      this._renderer.domElement.height !== this.getContainer().clientHeight
     ) {
       this._camera.aspect =
         this.getContainer().clientWidth / this.getContainer().clientHeight;

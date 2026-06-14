@@ -1,4 +1,7 @@
-import { CatalogEngine, DataProviderCreatorFunction } from '../catalog-engine';
+import {
+  CatalogEngine,
+  ItemArrayDataProviderCreatorFunction,
+} from '../catalog-engine';
 import { AIS, AIS_TYPE } from '../../../libraries/maritime/ais';
 import { ZirconEngineState } from '../../../zirconium/zircon-core/zircon-engine';
 import { ItemArray } from '../../../libraries/collection/item-array';
@@ -8,23 +11,25 @@ export interface AISCatalogEngineState extends ZirconEngineState {
   type: typeof AISCatalogEngine.AIS_CATALOG_ENGINE_TYPE;
 }
 
+export const AIS_CATALOG_DATA_PROVIDER = 'ais-catalog-data-provider';
+
 // dataProviderCreator: (data: T[]) => ZirconDataProvider<ItemArray<T>>,
-const aisArrayDataProviderCreator: DataProviderCreatorFunction<AIS> = (
+const aisArrayDataProviderCreator: ItemArrayDataProviderCreatorFunction<AIS> = (
   dataProviderName: string,
   dataType: string,
   items: AIS[] = [],
 ): ZirconDataProvider<ItemArray<AIS>> => {
-  const dataProvider = new ZirconDataProvider<ItemArray<AIS>>(
-    dataProviderName,
-    dataType,
-  );
+  const dataProvider = new ZirconDataProvider<ItemArray<AIS>>(dataType, {
+    type: AIS_CATALOG_DATA_PROVIDER,
+    dataType: AIS_TYPE,
+    name: dataProviderName,
+  });
   const itemArray = new ItemArray<AIS>({
     itemType: AIS_TYPE,
     name: `${dataProviderName}-item-array`,
   });
   itemArray.setItems(items);
   dataProvider.setData(itemArray);
-  dataProvider.setEventDispatcher;
   return dataProvider;
 };
 

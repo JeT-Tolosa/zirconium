@@ -1,22 +1,22 @@
 import './viz-tle-propagator.css';
 import { v4 as uuid } from 'uuid';
 
-import { MergeZirconRegistries } from '../../../../zirconium/zircon-event';
+import { MergeZirconRegistries } from '../../../zirconium/zircon-event';
 
 import {
   ZirconViz,
   ZirconVizEventRegistry,
   ZirconVizState,
-} from '../../../../zirconium/zircon-ui/zircon-visualizer';
+} from '../../../zirconium/zircon-ui/zircon-visualizer';
 
 import { IonButton } from '@ionic/core/components/ion-button';
 import { IonTextarea } from '@ionic/core/components/ion-textarea';
-import { TLEPropagator } from '../../../../libraries/spatial/propagators/propagation';
-import { SatelliteJsTLEPropagator } from '../../../../libraries/spatial/propagators/propagation-satelliteJS';
-import { IdentityFrameTransformer } from '../../../../libraries/spatial/propagators/frame';
-import { NadirPointingAttitudeProvider } from '../../../../libraries/spatial/propagators/attitude';
-import { SimpleSGP4CovarianceProvider } from '../../../../libraries/spatial/propagators/covariance';
-import { TLE, TLEHelper } from '../../../../libraries/spatial/core/tle';
+import { TLEPropagator } from '../../../libraries/spatial/propagators/propagation';
+import { SatelliteJsTLEPropagator } from '../../../libraries/spatial/propagators/propagation-satelliteJS';
+import { IdentityFrameTransformer } from '../../../libraries/spatial/propagators/frame';
+import { NadirPointingAttitudeProvider } from '../../../libraries/spatial/propagators/attitude';
+import { SimpleSGP4CovarianceProvider } from '../../../libraries/spatial/propagators/covariance';
+import { TLE, TLEHelper } from '../../../libraries/spatial/core/tle';
 
 export const VIZ_TLE_PROPAGATOR_TYPE: string = 'tle-propagator';
 
@@ -52,7 +52,9 @@ export class VizTLEPropagator<
   protected override async setState(
     state?: VizTLEPropagatorState,
   ): Promise<void> {
-    if (!state) return;
+    if (!state) {
+      return;
+    }
     await super.setState(state);
   }
 
@@ -134,7 +136,9 @@ ${JSON.stringify(result, null, 2)}`);
   }
 
   private displayValidResult(result: unknown): void {
-    if (!this.__resultTextArea) return;
+    if (!this.__resultTextArea) {
+      return;
+    }
     this.getResultTextArea().value =
       result instanceof Object
         ? JSON.stringify(result, null, 2)
@@ -144,7 +148,9 @@ ${JSON.stringify(result, null, 2)}`);
   }
 
   private displayError(err: unknown): void {
-    if (!this.__resultTextArea) return;
+    if (!this.__resultTextArea) {
+      return;
+    }
     this.getResultTextArea().value =
       err instanceof Error ? err.stack || err.message : String(err);
     this.__resultDiv?.classList.remove('ok');

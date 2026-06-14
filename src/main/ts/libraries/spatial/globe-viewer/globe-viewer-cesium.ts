@@ -12,7 +12,7 @@ import {
   buildInstancedVisibilityLines,
   VisibilityEngineCesium,
 } from './visibility-cesium';
-import { CesiumPrimitiveDataProvider } from './cesium-primitive-source';
+import { ZirconDataProvider } from '../../../zirconium/zircon-data/zircon-data-provider';
 
 const DEFAULT_CESIUM_TOKEN: string =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MTQ3MzJjOS1jY2MwLTRiOGUtYTU5Ny1kNTMxNTQ2MDIxOGIiLCJpZCI6Mzk2Mzc0LCJpYXQiOjE3NzI0MTE2OTB9.O-0_Gu3rYf-7ijUGGlWZtrybQ3OhKMtx0mjBidAcBIw';
@@ -43,18 +43,20 @@ export type GlobeViewerEventsCesium = GlobeViewerEvents & {};
 //   return new Cesium.Color(t, 0, 1 - t, 1);
 // }
 
-type Vec3 = {
-  x: number;
-  y: number;
-  z: number;
-};
+// type Vec3 = {
+//   x: number;
+//   y: number;
+//   z: number;
+// };
 
-type State = {
-  time: string;
-  frame: 'TEME';
-  position: Vec3;
-  velocity: Vec3;
-};
+// type State = {
+//   time: string;
+//   frame: 'TEME';
+//   position: Vec3;
+//   velocity: Vec3;
+// };
+
+export class CesiumPrimitive {}
 
 export class GlobeViewerCesium extends GlobeViewer<
   GlobeViewerOptionsCesium,
@@ -65,7 +67,9 @@ export class GlobeViewerCesium extends GlobeViewer<
   private _token: string = DEFAULT_CESIUM_TOKEN;
   private _sunLightning: boolean = true;
   private _skyAtmosphere: boolean = true;
-  private primitiveSources: { [id: string]: CesiumPrimitiveDataProvider } = {};
+  private primitiveSources: {
+    [id: string]: ZirconDataProvider<CesiumPrimitive>;
+  } = {};
 
   constructor(options?: GlobeViewerOptionsCesium) {
     super();
@@ -75,18 +79,24 @@ export class GlobeViewerCesium extends GlobeViewer<
     });
   }
 
-  public addPrimitiveSource(source: CesiumPrimitiveDataProvider): void {
-    if (!source) return;
+  public addPrimitiveSource(source: ZirconDataProvider<CesiumPrimitive>): void {
+    if (!source) {
+      return;
+    }
     this.primitiveSources[source.getId()] = source;
   }
 
   public removePrimitiveSource(sourceId: string): void {
-    if (!sourceId || !this.primitiveSources[sourceId]) return;
+    if (!sourceId || !this.primitiveSources[sourceId]) {
+      return;
+    }
     delete this.primitiveSources[sourceId];
   }
 
   private onOptionsChanged(): void {
-    if (!this._viewer) return;
+    if (!this._viewer) {
+      return;
+    }
     if (this.getOptions()?.token && this.getOptions().token !== this._token) {
       this.setToken(this.getOptions().token);
     }
@@ -148,7 +158,9 @@ export class GlobeViewerCesium extends GlobeViewer<
     if (!this._parent.id) {
       this._parent.id = `cesiumContainer-${uuid()}`;
     }
-    if (this._viewer) return;
+    if (this._viewer) {
+      return;
+    }
     // Your access token can be found at: https://ion.cesium.com/tokens.
     // Replace `your_access_token` with your Cesium ion access token.
 
@@ -296,7 +308,9 @@ export class GlobeViewerCesium extends GlobeViewer<
   }
 
   public displayIn(parent: HTMLDivElement): void {
-    if (this._parent) this.destroyViewer();
+    if (this._parent) {
+      this.destroyViewer();
+    }
     this._parent = parent;
     this.createViewer(parent);
   }

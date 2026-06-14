@@ -35,19 +35,23 @@ export class ZirconParamWindow<
   public setWindow(window: ZirconWindow): void {
     // TODO remove previous display if necessary
     this._window = window;
-    if (this.__windowPanel)
+    if (this.__windowPanel) {
       this._window.displayParameters(this.__windowPanel.content);
+    }
   }
 
   public override getType(): string {
     return ZIRCON_PARAMETER_WINDOW_TYPE;
   }
 
-  protected override onPanelCreated(panel: IJSPanelInstance): void {
-    if (!panel)
+  protected override async onPanelCreated(
+    panel: IJSPanelInstance,
+  ): Promise<void> {
+    if (!panel) {
       throw new Error(
         `panel should not be null in Param window Creation ID: ${this.getId()}`,
       );
+    }
     panel.classList.add(ZIRCON_PARAMETER_WINDOW_CLASS);
     this.__windowPanel = panel;
     this._window?.displayParameters(panel.content);

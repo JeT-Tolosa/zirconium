@@ -1,4 +1,3 @@
-
 export type ZirconInputButtonType = 'ok' | 'cancel';
 
 export interface ZirconInputConfig {
@@ -40,17 +39,18 @@ export class ZirconModal {
           text: value,
         });
       }
-    }
-    else alert.buttons= [{
+    } else {
+      alert.buttons = [
+        {
           role: 'ok',
           text: okButton,
         },
         {
           role: 'cancel',
           text: cancelButton,
-        }
-
-    ];
+        },
+      ];
+    }
 
     document.body.appendChild(alert);
 

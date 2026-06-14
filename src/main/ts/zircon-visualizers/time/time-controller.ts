@@ -115,14 +115,14 @@ export class TimeController<
   }
 
   private setCurrentTime(value: number): void {
-    if (this._timeSlider.value !== value) this._timeSlider.value = value;
+    if (this._timeSlider.value !== value) {this._timeSlider.value = value;}
   }
 
   /**
    * Get Time Runner
    */
   public getTimeRunner(): TimeRunner {
-    if (this._timeRunner) return this._timeRunner;
+    if (this._timeRunner) {return this._timeRunner;}
     this._timeRunner = new TimeRunner();
     this._timeRunner.addTimeChangeCallback(this.onTimeChange.bind(this));
     return this._timeRunner;
@@ -144,7 +144,7 @@ export class TimeController<
   }
 
   public getContainer(): HTMLDivElement {
-    if (this._mainDiv) return this._mainDiv;
+    if (this._mainDiv) {return this._mainDiv;}
 
     this._mainDiv = document.createElement('div');
     this._mainDiv.classList.add('time-controller-range');
@@ -291,7 +291,7 @@ export class TimeController<
     this._endDateModal.appendChild(this._endDatePicker);
 
     this._endDateReadableLabel.addEventListener('click', () => {
-      if (!this._endDateEnabledCheckbox.checked) return;
+      if (!this._endDateEnabledCheckbox.checked) {return;}
       this._endDateModal.present();
     });
 
@@ -425,8 +425,8 @@ export class TimeController<
 
     let v = Number(this._timeSlider.value);
 
-    if (v < start) v = start;
-    if (v > end) v = end;
+    if (v < start) {v = start;}
+    if (v > end) {v = end;}
 
     this._timeSlider.value = v;
     this._sliderDateLabel.textContent = this.formatTimestamp(v);

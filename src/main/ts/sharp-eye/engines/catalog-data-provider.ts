@@ -1,53 +1,59 @@
-import { Catalog } from '../../libraries/collection/item-collection';
+import { ItemCollection } from '../../libraries/collection/item-collection';
 import { ZirconDataProvider } from '../../zirconium/zircon-data/zircon-data-provider';
 
 export const CATALOG_DATA_PROVIDER_TYPE = 'catalog-data-provider';
 
-export class CatalogDataProvider<
-  CatalogElement,
-> extends ZirconDataProvider<CatalogElement> {
-  private _catalog: Catalog<CatalogElement> = null;
+export class ItemCollectionDataProvider<T> extends ZirconDataProvider<T> {
+  private _itemCollection: ItemCollection<T> = null;
 
-  constructor(name: string, catalog: Catalog<CatalogElement>) {
-    super(name);
-    this.setCatalog(catalog);
+  constructor(name: string, itemCollection: ItemCollection<T>) {
+    super('unknown-data', {
+      name,
+      type: CATALOG_DATA_PROVIDER_TYPE,
+      dataType: 'unknown',
+    });
+    this.setItemCollection(itemCollection);
   }
 
-  private setCatalog(catalog: Catalog<CatalogElement>): void {
-    if (!catalog) throw new Error('Catalog cannot be null');
-    // if (this._catalog === catalog) return;
+  private setItemCollection(itemCollection: ItemCollection<T>): void {
+    if (!itemCollection) {
+      throw new Error('Catalog cannot be null');
+    } // if (this._catalog === catalog) return;
     // if (this._catalog) this.unsetCatalog();
     // if (!catalog) return;
-    this._catalog = catalog;
-    this._catalog.addListener('CATALOG_CONTENT_CHANGED', (arg) => {
-      if (this._catalog?.getId() !== arg.catalogId) return; // check if the event is for the current catalog
-      this.emit('DATA_PROVIDER_CONTENT', {
-        dataProviderDescriptor: this.getDescriptor(),
-        data: this.getData(),
-      });
-    });
-    this.emit('DATA_PROVIDER_CHANGED', {
+    this._itemCollection = itemCollection;
+    this._itemCollection.addListener(
+      'ITEM_COLLECTION_CONTENT_CHANGED',
+      (arg) => {
+        if (this._itemCollection?.getId() !== arg.collectionDescriptor.id) {
+          return;
+        } // check if the event is for the current catalog
+        this.emit('ITEM_COLLECTION_CONTENT_CHANGED', {
+          dataProviderDescriptor: this.getDescriptor(),
+          data: this.getData(),
+        });
+      },
+    );
+    this.emit('ITEM_COLLECTION_CONTENT', {
       dataProviderId: this.getId(),
       dataType: this.getDataType(),
     });
   }
 
   public unsetCatalog(): boolean {
-    if (!this._catalog) return false;
+    if (!this._itemCollection) {
+      return false;
+    }
     // TODO: remove listeners
-    this._catalog = null;
+    this._itemCollection = null;
     return true;
   }
 
-  public getType(): string {
+  public override getType(): string {
     return CATALOG_DATA_PROVIDER_TYPE;
   }
 
-  public getDataType(): string {
-    return this._catalog.getDataType();
-  }
-
-  public getCatalog(): Catalog<CatalogElement> {
-    return this._catalog;
+  public getItemCollection(): ItemCollection<T> {
+    return this._itemCollection;
   }
 }

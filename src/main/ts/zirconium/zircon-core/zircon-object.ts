@@ -78,7 +78,9 @@ export abstract class ZirconObject<
    * @param eventEmitter
    */
   public setEventDispatcher(eventEmitter: EventEmitter2): void {
-    if (this._eventEmitter === eventEmitter) return;
+    if (this._eventEmitter === eventEmitter) {
+      return;
+    }
     this._eventEmitter = eventEmitter;
     this.listenToEvents();
   }
@@ -110,19 +112,28 @@ export abstract class ZirconObject<
    * @returns
    */
   public setId(id: string): boolean {
-    if (!id) return false;
+    if (!id) {
+      return false;
+    }
     const oldId: string = this._id;
-    if (id.indexOf(' ') != -1)
+    if (id.indexOf(' ') !== -1) {
       throw new Error(`IDs cannot contain spaces '${id}' is invalid`);
-    if (oldId === id) return false;
+    }
+    if (oldId === id) {
+      return false;
+    }
     this._id = id;
     this.emit('OBJECT_ID_CHANGED', { oldId: this._id, newId: id });
     return true;
   }
 
   public setName(name: string): boolean {
-    if (!name) return false;
-    if (this._name === name) return false;
+    if (!name) {
+      return false;
+    }
+    if (this._name === name) {
+      return false;
+    }
     this._name = name;
     this.emit('OBJECT_NAME_CHANGED', { id: this._id, name: this._name });
     return true;
@@ -133,7 +144,9 @@ export abstract class ZirconObject<
    * @param state *
    */
   protected async setState(state: ZirconObjectState): Promise<void> {
-    if (!state) return;
+    if (!state) {
+      return;
+    }
     this.setId(state.id);
     this.setName(state.name);
   }

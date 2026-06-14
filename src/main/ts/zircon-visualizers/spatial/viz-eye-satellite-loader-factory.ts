@@ -1,9 +1,7 @@
 import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
-import {
-  VizSatCatLoader,
-  VizSatCatLoaderState,
-} from './viz-eye-satellite-loader';
+import { VizSatCatLoader } from './viz-eye-satellite-loader';
 import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
+import { VizLoaderState } from '../data-loader/viz-loader';
 
 export class VizSatCatLoaderFactory extends SimpleZirconObjectFactory {
   constructor() {
@@ -11,7 +9,7 @@ export class VizSatCatLoaderFactory extends SimpleZirconObjectFactory {
   }
 
   public override async createObject(
-    state: VizSatCatLoaderState,
+    state: VizLoaderState,
   ): Promise<VizSatCatLoader> {
     return new VizSatCatLoader(state);
   }

@@ -39,12 +39,14 @@ export class VizOpenGlobus extends ZirconViz {
     return VizOpenGlobus.OPENGLOBUS_VISUALIZER_TYPE;
   }
 
-  public override onDisplay(): void {
+  public override async onDisplay(): Promise<void> {
     this.createGlobeRoutes();
   }
 
   public createGlobe(): void {
-    if (this._globe) return;
+    if (this._globe) {
+      return;
+    }
     this._osm = new OG.OpenStreetMap('osm');
 
     this._sat = new OG.Bing('bing');
@@ -62,7 +64,9 @@ export class VizOpenGlobus extends ZirconViz {
   }
 
   public createGlobeCO2(): void {
-    if (this._globe) return;
+    if (this._globe) {
+      return;
+    }
 
     //
     // Videos from https://svs.gsfc.nasa.gov/5273/
@@ -116,7 +120,9 @@ export class VizOpenGlobus extends ZirconViz {
    * @returns   Chart's div element
    */
   public getContainer(): HTMLDivElement {
-    if (this._mainDiv) return this._mainDiv;
+    if (this._mainDiv) {
+      return this._mainDiv;
+    }
     this._mainDiv = document.createElement('div');
     this._mainDiv.style.width = '100%';
     this._mainDiv.style.height = '100%';
@@ -125,7 +131,9 @@ export class VizOpenGlobus extends ZirconViz {
   }
 
   public createGlobeRoutes(): void {
-    if (this._globe) return;
+    if (this._globe) {
+      return;
+    }
     const sat: OG.Bing = new OG.Bing('sat');
 
     this._globe = new OG.Globe({

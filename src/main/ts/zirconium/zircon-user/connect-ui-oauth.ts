@@ -23,7 +23,9 @@ export class UserConnectUIOAuth implements UserConnectUIOAuth {
   }
 
   private getContainer(): HTMLDivElement {
-    if (this.__container) return this.__container;
+    if (this.__container) {
+      return this.__container;
+    }
 
     this.__container = document.createElement('div');
     this.__container.id = this.getId();

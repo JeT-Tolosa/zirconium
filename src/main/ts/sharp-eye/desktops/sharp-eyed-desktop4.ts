@@ -8,17 +8,61 @@ import {
   VizGroundStationCatalogTabulator,
   VizGroundStationCatalogTabulatorState,
 } from '../../zircon-visualizers/spatial/viz-eye-ground-station-catalog-tabulator';
-import {
-  VizGroundStationLoader,
-  VizGroundStationLoaderState,
-} from '../../zircon-visualizers/spatial/viz-eye-ground-station-loader';
+import { VizGroundStationLoader } from '../../zircon-visualizers/spatial/viz-eye-ground-station-loader';
 import {
   ZIRCON_DESKTOP_TYPE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
 } from '../../zirconium/zircon-core/zircon-types';
-import { VizCesiumFactory } from '../../zircon-visualizers/cesium/viz-eye-cesium-factory';
 import { CESIUM_VISUALIZER_TYPE } from '../../zircon-visualizers/cesium/viz-eye-cesium';
 import { VizCesiumState } from '../../zircon-visualizers/cesium/viz-eye-cesium';
+import { VizLoaderState } from '../../zircon-visualizers/data-loader/viz-loader';
+import { VizCesiumFactory } from '../../zircon-visualizers/cesium/viz-eye-cesium-factory';
+
+export const GROUND_STATION_TO_CESIUM_ADAPTER_TYPE =
+  'ground-station-to-cesium-adapter';
+
+// function compareGroundStation(gs1: GroundStation, gs2: GroundStation): number {
+//   return gs1.id.localeCompare(gs2.id);
+// }
+
+// function transformGroundStationToCesiumLayer(
+//   stations: GroundStation[],
+// ): Cesium.CustomDataSource {
+//   const dataSource = new Cesium.CustomDataSource('groundStations');
+
+//   stations.forEach((station) => {
+//     dataSource.entities.add({
+//       id: station.id,
+//       name: station.name,
+//       position: Cesium.Cartesian3.fromDegrees(
+//         station.coordinates.lon,
+//         station.coordinates.lat,
+//       ),
+//       point: {
+//         pixelSize: 10,
+//         color: Cesium.Color.CYAN,
+//         outlineColor: Cesium.Color.WHITE,
+//         outlineWidth: 2,
+//       },
+//       label: {
+//         text: station.name,
+//         font: '14px sans-serif',
+//         pixelOffset: new Cesium.Cartesian2(0, -20),
+//         showBackground: true,
+//       },
+//       properties: {
+//         data_imagery: station.data_imagery,
+//         imagery: station.imagery,
+//         state: station.state,
+//         country: station.country,
+//         URL: station.URL,
+//         satellites: station.satellites,
+//       },
+//     });
+//   });
+
+//   return dataSource;
+// }
 
 /**
  * DESKTOP4
@@ -27,13 +71,34 @@ export async function createDesktop4(
   app: SharpEyedApp,
 ): Promise<ZirconDesktopState> {
   await app.registerObjectFactory(new VizCesiumFactory());
+  // await app.registerObjectFactory(
+  //   new ZirconDataAdapterFactory(
+  //     app,
+  //     'default-ground-station-to-cesium-adapter',
+  //     GROUND_STATION_TO_CESIUM_ADAPTER_TYPE,
+  //     CESIUM_LAYER_TYPE,
+  //     transformGroundStationToCesiumLayer,
+  //     compareGroundStation,
+  //   ),
+  // );
 
   await app.registerObjectFactory(new VizGroundStationLoaderFactory());
   await app.registerObjectFactory(
     new VizGroundStationCatalogTabulatorFactory(),
   );
 
-  const vizGSLoaderState: VizGroundStationLoaderState = {
+  // await app.registerObjectFactory(
+  //   new ZirconDataAdapterFactory(
+  //     app,
+  //     'ground-station-catalog-to-loader-adapter',
+  //     GROUND_STATION_TO_CESIUM_ADAPTER_TYPE,
+  //     GROUND_STATION_TYPE,
+  //     GroundStationToCesiumConverter.groundStationToBillboard,
+  //     groundStationComparator,
+  //   ),
+  // );
+
+  const vizGSLoaderState: VizLoaderState = {
     id: 'groundStationLoaderVizId',
     type: VizGroundStationLoader.VIZ_GROUND_STATION_LOADER_TYPE,
     name: 'Ground Station Loader',

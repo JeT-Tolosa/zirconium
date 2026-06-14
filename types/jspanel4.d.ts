@@ -60,6 +60,9 @@ declare module 'jspanel4' {
     content: HTMLDivElement;
     footer?: HTMLDivElement;
     header?: HTMLDivElement;
+    headerlogo?: HTMLDivElement;
+    headertitle?: HTMLDivElement;
+    headertoolbar?: HTMLDivElement;
     options: IJSPanelOptions;
     status: JSPanelStatus;
 
@@ -159,6 +162,8 @@ declare module 'jspanel4' {
     autoposition?: IJSPanelAutoPosition;
     offsetX?: number | string;
     offsetY?: number | string;
+    minLeft?: number | string;
+    minTop?: number | string;
   }
 
   export interface IJSPanelResizeOptions {
@@ -167,6 +172,13 @@ declare module 'jspanel4' {
     minHeight?: number;
     maxWidth?: number;
     maxHeight?: number;
+    aspectRatio?: string;
+    containment?: number | array;
+    grid?: array;
+    handles?: string;
+    start?: function;
+    resize?: function;
+    stop?: function;
   }
 
   export interface IJSPanelThemeOptions {
@@ -219,7 +231,19 @@ declare module 'jspanel4' {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data?: any;
     dragit?: {
+      axis?: string;
+      containment?: number | array;
+      cursor?: string;
       disable?: boolean;
+      disableOnMaximized?: boolean;
+      drop?: object;
+      grid?: array;
+      handles?: string;
+      opacity?: number;
+      start?: function;
+      drag?: function;
+      stop?: function;
+      snap?: boolean | object;
     };
     footerToolbar?:
       | string

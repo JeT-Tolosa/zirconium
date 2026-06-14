@@ -23,8 +23,8 @@ export abstract class VizThreeJS extends ZirconViz {
 
   public abstract createScene(): void;
 
-  public override onDisplay(): void {
-    this.createScene();
+  public override async onDisplay(): Promise<void> {
+    await this.createScene();
   }
 
   /**
@@ -32,7 +32,9 @@ export abstract class VizThreeJS extends ZirconViz {
    * @returns   Chart's div element
    */
   public getContainer(): HTMLDivElement {
-    if (this._mainDiv) return this._mainDiv;
+    if (this._mainDiv) {
+      return this._mainDiv;
+    }
     this._mainDiv = document.createElement('div');
     this._mainDiv.style.width = '100%';
     this._mainDiv.style.height = '100%';

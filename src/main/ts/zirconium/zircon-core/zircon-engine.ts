@@ -79,7 +79,9 @@ export abstract class ZirconEngine<
   }
 
   private async onENGINE_START_REQUEST(engineId: string) {
-    if (engineId !== this.getId()) return;
+    if (engineId !== this.getId()) {
+      return;
+    }
     try {
       await this.stop();
       this.emit('ENGINE_STARTED', { engineId: engineId });
@@ -92,7 +94,9 @@ export abstract class ZirconEngine<
   }
 
   private async onENGINE_STOP_REQUEST(engineId: string) {
-    if (engineId !== this.getId()) return;
+    if (engineId !== this.getId()) {
+      return;
+    }
     try {
       await this.stop();
       this.emit('ENGINE_STOPPED', { engineId: engineId });

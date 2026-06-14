@@ -60,13 +60,14 @@ export abstract class AbstractClock<
   }
 
   protected override async setState(state: ClockState): Promise<void> {
-    if (!state) return Promise.resolve();
+    if (!state) {
+      return Promise.resolve();
+    }
     await super.setState(state);
     this._timeSource = state.timeSource;
-    this.setTimeZoneOffset( state.timeZoneOffset );
+    this.setTimeZoneOffset(state.timeZoneOffset);
   }
 
-  
   /**
    * Get Time Zone offset
    */
@@ -85,7 +86,9 @@ export abstract class AbstractClock<
    * Get Time Runner
    */
   public getTimeRunner(): TimeRunner {
-    if (this._timeRunner) return this._timeRunner;
+    if (this._timeRunner) {
+      return this._timeRunner;
+    }
     this._timeRunner = new TimeRunner();
     this._timeRunner.addTimeChangeCallback(this.onTimeChange.bind(this));
     return this._timeRunner;
@@ -93,7 +96,11 @@ export abstract class AbstractClock<
 
   private onTimeChange(runner: TimeRunner): void {
     let simulatedTime = runner.getCurrentSimulatedTime();
-    if (this._timeZoneOffset) simulatedTime = simulatedTime + this._timeZoneOffset * TimingHelper.HOUR_IN_MILLISECONDS;
+    if (this._timeZoneOffset) {
+      simulatedTime =
+        simulatedTime +
+        this._timeZoneOffset * TimingHelper.HOUR_IN_MILLISECONDS;
+    }
     this.displayTime(new Date(simulatedTime));
   }
 
@@ -117,16 +124,18 @@ export abstract class AbstractClock<
     timeSource: string,
     timeDescriptor: TimeDescriptor,
   ): void {
-    if (this._timeSource && this._timeSource !== timeSource) return;
+    if (this._timeSource && this._timeSource !== timeSource) {
+      return;
+    }
     this._timeDescriptor = timeDescriptor;
     this.getTimeRunner().setTimeDescriptor(this._timeDescriptor);
   }
 
-  public override onDisplay(): void {
+  public override onDisplay(): Promise<void> {
     this.emit('SIMULATED_TIMEDESCRIPTOR_REQUEST', {
       timeSource: this.getTimeSource(),
     });
-    super.onDisplay();
+    return super.onDisplay();
   }
 
   protected abstract displayTime(simulatedDate: Date): void;

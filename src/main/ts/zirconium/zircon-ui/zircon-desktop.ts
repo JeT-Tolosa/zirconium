@@ -102,12 +102,16 @@ export class ZirconDesktop<
   }
 
   private onDESKTOP_ACTIVATE_REQUEST(desktopId: string): void {
-    if (desktopId !== this.getId()) return;
+    if (desktopId !== this.getId()) {
+      return;
+    }
     this.activate();
   }
 
   private onDESKTOP_DEACTIVATE_REQUEST(desktopId: string): void {
-    if (desktopId !== this.getId()) return;
+    if (desktopId !== this.getId()) {
+      return;
+    }
     this.deactivate();
   }
 
@@ -151,7 +155,9 @@ export class ZirconDesktop<
   }
 
   protected override async setState(state: ZirconDesktopState): Promise<void> {
-    if (!state) return;
+    if (!state) {
+      return;
+    }
     await super.setState(state);
     this.setWindowIds(state.windowIds);
   }
@@ -211,15 +217,18 @@ export class ZirconDesktop<
   }
 
   public getContainer(): HTMLDivElement {
-    if (!this.__container) this.createContainer(this.getId());
+    if (!this.__container) {
+      this.createContainer(this.getId());
+    }
     return this.__container;
   }
 
   private createContainer(id: string): HTMLDivElement {
-    if (this.__container)
+    if (this.__container) {
       throw new Error(
         'Desktop container already created. Please clean object before re-creating',
       );
+    }
     this.__container = document.createElement('div');
     this.__container.id = `desktop-container-${id}`;
     this.__container.classList.add('desktop');
@@ -253,15 +262,20 @@ export class ZirconDesktop<
   }
 
   private async displayWindow(windowId: string): Promise<void> {
-    if (!windowId) return Promise.resolve();
+    if (!windowId) {
+      return Promise.resolve();
+    }
     const ui: ZirconDesktopUI = this.__displayedWindows[windowId];
-    if (ui) return Promise.resolve();
+    if (ui) {
+      return Promise.resolve();
+    }
     const window: ZirconObject =
       await this.getApplication().getInstance(windowId);
-    if (!(window instanceof ZirconWindow))
+    if (!(window instanceof ZirconWindow)) {
       throw new Error(
         `Cannot display Window with id ${windowId} object is not a Window: type ${window.getType()}`,
       );
+    }
     // add Window in desktop
     const panel: HTMLElement = window.getContainer();
     this.getContainer().appendChild(panel);
@@ -270,9 +284,13 @@ export class ZirconDesktop<
   }
 
   private undisplayWindow(windowId: string): boolean {
-    if (!windowId) return false;
+    if (!windowId) {
+      return false;
+    }
     const ui: ZirconDesktopUI = this.__displayedWindows[windowId];
-    if (!ui) return false;
+    if (!ui) {
+      return false;
+    }
     this.getContainer().removeChild(ui.panel);
     delete this.__displayedWindows[windowId];
     return true;

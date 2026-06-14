@@ -55,9 +55,9 @@ export class VizJSSandbox<
 
   public setCode(code: string): void {
     this._code = code;
-    if (this.__sourceTextArea) this.__sourceTextArea.innerText = this.getCode();
+    if (this.__sourceTextArea) {this.__sourceTextArea.innerText = this.getCode();}
     if (this.__resultTextArea)
-      this.__resultTextArea.innerText = 'click run to see the result';
+      {this.__resultTextArea.innerText = 'click run to see the result';}
     if (this.__resultDiv) {
       this.__resultDiv.classList.remove('ok');
       this.__resultDiv.classList.remove('nok');
@@ -65,7 +65,7 @@ export class VizJSSandbox<
   }
 
   protected override async setState(state?: VizJSSandboxState): Promise<void> {
-    if (!state) return;
+    if (!state) {return;}
     await super.setState(state);
     this.setCode(state?.code);
   }
@@ -120,7 +120,7 @@ export class VizJSSandbox<
       // sandbox execution
 
       // app is used as string in function arguments
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
       const app: ZirconApplication = this.getApplication();
       const fn = new Function('app', ` "use strict";    ${source}  `);
       const result = fn(app);

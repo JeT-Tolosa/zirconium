@@ -172,7 +172,7 @@ export class VizCollectionCatalogTabulator<
     catalogDescriptor: CatalogEngineDescriptor,
     itemCollectionDescriptors: ItemCollectionDescriptor[],
   ): void {
-    if (catalogDescriptor?.dataType !== this.getElementsType()) return;
+    if (catalogDescriptor?.dataType !== this.getElementsType()) {return;}
     this.getCollectionCatalogComponent().setItemCollectionDescriptors(
       itemCollectionDescriptors,
     );
@@ -182,7 +182,7 @@ export class VizCollectionCatalogTabulator<
     catalogDescriptor: CatalogEngineDescriptor,
     itemCollectionDescriptor: ItemCollectionDescriptor,
   ): void {
-    if (catalogDescriptor?.dataType !== this.getElementsType()) return;
+    if (catalogDescriptor?.dataType !== this.getElementsType()) {return;}
     this.requestItemCollectionContent(itemCollectionDescriptor.id);
   }
 
@@ -191,18 +191,18 @@ export class VizCollectionCatalogTabulator<
     itemCollectionDescriptor: ItemCollectionDescriptor,
     items: T[],
   ): void {
-    if (catalogDescriptor?.dataType !== this.getElementsType()) return;
+    if (catalogDescriptor?.dataType !== this.getElementsType()) {return;}
     const array = new ItemArray<T>(itemCollectionDescriptor);
     array.addItems(items);
     this._itemCollections[itemCollectionDescriptor.id] = array;
     if (itemCollectionDescriptor.id === this.getSelectedCatalogId())
-      this.setTabulatorData(items);
+      {this.setTabulatorData(items);}
   }
 
   private onCATALOG_ENGINE_COLLECTIONS_CHANGED(
     catalogDescriptor: CatalogEngineDescriptor,
   ): void {
-    if (catalogDescriptor?.dataType !== this.getElementsType()) return;
+    if (catalogDescriptor?.dataType !== this.getElementsType()) {return;}
     this.emit('CATALOG_ENGINE_GET_COLLECTION_DESCRIPTORS_REQUEST', {
       dataType: this.getElementsType(),
     });
@@ -251,7 +251,7 @@ export class VizCollectionCatalogTabulator<
   private displaySelectedCatalogContent(): void {
     const itemCollectionId: string =
       this.getCollectionCatalogComponent().getSelectedItemCollectionId();
-    if (!itemCollectionId) return;
+    if (!itemCollectionId) {return;}
     const itemCollection: ItemCollection =
       this.getItemCollection(itemCollectionId);
     if (!itemCollection) {
@@ -294,7 +294,7 @@ export class VizCollectionCatalogTabulator<
     this.getTabulator().setData(tabulatorData);
     // force rebuild of columns (HACK: call two times set data)
     if (this.getTabulator().options.autoColumns)
-      this.getTabulator().setColumns([]); // clear
+      {this.getTabulator().setColumns([]);} // clear
     return this.getTabulator()
       .setData(tabulatorData)
       .then(() => {
@@ -317,7 +317,7 @@ export class VizCollectionCatalogTabulator<
   }
 
   private getTabulator(): Tabulator {
-    if (this._dataTable) return this._dataTable;
+    if (this._dataTable) {return this._dataTable;}
     this._dataTable = new Tabulator(`#${this.getSatCatDiv().id}`, {
       minHeight: '100px',
       maxHeight: '100%',
@@ -373,7 +373,7 @@ export class VizCollectionCatalogTabulator<
   private enableDrop() {
     const container = this.getSatCatDiv();
 
-    if (!container) return;
+    if (!container) {return;}
 
     container.addEventListener('dragover', (e) => {
       e.preventDefault(); // obligatoire
@@ -383,7 +383,7 @@ export class VizCollectionCatalogTabulator<
       e.preventDefault();
 
       const json = e.dataTransfer?.getData('application/json');
-      if (!json) return;
+      if (!json) {return;}
 
       const data = JSON.parse(json) as Array<unknown>;
       // TODO: unsafe cast: Check data type
@@ -422,7 +422,7 @@ export class VizCollectionCatalogTabulator<
     event.preventDefault();
 
     const tr = (event.target as HTMLElement).closest('tr');
-    if (!tr) return;
+    if (!tr) {return;}
 
     // const row = this._dataTable.getData(tr);
 
@@ -446,7 +446,7 @@ export class VizCollectionCatalogTabulator<
   }
 
   private getContextMenu(): HTMLDivElement {
-    if (this._menu) return this._menu;
+    if (this._menu) {return this._menu;}
     this._menu = document.createElement('div');
     this._menu.id = uuid();
     this._menu.classList.add('catalog-menu');
@@ -472,7 +472,7 @@ export class VizCollectionCatalogTabulator<
   }
 
   private getContextMenuDiv(): HTMLDivElement {
-    if (this._menuDiv) return this._menuDiv;
+    if (this._menuDiv) {return this._menuDiv;}
     this._menuDiv = document.createElement('div');
     this._menuDiv.id = uuid();
     this._menuDiv.style.display = 'none';
@@ -486,7 +486,7 @@ export class VizCollectionCatalogTabulator<
   }
 
   public getCollectionCatalogComponent(): CollectionCatalogSelectorComponent {
-    if (this._itemCollectionSelector) return this._itemCollectionSelector;
+    if (this._itemCollectionSelector) {return this._itemCollectionSelector;}
     this._itemCollectionSelector = new CollectionCatalogSelectorComponent();
     this._itemCollectionSelector.getUI().classList.add('catalog-selector');
     this._itemCollectionSelector.onCreateNewCollection(
@@ -515,7 +515,7 @@ export class VizCollectionCatalogTabulator<
    * @returns   Chart's div element
    */
   public getContainer(): HTMLDivElement {
-    if (this._div) return this._div;
+    if (this._div) {return this._div;}
     this._div = document.createElement('div');
     this._div.id = uuid();
     this._div.classList.add('catalog-container');
@@ -529,7 +529,7 @@ export class VizCollectionCatalogTabulator<
   /**
    */
   private getSatCatDiv(): HTMLDivElement {
-    if (this._catalogTabulatorDiv) return this._catalogTabulatorDiv;
+    if (this._catalogTabulatorDiv) {return this._catalogTabulatorDiv;}
     this._catalogTabulatorDiv = document.createElement('div');
     this._catalogTabulatorDiv.id = `tabulator-div-${uuid()}`;
     this._catalogTabulatorDiv.classList.add('catalog-grid');

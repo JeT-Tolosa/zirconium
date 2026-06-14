@@ -21,17 +21,23 @@ export class ZirconHelper {
     const window: ZirconWindow = application
       .getObjectManager()
       .getExistingInstance(windowId, ZIRCON_WINDOW_TYPE) as ZirconWindow;
+    if (!window) {
+      console.error(`Moving window: Window with ID ${windowId} not found.`);
+      return;
+    }
     const sourceDesktop: ZirconDesktop = window.getParentDesktop();
+    if (!sourceDesktop) {
+      console.error(
+        `Moving window: Source desktop with ID ${sourceDesktop} not found.`,
+      );
+      return;
+    }
     const targetDesktop: ZirconDesktop = application
       .getObjectManager()
       .getExistingInstance(
         targetDesktopId,
         ZIRCON_DESKTOP_TYPE,
       ) as ZirconDesktop;
-    if (!window) {
-      console.error(`Moving window: Window with ID ${windowId} not found.`);
-      return;
-    }
     if (!targetDesktop) {
       console.error(
         `Moving window: Target desktop with ID ${targetDesktopId} not found.`,
@@ -39,7 +45,9 @@ export class ZirconHelper {
       return;
     }
     // add to target
-    if (targetDesktopId === sourceDesktop?.getId()) return Promise.resolve();
+    if (targetDesktopId === sourceDesktop?.getId()) {
+      return Promise.resolve();
+    }
     const targetDesktopState = targetDesktop.generateCurrentState();
     targetDesktopState.windowIds.push(windowId);
     application.emit('SET_OBJECT_STATE_REQUEST', {

@@ -74,7 +74,9 @@ export class VisibilityEngineCesium {
     );
     const ray = new Cesium.Ray(from, direction);
     const hit = this.viewer.scene.globe.pick(ray, this.viewer.scene);
-    if (!hit) return true;
+    if (!hit) {
+      return true;
+    }
     const distTarget = Cesium.Cartesian3.distance(from, to);
     const distHit = Cesium.Cartesian3.distance(from, hit);
     return distHit > distTarget - 1e-6;

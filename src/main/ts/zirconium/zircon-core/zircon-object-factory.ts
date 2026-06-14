@@ -3,42 +3,54 @@ import { jQueryFactory } from 'jquery/factory';
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
 import { ZirconObject, ZirconObjectState } from './zircon-object';
 
-export interface ZirconObjectFactory {
+export interface ZirconObjectFactory<
+  TState extends ZirconObjectState = ZirconObjectState,
+  TObject extends ZirconObject = ZirconObject,
+> {
   name: string;
   type: string;
   ancestorType: string;
-  create: (state: ZirconObjectState) => Promise<ZirconObject> | null;
+  create: (state: TState) => Promise<TObject>;
   contextMenuFactory: ZirconContextMenuFactory;
 }
 
-export function createObjectFactory(
-  name: string,
-  type: string,
-  ancestorType: string,
-  create: (state: ZirconObjectState) => Promise<ZirconObject> | null = null,
-  contextMenuFactory: ZirconContextMenuFactory = null,
-) {
-  return {
-    name: name,
-    type: type,
-    ancestorType: ancestorType,
-    create: create,
-    contextMenuFactory: contextMenuFactory,
-  };
-}
+// export function createObjectFactory<TState, TObject>(
+//   name: string,
+//   type: string,
+//   ancestorType: string,
+//   create: (state: TState) => Promise<TObject> = null,
+//   contextMenuFactory: ZirconContextMenuFactory = null,
+// ) {
+//   return {
+//     name: name,
+//     type: type,
+//     ancestorType: ancestorType,
+//     create: create,
+//     contextMenuFactory: contextMenuFactory,
+//   };
+// }
 
 export class ZirconFactoriesRegistry {
-  private _objectFactories: { [type: string]: ZirconObjectFactory } = {};
+  private _objectFactories: {
+    [type: string]: ZirconObjectFactory<ZirconObjectState, ZirconObject>;
+  } = {};
 
   constructor() {}
 
-  public registerObjectFactory(factory: ZirconObjectFactory): boolean {
-    if (!factory) return false;
-    if (!factory.type)
+  public registerObjectFactory(
+    factory: ZirconObjectFactory<ZirconObjectState, ZirconObject>,
+  ): boolean {
+    if (!factory) {
+      return false;
+    }
+    if (!factory.type) {
       throw new Error(
         `Asked to register a valid factory with invalid type ... factory = ${jQueryFactory.name}`,
       );
-    if (this._objectFactories[factory.type]) return false;
+    }
+    if (this._objectFactories[factory.type]) {
+      return false;
+    }
     this._objectFactories[factory.type] = factory;
     return true;
   }
@@ -49,16 +61,21 @@ export class ZirconFactoriesRegistry {
    * @returns
    */
   public isHandled(state: ZirconObjectState): boolean {
-    if (!state) return false;
-    if (!state.type)
+    if (!state) {
+      return false;
+    }
+    if (!state.type) {
       throw new Error(
         `Object states with undefined type are not allowed ID = ${state.id}`,
       );
+    }
     return true;
   }
 
   public getHandlingFactory(type: string): ZirconObjectFactory {
-    if (!type) return null;
+    if (!type) {
+      return null;
+    }
     return this._objectFactories[type];
   }
 
@@ -71,15 +88,19 @@ export class ZirconFactoriesRegistry {
   }
 
   public createInstance(state: any): Promise<any> | null {
-    if (!this.isHandled(state)) return null;
-    if (!state.type)
+    if (!this.isHandled(state)) {
+      return null;
+    }
+    if (!state.type) {
       throw new Error(
         `Object state has no type defined:  ${JSON.stringify(state)}}`,
       );
-    if (!this._objectFactories[state.type])
+    }
+    if (!this._objectFactories[state.type]) {
       throw new Error(
         `Object type ${state.type} has no associated Factory. Please add one for this type using Application.registerObjectFactory(factory: ZirconObjectFactory)`,
       );
+    }
     return this._objectFactories[state.type].create(state);
   }
 

@@ -9,7 +9,8 @@ import { MergeZirconRegistries } from '../../zirconium/zircon-event';
 import { GlobeViewer } from '../../libraries/spatial/globe-viewer/globe-viewer';
 import { GlobeViewerCesium } from '../../libraries/spatial/globe-viewer/globe-viewer-cesium';
 
-export const CESIUM_VISUALIZER_TYPE: string = 'cesium-visualizer';
+export const CESIUM_WITH_DATA_PROVIDERS_VISUALIZER_TYPE: string =
+  'cesium-with-data-providers-visualizer';
 /**
  * Visualizer based on Cesium library
  * https://cesium.com/platform/cesiumjs/
@@ -19,17 +20,17 @@ export const CESIUM_VISUALIZER_TYPE: string = 'cesium-visualizer';
  *
  */
 
-export interface VizCesiumState extends ZirconVizState {
-  type: typeof CESIUM_VISUALIZER_TYPE;
+export interface VizCesiumWithDataProvidersState extends ZirconVizState {
+  type: typeof CESIUM_WITH_DATA_PROVIDERS_VISUALIZER_TYPE;
   token?: string;
   sunLightning?: boolean;
   timeControllerId?: string;
 }
 
-const DEFAULT_CESIUM_TOKEN: string =
+const JET_CESIUM_TOKEN: string =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MTQ3MzJjOS1jY2MwLTRiOGUtYTU5Ny1kNTMxNTQ2MDIxOGIiLCJpZCI6Mzk2Mzc0LCJpYXQiOjE3NzI0MTE2OTB9.O-0_Gu3rYf-7ijUGGlWZtrybQ3OhKMtx0mjBidAcBIw';
 
-export type VizCesiumEventRegistry = MergeZirconRegistries<
+export type VizCesiumWithDataProvidersEventRegistry = MergeZirconRegistries<
   {
     incoming: {};
     outgoing: {};
@@ -37,11 +38,13 @@ export type VizCesiumEventRegistry = MergeZirconRegistries<
   ZirconVizEventRegistry
 >;
 
-export class VizCesium<
-  R extends VizCesiumEventRegistry = VizCesiumEventRegistry,
+export class VizCesiumWithDataProviders<
+  R extends VizCesiumWithDataProvidersEventRegistry =
+    VizCesiumWithDataProvidersEventRegistry,
 > extends ZirconViz<R> {
-  public static readonly CESIUM_VISUALIZER_TYPE = 'cesium-visualizer';
-  private _token: string = DEFAULT_CESIUM_TOKEN;
+  public static readonly CESIUM_WITH_DATA_PROVIDERS_VISUALIZER_TYPE =
+    CESIUM_WITH_DATA_PROVIDERS_VISUALIZER_TYPE;
+  private _token: string = JET_CESIUM_TOKEN;
   private _sunLightning: boolean = true;
   private __mainDiv: HTMLDivElement = null;
   private __viewer: GlobeViewer = null;
@@ -49,26 +52,30 @@ export class VizCesium<
   /**
    * constructor
    */
-  constructor(state?: VizCesiumState) {
+  constructor(state?: VizCesiumWithDataProvidersState) {
     super(state);
   }
 
   public override getType(): string {
-    return VizCesium.CESIUM_VISUALIZER_TYPE;
+    return VizCesiumWithDataProviders.CESIUM_WITH_DATA_PROVIDERS_VISUALIZER_TYPE;
   }
 
-  public override generateCurrentState(): VizCesiumState {
+  public override generateCurrentState(): VizCesiumWithDataProvidersState {
     const baseState = super.generateCurrentState();
     return {
       ...baseState,
-      type: VizCesium.CESIUM_VISUALIZER_TYPE,
+      type: VizCesiumWithDataProviders.CESIUM_WITH_DATA_PROVIDERS_VISUALIZER_TYPE,
       sunLightning: this.getSunLightning(),
       token: this.getToken(),
     };
   }
 
-  public override async setState(state?: VizCesiumState): Promise<void> {
-    if (!state) {return;}
+  public override async setState(
+    state?: VizCesiumWithDataProvidersState,
+  ): Promise<void> {
+    if (!state) {
+      return;
+    }
     await super.setState(state);
     if (state.token) {
       this.setToken(state.token);
@@ -108,7 +115,9 @@ export class VizCesium<
   }
 
   private async createViewer(): Promise<void> {
-    if (this.__viewer) {return;}
+    if (this.__viewer) {
+      return;
+    }
     const cesiumOptions = {
       token: this.getToken(),
       sunLightning: this.getSunLightning(),
@@ -117,7 +126,9 @@ export class VizCesium<
   }
 
   private async displayViewer(): Promise<void> {
-    if (!this.__viewer) {await this.createViewer();}
+    if (!this.__viewer) {
+      await this.createViewer();
+    }
     this.__viewer.displayIn(this.getContainer());
   }
 
@@ -129,7 +140,9 @@ export class VizCesium<
    * Get Main div element
    */
   public override getContainer(): HTMLDivElement {
-    if (this.__mainDiv) {return this.__mainDiv;}
+    if (this.__mainDiv) {
+      return this.__mainDiv;
+    }
     this.__mainDiv = document.createElement('div');
     this.__mainDiv.style.width = '100%';
     this.__mainDiv.style.height = '100%';

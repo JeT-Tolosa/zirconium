@@ -1,8 +1,12 @@
+import { v4 as uuid } from 'uuid';
 import {
   Satellite,
   SATELLITE_TYPE,
 } from '../../../libraries/spatial/satellite/satellite';
-import { CatalogEngine, DataProviderCreatorFunction } from '../catalog-engine';
+import {
+  CatalogEngine,
+  ItemArrayDataProviderCreatorFunction,
+} from '../catalog-engine';
 import { ZirconEngineState } from '../../../zirconium/zircon-core/zircon-engine';
 import { ItemArray } from '../../../libraries/collection/item-array';
 import { ZirconDataProvider } from '../../../zirconium/zircon-data/zircon-data-provider';
@@ -11,7 +15,7 @@ export interface SatelliteCatalogEngineState extends ZirconEngineState {
   type: typeof SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE;
 }
 
-const satelliteArrayDataProviderCreator: DataProviderCreatorFunction<
+const satelliteArrayDataProviderCreator: ItemArrayDataProviderCreatorFunction<
   Satellite
 > = (
   dataProviderName: string,
@@ -19,8 +23,13 @@ const satelliteArrayDataProviderCreator: DataProviderCreatorFunction<
   items: Satellite[] = [],
 ): ZirconDataProvider<ItemArray<Satellite>> => {
   const dataProvider = new ZirconDataProvider<ItemArray<Satellite>>(
-    dataProviderName,
-    dataType,
+    SATELLITE_TYPE,
+    {
+      id: uuid(),
+      name: dataProviderName,
+      type: SATELLITE_TYPE,
+      dataType: dataType,
+    },
   );
   const itemArray = new ItemArray<Satellite>({
     itemType: SATELLITE_TYPE,
@@ -28,7 +37,7 @@ const satelliteArrayDataProviderCreator: DataProviderCreatorFunction<
   });
   itemArray.setItems(items);
   dataProvider.setData(itemArray);
-  dataProvider.setEventDispatcher;
+  // dataProvider.setEventDispatcher;
   return dataProvider;
 };
 

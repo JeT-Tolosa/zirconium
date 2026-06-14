@@ -11,11 +11,11 @@ import {
   ZIRCON_DESKTOP_TYPE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
 } from '../../zirconium/zircon-core/zircon-types';
-import { VizTLEPropagatorFactory } from '../engines/visualizers/tle-propagator/viz-tle-propagator-factory';
+import { VizTLEPropagatorFactory } from '../visualizers/tle-propagator/viz-tle-propagator-factory';
 import {
   VIZ_TLE_PROPAGATOR_TYPE,
   VizTLEPropagatorState,
-} from '../engines/visualizers/tle-propagator/viz-tle-propagator';
+} from '../visualizers/tle-propagator/viz-tle-propagator';
 
 /**
  * DESKTOP6
@@ -45,7 +45,7 @@ export async function createDesktop6(
 
   const tlePropagatorVizState: VizTLEPropagatorState = {
     type: VIZ_TLE_PROPAGATOR_TYPE,
-    id: 'tleProagatorVizId',
+    id: 'tlePropagatorVizId',
   };
   app.registerObjectState(tlePropagatorVizState);
   const tlePropagatorWindowState: ZirconVizWindowState = {
@@ -65,6 +65,7 @@ export async function createDesktop6(
     id: `desktop6-${uuid()}`,
     name: 'JS',
     windowIds: [jsSandboxWindowState.id, tlePropagatorWindowState.id],
+    // windowIds: [tlePropagatorWindowState.id],
   };
   app.registerObjectState(desktop6State);
   return Promise.resolve(desktop6State);

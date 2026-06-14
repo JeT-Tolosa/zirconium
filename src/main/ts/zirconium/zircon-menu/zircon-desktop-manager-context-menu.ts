@@ -17,15 +17,22 @@ export class ZirconContextMenuFactoryDesktopManager extends ZirconContextMenuFac
   private getAssociatedZirconDesktopManager(
     element: Element,
   ): ZirconDesktopManager {
-    if (!element) return null;
-    if (!(element instanceof HTMLElement)) return null;
+    if (!element) {
+      return null;
+    }
+    if (!(element instanceof HTMLElement)) {
+      return null;
+    }
     const htmlElement: HTMLElement = element;
-    if (!htmlElement.checkVisibility({ opacityProperty: true })) return;
+    if (!htmlElement.checkVisibility({ opacityProperty: true })) {
+      return;
+    }
     const zirconObjectId = htmlElement.getAttribute(
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
     );
-    if (zirconObjectId != this.getApplication().getDesktopManager().getId())
+    if (zirconObjectId !== this.getApplication().getDesktopManager().getId()) {
       return null;
+    }
     return this.getApplication().getDesktopManager();
   }
 
@@ -36,7 +43,9 @@ export class ZirconContextMenuFactoryDesktopManager extends ZirconContextMenuFac
   public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
     const desktopManager: ZirconDesktopManager =
       this.getAssociatedZirconDesktopManager(element);
-    if (!desktopManager) return null;
+    if (!desktopManager) {
+      return null;
+    }
 
     return [
       {

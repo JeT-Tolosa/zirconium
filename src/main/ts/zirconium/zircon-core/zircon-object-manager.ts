@@ -32,8 +32,9 @@ export class ZirconObjectManager extends ZirconAppObject {
   }
 
   public getObjectRegistry(): ZirconFactoriesRegistry {
-    if (!this.__objectFactoriesRegistry)
+    if (!this.__objectFactoriesRegistry) {
       this.__objectFactoriesRegistry = new ZirconFactoriesRegistry();
+    }
     return this.__objectFactoriesRegistry;
   }
 
@@ -42,17 +43,21 @@ export class ZirconObjectManager extends ZirconAppObject {
   }
 
   public async registerObjectFactory(
-    factory: ZirconObjectFactory,
+    factory: ZirconObjectFactory<ZirconObjectState, ZirconObject>,
   ): Promise<boolean> {
-    if (!factory) return false;
-    if (!factory.type)
+    if (!factory) {
+      return false;
+    }
+    if (!factory.type) {
       throw new Error(
         `Object factory must handle an object type. Factory name = ${factory.name}`,
       );
-    if (!factory.ancestorType)
+    }
+    if (!factory.ancestorType) {
       throw new Error(
         `Object factory must inherent from an object type. Factory name = ${factory.name}. default should be ${ZIRCON_OBJECT_TYPE}`,
       );
+    }
     const existingFactory = this.getHandlingFactory(factory.type);
     if (existingFactory && existingFactory.name === factory.name) {
       this.getLogger().warn(
@@ -130,8 +135,12 @@ export class ZirconObjectManager extends ZirconAppObject {
   // }
 
   private addInstance(obj: ZirconObject): ZirconObject {
-    if (!obj) return null;
-    if (this.__objectInstances[obj.getId()] === obj) return obj;
+    if (!obj) {
+      return null;
+    }
+    if (this.__objectInstances[obj.getId()] === obj) {
+      return obj;
+    }
     this.__objectInstances[obj.getId()] = obj;
     return obj;
   }
@@ -142,10 +151,15 @@ export class ZirconObjectManager extends ZirconAppObject {
    * @returns
    */
   public registerObjectState(state: ZirconObjectState): boolean {
-    if (!state) return false;
-    if (!state.id) throw new Error('Object state must have an id');
-    if (!state.type)
+    if (!state) {
+      return false;
+    }
+    if (!state.id) {
+      throw new Error('Object state must have an id');
+    }
+    if (!state.type) {
       throw new Error(`Object ${state.id} state must have a type`);
+    }
     // add or update state
     this.__registeredStates[state.id] = state;
     this.emit('OBJECT_STATE_REGISTERED', { state: state });
@@ -161,11 +175,14 @@ export class ZirconObjectManager extends ZirconAppObject {
     type: ZirconType = ZIRCON_OBJECT_TYPE,
   ): ZirconObject | null {
     const instance = this.__objectInstances[objectId];
-    if (!instance) return null;
-    if (!this.isTypeOf(instance.getType(), type as string))
+    if (!instance) {
+      return null;
+    }
+    if (!this.isTypeOf(instance.getType(), type as string)) {
       throw new Error(
         `Existing object Id ${objectId} exists with type ${instance.getType()} but was requested with type ${type}`,
       );
+    }
     return instance;
   }
 
@@ -183,12 +200,14 @@ export class ZirconObjectManager extends ZirconAppObject {
       return null;
     }
     instance = await this.createObject(state);
-    if (!instance)
-      if (!this.isTypeOf(instance.getType(), type as string))
+    if (!instance) {
+      if (!this.isTypeOf(instance.getType(), type as string)) {
         throw new Error(
           `Object with id ${objectId} is not the expected class: ${instance.getType()} which is not ofType ${type}`,
         );
-    this.addInstance(instance);
+      }
+      this.addInstance(instance);
+    }
     return instance;
   }
 
@@ -199,7 +218,9 @@ export class ZirconObjectManager extends ZirconAppObject {
   //   }
 
   public getChildrenObjectTypes(rootType: string): string[] {
-    if (!rootType) return;
+    if (!rootType) {
+      return;
+    }
     return Object.values(this.getObjectRegistry().getFactories())
       .filter((factory: ZirconObjectFactory) => {
         return this.isTypeOf(factory.type, rootType);
@@ -212,7 +233,9 @@ export class ZirconObjectManager extends ZirconAppObject {
   public getRegisteredObjectsStates(
     type: string = ZIRCON_OBJECT_TYPE,
   ): ZirconObjectState[] {
-    if (!type) return;
+    if (!type) {
+      return;
+    }
     return Object.values(this.__registeredStates).filter(
       (state: ZirconObjectState) => {
         return this.isTypeOf(state?.type, type);

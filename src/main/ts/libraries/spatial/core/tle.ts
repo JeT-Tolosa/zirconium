@@ -87,12 +87,16 @@ export class TLEHelper {
   public static parseExponential(str: string): number {
     const cleaned = str.trim();
 
-    if (!cleaned) return 0;
+    if (!cleaned) {
+      return 0;
+    }
 
     // format TLE: 12345-4 => 0.12345e-4
     const match = cleaned.match(/^([+-]?\d+)([+-]\d+)$/);
 
-    if (!match) return parseFloat(cleaned);
+    if (!match) {
+      return parseFloat(cleaned);
+    }
 
     const base = parseFloat('0.' + match[1]);
     const exp = parseInt(match[2], 10);
@@ -296,7 +300,9 @@ export class TLEHelper {
    * @throws {Error} If the input format is invalid or the day-of-year is out of range
    */
   public static parseTLEEpochFromString(epoch: string): Date {
-    if (!epoch) return null;
+    if (!epoch) {
+      return null;
+    }
     // Check type
     if (typeof epoch !== 'string') {
       throw new Error('Epoch must be a string (YYDDD.DDDDDDDD)');
@@ -307,10 +313,11 @@ export class TLEHelper {
 
     // Check format
     const match = e.match(/^(\d{2})(\d{3})(\.\d+)?$/);
-    if (!match)
+    if (!match) {
       throw new Error(
         `Invalid TLE epoch format. Expected YYDDD.DDDDDDDD. '${e}' is not`,
       );
+    }
 
     const yy = parseInt(match[1], 10);
     const doy = parseInt(match[2], 10);

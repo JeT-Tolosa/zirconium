@@ -99,7 +99,7 @@ export class VizDataProviderExplorer<
   }
 
   private getJsonEditorContainer(): HTMLElement {
-    if (this._jsonEditorContainer) return this._jsonEditorContainer;
+    if (this._jsonEditorContainer) {return this._jsonEditorContainer;}
     this._jsonEditorContainer = document.createElement('div');
     this._jsonEditorContainer.classList.add('provider-json-view');
     this._jsonEditor = new JSONEditor(this._jsonEditorContainer, {
@@ -112,7 +112,7 @@ export class VizDataProviderExplorer<
     return this._jsonEditorContainer;
   }
 
-  private refreshProviderList(): void {
+  private async refreshProviderList(): Promise<void> {
     const select = this.getProviderSelector();
     const previousSelection = select.value;
 
@@ -137,11 +137,11 @@ export class VizDataProviderExplorer<
     }
     if (dataProviderDescriptors.length > 0) {
       select.selectedIndex = Math.max(select.selectedIndex, 0);
-      this.displaySelectedProvider();
+      await this.displaySelectedProvider();
     }
   }
 
-  private displaySelectedProvider(): void {
+  private async displaySelectedProvider(): Promise<void> {
     try {
       const providerId = this.getProviderSelector().value;
       const manager = this.getApplication().getDataProviderManager();
@@ -152,7 +152,7 @@ export class VizDataProviderExplorer<
         this.displayMessage('Provider not found', 'warning');
         return;
       }
-      const data = provider.getData();
+      const data = await provider.getData();
       this._jsonEditor?.set(data);
       const count =
         data && typeof data === 'object' ? Object.keys(data).length : 0;
@@ -166,7 +166,7 @@ export class VizDataProviderExplorer<
   }
 
   private getRefreshButton(): HTMLIonButtonElement {
-    if (this._refreshButton) return this._refreshButton;
+    if (this._refreshButton) {return this._refreshButton;}
 
     this._refreshButton = document.createElement('ion-button');
     this._refreshButton.classList.add('provider-refresh-button');
@@ -181,7 +181,7 @@ export class VizDataProviderExplorer<
   }
 
   private getProviderSelector(): HTMLSelectElement {
-    if (this._providerSelect) return this._providerSelect;
+    if (this._providerSelect) {return this._providerSelect;}
 
     this._providerSelect = document.createElement('select');
     this._providerSelect.classList.add('provider-selector');
@@ -194,7 +194,7 @@ export class VizDataProviderExplorer<
   }
 
   private getOutputElement(): HTMLParagraphElement {
-    if (this._output) return this._output;
+    if (this._output) {return this._output;}
 
     this._output = document.createElement('p');
     this._output.classList.add('provider-output');
@@ -203,7 +203,7 @@ export class VizDataProviderExplorer<
   }
 
   public getContainer(): HTMLDivElement {
-    if (this._div) return this._div;
+    if (this._div) {return this._div;}
 
     this._div = document.createElement('div');
     this._div.id = uuid();

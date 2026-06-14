@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export abstract class CesiumPrimitiveAdapter<T extends object> {
+export abstract class ToCesiumPrimitiveConverter<T extends object> {
   /**
    * Creates the Cesium primitive associated with the data source.
    * This method must be implemented by subclasses.

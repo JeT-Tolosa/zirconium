@@ -98,20 +98,24 @@ export class ZirconVizWindow<
   protected override async setState(
     state: ZirconVizWindowState,
   ): Promise<void> {
-    if (!state) return;
+    if (!state) {
+      return;
+    }
     await super.setState(state);
-    this.setVisualizerId(state.vizId);
+    await this.setVisualizerId(state.vizId);
   }
 
-  private setVisualizerId(_vizId: string): boolean {
-    if (this._vizId === _vizId) return false;
-    this._vizId = _vizId;
+  private async setVisualizerId(vizId: string): Promise<boolean> {
+    if (this._vizId === vizId) {
+      return false;
+    }
+    this._vizId = vizId;
     if (this.__viz) {
       // this.__viz.stop();  // TODO implement stop in visualizers
       this.__viz = null;
     }
-    this.displayVisualizer();
     // TODO: change visusalizer's display if window is displayed...
+    // await this.displayVisualizer(); (double function call in onPanelCreated)
     return true;
   }
 
@@ -150,43 +154,59 @@ export class ZirconVizWindow<
     return false;
   }
 
-  protected override onPanelCreated(panel: IJSPanelInstance): void {
-    if (!panel)
+  protected override async onPanelCreated(
+    panel: IJSPanelInstance,
+  ): Promise<void> {
+    if (!panel) {
       throw new Error(
         `panel should not be null in Visualizer window Creation ID: ${this.getId()}`,
       );
+    }
     panel.classList.add(ZIRCON_VISUALIZER_WINDOW_CLASS);
 
-    this.displayVisualizer();
+    await this.displayVisualizer();
     panel?.headerlogo?.addEventListener('click', () => {
       this.displayParameterWindow();
     });
   }
 
   public getVisualizer(): Promise<ZirconViz> {
-    if (this.__viz && this.__viz.getId() === this._vizId)
+    if (this.__viz && this.__viz.getId() === this._vizId) {
       return Promise.resolve(this.__viz);
+    }
     return this.getApplication()
       .getInstance(this._vizId)
       .then((instance) => {
-        if (!instance || !(instance instanceof ZirconViz))
+        if (!instance || !(instance instanceof ZirconViz)) {
           throw new Error(
             `Unable to retrieve Visualizer Id ${this._vizId} in window ${this.getId()}`,
           );
+        }
         this.__viz = instance;
         return this.__viz;
       });
   }
 
   private removeVisualizer(): void {
-    if (!this.isDisplayed()) return;
+    if (!this.isDisplayed()) {
+      return;
+    }
     this.getWindowContent().innerHTML = '';
     this._vizId = null;
     this.__viz = null;
   }
 
-  private displayVisualizer(): void {
-    if (!this.isDisplayed()) return;
+  private async undisplayVisualizer(): Promise<void> {
+    if (!this.__viz) {
+      return;
+    }
+    this.__viz.undisplayFromParent();
+  }
+
+  private async displayVisualizer(): Promise<void> {
+    if (!this.isDisplayed()) {
+      return;
+    }
     this.getWindowContent().innerHTML = '';
     if (!this._vizId) {
       this.getWindowContent().innerHTML = `<p>No Visualizer defined (vizId = null)</p>`;
@@ -207,10 +227,11 @@ export class ZirconVizWindow<
   }
 
   public override displayParameters(container: HTMLElement) {
-    if (!container)
+    if (!container) {
       throw new Error(
         `displaying parameters should not be called with an invalid container in window Id ${this.getId()}`,
       );
+    }
     super.displayParameters(container);
     let h2: HTMLHeadingElement = document.createElement('h2');
     h2.innerText = `Window ${this.getId()}`;

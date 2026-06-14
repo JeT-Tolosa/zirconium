@@ -195,7 +195,9 @@ export class ZirconDesktopManager<
    * @param state The new state of the desktop manager
    */
   private onDESKTOP_MANAGER_STATE(state: ZirconDesktopManagerState): void {
-    if (this.getId() !== state.id) return;
+    if (this.getId() !== state.id) {
+      return;
+    }
     this.setState(state);
   }
 
@@ -215,7 +217,9 @@ export class ZirconDesktopManager<
   protected override async setState(
     state: ZirconDesktopManagerState,
   ): Promise<void> {
-    if (!state) return;
+    if (!state) {
+      return;
+    }
     await super.setState(state);
     this.setDesktopIds(state.desktopIds);
   }
@@ -253,9 +257,13 @@ export class ZirconDesktopManager<
    * @returns A promise that resolves when the desktop is displayed
    */
   private displayDesktop(desktopId: string): Promise<void> {
-    if (!desktopId) return Promise.resolve();
+    if (!desktopId) {
+      return Promise.resolve();
+    }
     const ui: ZirconDesktopManagerUI = this.__displayedDesktops[desktopId];
-    if (ui) return Promise.resolve();
+    if (ui) {
+      return Promise.resolve();
+    }
     return this.getApplication()
       .getInstance(desktopId)
       .then((obj: ZirconObject) => {
@@ -288,9 +296,13 @@ export class ZirconDesktopManager<
    * @returns True if the desktop was successfully undisplayed, false otherwise
    */
   private undisplayDesktop(desktopId: string): boolean {
-    if (!desktopId) return false;
+    if (!desktopId) {
+      return false;
+    }
     const ui: ZirconDesktopManagerUI = this.__displayedDesktops[desktopId];
-    if (ui) return false;
+    if (ui) {
+      return false;
+    }
     this.getDesktopsContainer().removeChild(ui.desktopElement);
     this.getDesktopsSelectorsContainer().removeChild(ui.desktopSelectorElement);
     delete this.__displayedDesktops[desktopId];
@@ -357,10 +369,16 @@ export class ZirconDesktopManager<
    * @returns True if something was added to the DOM, false otherwise
    */
   public async displayUIIn(parent: HTMLElement): Promise<boolean> {
-    if (!parent) return false;
+    if (!parent) {
+      return false;
+    }
     const mainDiv = this.getMainDiv();
-    if (!mainDiv) return false;
-    if (parent.contains(mainDiv)) return false;
+    if (!mainDiv) {
+      return false;
+    }
+    if (parent.contains(mainDiv)) {
+      return false;
+    }
     // append app mainDiv in given parent
     parent.appendChild(mainDiv);
     // append desktopManager UI in app mainDiv
@@ -380,7 +398,9 @@ export class ZirconDesktopManager<
    * @returns The main div element
    */
   private getMainDiv(): HTMLDivElement {
-    if (this.__mainDiv) return this.__mainDiv;
+    if (this.__mainDiv) {
+      return this.__mainDiv;
+    }
     this.__mainDiv = document.createElement('div');
     this.__mainDiv.setAttribute(
       ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
@@ -397,7 +417,9 @@ export class ZirconDesktopManager<
    * @returns The desktops container div element
    */
   private getDesktopsContainer(): HTMLDivElement {
-    if (this.__desktopContainer) return this.__desktopContainer;
+    if (this.__desktopContainer) {
+      return this.__desktopContainer;
+    }
     this.__desktopContainer = document.createElement('div');
     this.__desktopContainer.classList.add(DESKTOPS_CONTAINER_CLASS);
     this.__desktopContainer.id = `desktop-container-${this.getId()}`;
@@ -412,7 +434,9 @@ export class ZirconDesktopManager<
   }
 
   private getToolbarContainer(): HTMLDivElement {
-    if (this.__toolbarContainer) return this.__toolbarContainer;
+    if (this.__toolbarContainer) {
+      return this.__toolbarContainer;
+    }
     this.__toolbarContainer = document.createElement('div');
     this.__toolbarContainer.classList.add(TOOLBAR_CONTAINER_CLASS);
     this.__toolbarContainer.id = `toolbar-container-${this.getId()}`;
@@ -429,8 +453,9 @@ export class ZirconDesktopManager<
    * @returns The desktop selectors container div element
    */
   private getDesktopsSelectorsContainer(): HTMLDivElement {
-    if (this.__desktopsSelectorContainer)
+    if (this.__desktopsSelectorContainer) {
       return this.__desktopsSelectorContainer;
+    }
     this.__desktopsSelectorContainer = document.createElement('div');
     this.__desktopsSelectorContainer.classList.add(DESKTOPS_SELECTOR_CLASS);
     this.__desktopsSelectorContainer.id = `desktop-selector-${this.getId()}`;
@@ -443,7 +468,9 @@ export class ZirconDesktopManager<
   }
 
   private getHeaderDiv(): HTMLDivElement {
-    if (this.__headerDiv) return this.__headerDiv;
+    if (this.__headerDiv) {
+      return this.__headerDiv;
+    }
     this.__headerDiv = document.createElement('div');
     this.__headerDiv.classList.add(DESKTOPS_MANAGER_HEADER_CLASS);
     this.__headerDiv.id = `desktops-manager-header-${this.getId()}`;
@@ -526,9 +553,13 @@ export class ZirconDesktopManager<
    * @returns True if the desktop was successfully activated, false otherwise
    */
   private setActiveDesktop(desktopId: string): boolean {
-    if (!desktopId) return false;
+    if (!desktopId) {
+      return false;
+    }
     const ui = this.__displayedDesktops[desktopId];
-    if (!ui) return;
+    if (!ui) {
+      return;
+    }
 
     Object.values(this.__displayedDesktops).forEach(
       (ui: ZirconDesktopManagerUI) => {
@@ -553,7 +584,9 @@ export class ZirconDesktopManager<
   }
 
   public addToolbarElement(toolbarElement: ToolbarElementDescriptor): string {
-    if (!toolbarElement) return;
+    if (!toolbarElement) {
+      return;
+    }
     const id = `toolber-element-${uuid()}`;
     this.__toolbarElements[id] = toolbarElement;
     this.displayToolbarElement(id);
@@ -562,8 +595,12 @@ export class ZirconDesktopManager<
 
   private displayToolbarElement(id: string): void {
     const toolbarElement: ToolbarElementDescriptor = this.__toolbarElements[id];
-    if (!toolbarElement) return;
-    if (!this.__toolbarContainer) return;
+    if (!toolbarElement) {
+      return;
+    }
+    if (!this.__toolbarContainer) {
+      return;
+    }
     const toolDiv = document.createElement('div');
     toolDiv.id = id;
     toolDiv.appendChild(toolbarElement.content);

@@ -7,10 +7,7 @@ import {
   VIZ_AIS_CATALOG_TABULATOR_TYPE,
   VizAISCatalogTabulatorState,
 } from '../../zircon-visualizers/maritime/viz-eye-ais-catalog-tabulator';
-import {
-  VIZ_AIS_LOADER_TYPE,
-  VizAISLoaderState,
-} from '../../zircon-visualizers/maritime/viz-eye-ais-loader';
+import { VIZ_AIS_LOADER_TYPE } from '../../zircon-visualizers/maritime/viz-eye-ais-loader';
 import {
   ZIRCON_DESKTOP_TYPE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
@@ -21,6 +18,7 @@ import {
   VizDataProviderExplorer,
   VizDataProviderExplorerState,
 } from '../../zircon-visualizers/data/viz-data-provider-explorer';
+import { VizLoaderState } from '../../zircon-visualizers/data-loader/viz-loader';
 
 /**
  * DESKTOP5
@@ -32,7 +30,7 @@ export async function createDesktop5(
   await app.registerObjectFactory(new VizAISCatalogTabulatorFactory());
   await app.registerObjectFactory(new VizDataProviderFactory(app));
 
-  const aisLoaderViz: VizAISLoaderState = {
+  const aisLoaderViz: VizLoaderState = {
     id: 'aisLoaderVizId',
     type: VIZ_AIS_LOADER_TYPE,
     name: 'AIS Loader',

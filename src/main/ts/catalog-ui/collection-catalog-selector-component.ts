@@ -73,15 +73,20 @@ export class CollectionCatalogSelectorComponent {
     if (
       !this.getItemCollectionSelect().options ||
       this.getItemCollectionSelect().options.length <= 0
-    )
+    ) {
       return null;
+    }
     const selectedIndex = this.getItemCollectionSelect().selectedIndex;
-    if (selectedIndex < 0) return null;
+    if (selectedIndex < 0) {
+      return null;
+    }
     return this.getItemCollectionSelect().options[selectedIndex]?.value;
   }
 
   public getMainDiv(): HTMLDivElement {
-    if (this.__mainDiv) return this.__mainDiv;
+    if (this.__mainDiv) {
+      return this.__mainDiv;
+    }
     this.__mainDiv = document.createElement('div');
     this.__mainDiv.classList.add('catalog-collection-selector');
     this.__mainDiv.appendChild(this.getSelectorLabel());
@@ -93,7 +98,9 @@ export class CollectionCatalogSelectorComponent {
   }
 
   public getSelectorLabel(): HTMLLabelElement {
-    if (this.__selectorLabel) return this.__selectorLabel;
+    if (this.__selectorLabel) {
+      return this.__selectorLabel;
+    }
     this.__selectorLabel = document.createElement('label');
     this.__selectorLabel.innerHTML = 'Choose catalog:';
     this.__selectorLabel.setAttribute('for', this.getItemCollectionSelect().id);
@@ -103,7 +110,9 @@ export class CollectionCatalogSelectorComponent {
   /**
    */
   public getCatIdLabel(): HTMLLabelElement {
-    if (this.__collectionIdLabel) return this.__collectionIdLabel;
+    if (this.__collectionIdLabel) {
+      return this.__collectionIdLabel;
+    }
     this.__collectionIdLabel = document.createElement('label');
     this.__collectionIdLabel.innerHTML = `no selected`;
     return this.__collectionIdLabel;
@@ -112,15 +121,18 @@ export class CollectionCatalogSelectorComponent {
   /**
    */
   public getCatCountLabel(): HTMLLabelElement {
-    if (this.__catCountLabel) return this.__catCountLabel;
+    if (this.__catCountLabel) {
+      return this.__catCountLabel;
+    }
     this.__catCountLabel = document.createElement('label');
     this.__catCountLabel.innerHTML = `?`;
     return this.__catCountLabel;
   }
 
   public getCreateNewCatalogButton(): HTMLElement {
-    if (this.__createNewCollectionButton)
+    if (this.__createNewCollectionButton) {
       return this.__createNewCollectionButton;
+    }
 
     this.__createNewCollectionButton = document.createElement('ion-button');
 
@@ -148,7 +160,9 @@ export class CollectionCatalogSelectorComponent {
   }
 
   public getItemCollectionSelect(): HTMLSelectElement {
-    if (this.__collectionSelect) return this.__collectionSelect;
+    if (this.__collectionSelect) {
+      return this.__collectionSelect;
+    }
     this.__collectionSelect = document.createElement('select');
     this.__collectionSelect.id = uuid();
     this.__collectionSelect.addEventListener('change', (_ev: Event) => {
@@ -162,10 +176,14 @@ export class CollectionCatalogSelectorComponent {
 
   public selectItemCollection(collectionId: string): boolean {
     let newSelectedIndex: number = -1;
-    for (let i = 0; i < this.getItemCollectionSelect().options.length; i++)
-      if (collectionId === this.getItemCollectionSelect().options[i].value)
+    for (let i = 0; i < this.getItemCollectionSelect().options.length; i++) {
+      if (collectionId === this.getItemCollectionSelect().options[i].value) {
         newSelectedIndex = i;
-    if (newSelectedIndex < 0) return false;
+      }
+    }
+    if (newSelectedIndex < 0) {
+      return false;
+    }
     this.getItemCollectionSelect().selectedIndex = newSelectedIndex;
     this.getCatIdLabel().innerHTML = `ID = ${collectionId}
     index = ${newSelectedIndex}`;
@@ -179,7 +197,7 @@ export class CollectionCatalogSelectorComponent {
    * @param catalogId
    * @returns
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   public setItemCollectionDescriptors(
     itemCollectionDescriptors: ItemCollectionDescriptor[],
   ): boolean {

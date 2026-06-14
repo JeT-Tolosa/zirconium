@@ -56,13 +56,20 @@ export abstract class VizJSChart<
     state: VizJSChartState<TType>,
   ): Promise<void> {
     await super.setState(state);
-    if (!state) return;
-    if (state.chartType && state.chartType !== this.getChartType())
+    if (!state) {
+      return;
+    }
+    if (state.chartType && state.chartType !== this.getChartType()) {
       throw new Error(
         `Invalid chart type ${state.chartType} for this visualizer`,
       );
-    if (state.series) this.setSeries(state.series);
-    if (state.options) this.setChartOptions(state.options);
+    }
+    if (state.series) {
+      this.setSeries(state.series);
+    }
+    if (state.options) {
+      this.setChartOptions(state.options);
+    }
   }
 
   public override generateCurrentState(): VizJSChartState<TType> {
@@ -107,14 +114,16 @@ export abstract class VizJSChart<
    * @param series
    */
   public setSeries(series: DataSeries<ChartData<TType>>): void {
-    if (this._series === series) return;
-    if (this._series)
+    if (this._series === series) {
+      return;
+    }
+    if (this._series) {
       this._series.removeListener('SERIES_DATA_CHANGED', this.onSeriesChange);
-
+    }
     this._series = series;
-    if (this._series)
+    if (this._series) {
       this._series.addListener('SERIES_DATA_CHANGED', this.onSeriesChange);
-
+    }
     //this.emit('VIZ_INPUT_SERIES_CHANGED', { id: this.series.getId() });
   }
 
@@ -127,7 +136,9 @@ export abstract class VizJSChart<
   }
 
   public setChartOptions(value: ChartOptions<TType>): boolean {
-    if (!value) return false;
+    if (!value) {
+      return false;
+    }
     this._chartOptions = value;
     if (this._chart) {
       this._chart.options = value;
@@ -137,7 +148,9 @@ export abstract class VizJSChart<
   }
 
   public updateData(): boolean {
-    if (!this._chart || !this._chart.data) return false;
+    if (!this._chart || !this._chart.data) {
+      return false;
+    }
     this._chart.data = this.getSeries().getData();
     this.update();
     return true;
@@ -158,13 +171,14 @@ export abstract class VizJSChart<
    * @param parent  Parent element to dock chart into
    * @returns   true if chart was created and docked, false otherwise
    */
-  public override onDisplay(): boolean {
-    this.createChart(this.getCanvas());
-    return true;
+  public override async onDisplay(): Promise<void> {
+    await this.createChart(this.getCanvas());
   }
 
   private getCanvas(): HTMLCanvasElement {
-    if (this._canvas) return this._canvas;
+    if (this._canvas) {
+      return this._canvas;
+    }
     this._canvas = document.createElement('canvas');
     this._canvas.style.width = '100%';
     this._canvas.style.height = '100%';
@@ -176,7 +190,9 @@ export abstract class VizJSChart<
    * Get Logger's div element
    */
   public getContainer(): HTMLDivElement {
-    if (this._mainDiv) return this._mainDiv;
+    if (this._mainDiv) {
+      return this._mainDiv;
+    }
     this._mainDiv = document.createElement('div');
     this._mainDiv.id = uuid();
     this._mainDiv.classList.add('event-logger');

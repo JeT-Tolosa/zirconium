@@ -10,7 +10,9 @@ export class ZirconPluginManager extends ZirconAppObject {
   }
 
   public registerPlugin(plugin: ZirconPlugin): boolean {
-    if (!plugin) return false;
+    if (!plugin) {
+      return false;
+    }
     this.__registeredPlugins[plugin.getId()] = plugin;
     return true;
   }

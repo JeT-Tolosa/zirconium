@@ -29,7 +29,9 @@ export class VizCubeSampleThreeJS extends VizThreeJS {
   /**
    */
   public createScene(): void {
-    if (this._scene) return;
+    if (this._scene) {
+      return;
+    }
 
     this._scene = new THREE.Scene();
     this._camera = new THREE.PerspectiveCamera(
@@ -62,8 +64,8 @@ export class VizCubeSampleThreeJS extends VizThreeJS {
     this._cube.rotation.x += 0.05;
     this._cube.rotation.y += 0.05;
     if (
-      this._renderer.domElement.width != this.getContainer().clientWidth ||
-      this._renderer.domElement.height != this.getContainer().clientHeight
+      this._renderer.domElement.width !== this.getContainer().clientWidth ||
+      this._renderer.domElement.height !== this.getContainer().clientHeight
     ) {
       this._camera.aspect =
         this.getContainer().clientWidth / this.getContainer().clientHeight;

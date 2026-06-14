@@ -16,8 +16,14 @@
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-
+  
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
   "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsserver.useProjectService": true,
+  "typescript.validate.enable": true,
+  "js/ts.tsserver.experimental.enableProjectDiagnostics": true,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+
   "prettier-eslint-typescript.eslintConfig": {
     "rules": {
       "curly": "error",

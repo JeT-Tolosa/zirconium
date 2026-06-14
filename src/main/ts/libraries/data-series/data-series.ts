@@ -21,7 +21,6 @@ export class DataSeries<DataType> {
   private _eventEmitter: EventEmitter = new EventEmitter();
   private _data: DataType = null;
 
-
   /**
    * Constructor
    * @param id
@@ -41,7 +40,9 @@ export class DataSeries<DataType> {
   }
 
   public setName(name: string): boolean {
-    if (this._name === name) return false;
+    if (this._name === name) {
+      return false;
+    }
     this._name = name;
     this._eventEmitter.emit('SERIES_NAME_CHANGED');
     return true;
@@ -61,7 +62,6 @@ export class DataSeries<DataType> {
     this._data = data;
     this.emitDataChanged();
   }
-
 
   /**
    * Json format export

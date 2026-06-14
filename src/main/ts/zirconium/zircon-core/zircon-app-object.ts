@@ -42,10 +42,11 @@ export abstract class ZirconAppObject<
    */
   constructor(app: ZirconApplication, state?: ZirconAppObjectState) {
     super(state);
-    if (!app)
+    if (!app) {
       throw new Error(
         `parent application cannot be null in ${this.constructor.name} constructor`,
       );
+    }
     this._application = app;
     this.setEventDispatcher(app.getEventDispatcher());
   }

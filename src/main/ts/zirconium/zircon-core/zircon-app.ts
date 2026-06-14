@@ -173,7 +173,9 @@ export class ZirconApplication<
   }
 
   private onAPPLICATION_START_REQUEST(applicationId: string): void {
-    if (this.getId() === applicationId) this.start();
+    if (this.getId() === applicationId) {
+      this.start();
+    }
   }
 
   private onUNCAUGHT_EXCEPTION(error: string): void {
@@ -184,7 +186,9 @@ export class ZirconApplication<
     objectId: string,
     state: ZirconObjectState,
   ): void {
-    if (objectId !== state.id) throw new Error('Object ID mismatch');
+    if (objectId !== state.id) {
+      throw new Error('Object ID mismatch');
+    }
     this.getObjectManager().registerObjectState(state);
   }
 
@@ -201,20 +205,23 @@ export class ZirconApplication<
   }
 
   public getObjectManager(): ZirconObjectManager {
-    if (!this.__objectManager)
+    if (!this.__objectManager) {
       this.__objectManager = new ZirconObjectManager(this);
+    }
     return this.__objectManager;
   }
 
   public getPluginManager(): ZirconPluginManager {
-    if (!this.__pluginManager)
+    if (!this.__pluginManager) {
       this.__pluginManager = new ZirconPluginManager(this);
+    }
     return this.__pluginManager;
   }
 
   public getDataProviderManager(): ZirconDataProviderManager {
-    if (!this.__dataProviderManager)
+    if (!this.__dataProviderManager) {
       this.__dataProviderManager = new ZirconDataProviderManager(this);
+    }
     return this.__dataProviderManager;
   }
 
@@ -260,7 +267,9 @@ export class ZirconApplication<
   }
 
   public getContextMenu(): ZirconContextMenu {
-    if (this.__contextMenu) return this.__contextMenu;
+    if (this.__contextMenu) {
+      return this.__contextMenu;
+    }
     this.__contextMenu = new ZirconContextMenu(this);
     return this.__contextMenu;
   }
@@ -312,8 +321,12 @@ export class ZirconApplication<
    * @returns true if done
    */
   public undisplayUI(): boolean {
-    if (!this.__mainDiv) return false;
-    if (!this._parent) return false;
+    if (!this.__mainDiv) {
+      return false;
+    }
+    if (!this._parent) {
+      return false;
+    }
     this._parent.removeChild(this.__mainDiv);
     return true;
   }
@@ -323,11 +336,19 @@ export class ZirconApplication<
    * @returns true if something has been added to the DOM, false otherwise
    */
   private async displayUIIn(parent: HTMLElement): Promise<boolean> {
-    if (!parent) return false;
+    if (!parent) {
+      return false;
+    }
     const mainDiv = this.getMainDiv();
-    if (!mainDiv) return false;
-    if (parent.contains(mainDiv)) return false;
-    if (this._parent) this.undisplayUI();
+    if (!mainDiv) {
+      return false;
+    }
+    if (parent.contains(mainDiv)) {
+      return false;
+    }
+    if (this._parent) {
+      this.undisplayUI();
+    }
     this._parent = parent;
     // append app mainDiv in given parent
     this._parent.appendChild(mainDiv);
@@ -371,19 +392,23 @@ export class ZirconApplication<
     this.__isStarted = true;
     await this.displayUIIn(document.body);
     // activate first desktop if at least one exist
-    if (this.getDesktopManager().getDesktopIds().length > 0)
+    if (this.getDesktopManager().getDesktopIds().length > 0) {
       this.emit('DESKTOP_ACTIVATE_REQUEST', {
         desktopId: this.getDesktopManager().getDesktopIds()[0],
       });
+    }
     this.emit('APPLICATION_STARTED', { applicationId: this.getId() });
   }
 
   private async createDesktopManager(): Promise<ZirconDesktopManager> {
-    if (this.__desktopManager) return this.__desktopManager;
+    if (this.__desktopManager) {
+      return this.__desktopManager;
+    }
     const desktopManagerState =
       this.getObjectManager().getRegisteredObjectState(this._desktopManagerId);
-    if (!desktopManagerState)
+    if (!desktopManagerState) {
       throw new Error(`createDesktopManager does not have a valid state`);
+    }
     this.__desktopManager = new ZirconDesktopManager(
       this,
       desktopManagerState as ZirconDesktopManagerState,
@@ -400,7 +425,9 @@ export class ZirconApplication<
    * @returns
    */
   private getMainDiv(): HTMLDivElement {
-    if (this.__mainDiv) return this.__mainDiv;
+    if (this.__mainDiv) {
+      return this.__mainDiv;
+    }
     this.__mainDiv = document.createElement('div');
     this.__mainDiv.id = `zircon-app-ui-${uuid()}`;
     this.__mainDiv.classList.add('zircon-ui');

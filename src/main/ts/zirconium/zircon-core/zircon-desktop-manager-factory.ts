@@ -17,10 +17,11 @@ export class ZirconDesktopManagerFactory implements ZirconObjectFactory {
   public contextMenuFactory: ZirconContextMenuFactory = null;
 
   constructor(app: ZirconApplication) {
-    if (!app)
+    if (!app) {
       throw new Error(
         `parent application cannot be null in ${this.constructor.name} constructor`,
       );
+    }
     this._app = app;
     this.contextMenuFactory = new ZirconContextMenuFactoryDesktopManager(
       this._app,

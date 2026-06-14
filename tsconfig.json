@@ -13,18 +13,17 @@
     "strictNullChecks": false,
     "noImplicitOverride": true,
     "sourceMap": true,
-
-    // "baseUrl": ".",
     "outDir": "dist",
     // "moduleResolution": "node16",
     "paths": {
-      "jspanel4": ["./types/jspanel"]
+      "jspanel4": ["./types/jspanel4.d.ts"]
     },
     "typeRoots": ["./types", "./node_modules/@types"]
   },
   "include": [
-    "src"
-, "types"  ],
+    "./src",
+    "./types/"
+  ],
   "exclude": [
     "node_modules",
     ".vite",

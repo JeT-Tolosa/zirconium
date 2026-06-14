@@ -1,82 +1,64 @@
 /* Container principal */
-
 .provider-container {
   display: flex;
   flex-direction: column;
   height: 100%;
   width: 100%;
-
   overflow: hidden;
 }
 
 /* Ligne supérieure */
-
 .provider-toolbar {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 8px;
-
   flex-shrink: 0;
-
   padding: 8px;
 }
 
 /* Select */
-
 .provider-selector {
   flex: 1;
   min-width: 0;
 }
 
 /* Bouton refresh */
-
 .provider-refresh-button {
   flex-shrink: 0;
 }
 
 /* Zone JSON */
-
 .provider-json-view {
   flex: 1;
-
   min-height: 0; /* IMPORTANT pour flex */
   overflow: hidden;
 }
 
 /* JSONEditor doit occuper tout le div */
-
 .provider-json-view .jsoneditor {
   height: 100% !important;
   width: 100% !important;
 }
 
 /* Barre de statut en bas */
-
 .provider-output {
   flex-shrink: 0;
-
   padding: 6px 10px;
-
   border-top: 1px solid #ccc;
-
   font-size: 0.9rem;
 }
 
 /* Couleurs des messages */
-
 .provider-output.info {
-  color: #444;
+  color: #a5a5a5;
 }
-
 .provider-output.success {
-  color: green;
+  color: rgb(120, 202, 120);
 }
-
 .provider-output.warning {
-  color: orange;
+  color: rgb(200, 166, 102);
 }
-
 .provider-output.error {
-  color: red;
+  color: rgb(201, 88, 88);
 }

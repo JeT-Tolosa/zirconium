@@ -10,14 +10,6 @@ import { VizLeaflet } from '../zircon-visualizers/leaflet/viz-eye-leaflet';
 import { VizLineJSChart } from '../zircon-visualizers/jschart/line-jschart';
 import { VizEventLogger } from '../zircon-visualizers/logger/viz-eye-event-logger';
 import { VizOpenGlobus } from '../zircon-visualizers/openglobus/viz-eye-openglobus';
-import {
-  Satellite,
-  SATELLITE_TYPE,
-} from '../libraries/spatial/satellite/satellite';
-import {
-  GROUND_STATION_TYPE,
-  GroundStation,
-} from '../libraries/spatial/ground-station/ground-station';
 import { VizSatelliteCatalogTabulator } from '../zircon-visualizers/spatial/viz-eye-satellite-catalog-tabulator';
 import { VizGroundStationCatalogTabulator } from '../zircon-visualizers/spatial/viz-eye-ground-station-catalog-tabulator';
 

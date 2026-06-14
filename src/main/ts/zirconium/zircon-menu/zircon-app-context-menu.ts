@@ -15,11 +15,17 @@ export class ZirconContextMenuFactoryApplication extends ZirconContextMenuFactor
   }
 
   private getAssociatedZirconApplication(element: Element): ZirconApplication {
-    if (!element) return null;
-    if (!(element instanceof HTMLElement)) return null;
+    if (!element) {
+      return null;
+    }
+    if (!(element instanceof HTMLElement)) {
+      return null;
+    }
 
     const htmlElement: HTMLElement = element;
-    if (htmlElement.id !== this.getApplication().getUI().id) return null;
+    if (htmlElement.id !== this.getApplication().getUI().id) {
+      return null;
+    }
     return this.getApplication();
   }
 
@@ -29,7 +35,9 @@ export class ZirconContextMenuFactoryApplication extends ZirconContextMenuFactor
 
   public getContextMenuElements(element: Element): ZirconContextMenuItem[] {
     const app: ZirconApplication = this.getAssociatedZirconApplication(element);
-    if (!app) return null;
+    if (!app) {
+      return null;
+    }
     return [
       {
         label: `Application`,
@@ -58,7 +66,9 @@ export class ZirconContextMenuFactoryApplication extends ZirconContextMenuFactor
     app: ZirconApplication,
     engineState: ZirconEngineState,
   ): ZirconContextMenuItem {
-    if (!engineState) return null;
+    if (!engineState) {
+      return null;
+    }
     const instance = app
       .getObjectManager()
       .getExistingInstance(engineState.id, ZIRCON_ENGINE_TYPE);

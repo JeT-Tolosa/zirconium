@@ -55,10 +55,10 @@ export class USRadioGuyGroundStationLocalLoaderJson extends ItemLoader<GroundSta
    * @returns
    */
   public getData(): Promise<GroundStation[]> {
-    let retrievedData: Promise<unknown> = null;
+    // let retrievedData: Promise<unknown> = null;
     // if (this._local) retrievedData = this.fetchDataCelestrakLocal();
     // else retrievedData = this.fetchDataCelestrakOnline();
-    retrievedData = Promise.resolve(this._jsonContent);
+    const retrievedData: Promise<string> = Promise.resolve(this._jsonContent);
     // return this.fetchDataCelestrakOnline()
     return retrievedData.then((data) => {
       const result = USRadioGuyGroundStationFileSchema.safeParse(data);
