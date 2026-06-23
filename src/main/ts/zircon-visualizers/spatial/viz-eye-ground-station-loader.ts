@@ -35,7 +35,7 @@ const loaderDescriptors: { [id: string]: LoaderDescriptor<GroundStation> } = {
 
 export class VizGroundStationLoader extends VizLoader<GroundStation> {
   public static readonly VIZ_GROUND_STATION_LOADER_TYPE =
-    'VIZ_GROUND_STATION_LOADER_TYPE';
+    'ground-station-loader-type';
 
   constructor(state?: VizLoaderState) {
     super(GROUND_STATION_TYPE, loaderDescriptors, state);

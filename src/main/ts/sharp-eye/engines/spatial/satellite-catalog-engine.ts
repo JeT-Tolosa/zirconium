@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import {
   Satellite,
   SATELLITE_TYPE,
@@ -15,6 +14,9 @@ export interface SatelliteCatalogEngineState extends ZirconEngineState {
   type: typeof SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE;
 }
 
+export const SATELLITE_CATALOG_DATA_PROVIDER_TYPE =
+  'satellite-catalog-data-provider';
+
 const satelliteArrayDataProviderCreator: ItemArrayDataProviderCreatorFunction<
   Satellite
 > = (
@@ -22,17 +24,17 @@ const satelliteArrayDataProviderCreator: ItemArrayDataProviderCreatorFunction<
   dataType: string,
   items: Satellite[] = [],
 ): ZirconDataProvider<ItemArray<Satellite>> => {
-  const dataProvider = new ZirconDataProvider<ItemArray<Satellite>>(
-    SATELLITE_TYPE,
-    {
-      id: uuid(),
-      name: dataProviderName,
-      type: SATELLITE_TYPE,
-      dataType: dataType,
-    },
-  );
+  if (dataType !== SATELLITE_TYPE) {
+    throw new Error(`${dataType} should be ${SATELLITE_TYPE}`);
+  }
+  const dataProvider = new ZirconDataProvider<ItemArray<Satellite>>(dataType, {
+    id: `satellite-data-provider-engine-${dataProviderName}`,
+    type: SATELLITE_CATALOG_DATA_PROVIDER_TYPE,
+    outputDataType: dataType,
+    name: dataProviderName,
+  });
   const itemArray = new ItemArray<Satellite>({
-    itemType: SATELLITE_TYPE,
+    itemType: dataType,
     name: `${dataProviderName}-item-array`,
   });
   itemArray.setItems(items);

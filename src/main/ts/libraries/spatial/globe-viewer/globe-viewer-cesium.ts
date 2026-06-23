@@ -12,7 +12,6 @@ import {
   buildInstancedVisibilityLines,
   VisibilityEngineCesium,
 } from './visibility-cesium';
-import { ZirconDataProvider } from '../../../zirconium/zircon-data/zircon-data-provider';
 
 const DEFAULT_CESIUM_TOKEN: string =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI1MTQ3MzJjOS1jY2MwLTRiOGUtYTU5Ny1kNTMxNTQ2MDIxOGIiLCJpZCI6Mzk2Mzc0LCJpYXQiOjE3NzI0MTE2OTB9.O-0_Gu3rYf-7ijUGGlWZtrybQ3OhKMtx0mjBidAcBIw';
@@ -67,9 +66,6 @@ export class GlobeViewerCesium extends GlobeViewer<
   private _token: string = DEFAULT_CESIUM_TOKEN;
   private _sunLightning: boolean = true;
   private _skyAtmosphere: boolean = true;
-  private primitiveSources: {
-    [id: string]: ZirconDataProvider<CesiumPrimitive>;
-  } = {};
 
   constructor(options?: GlobeViewerOptionsCesium) {
     super();
@@ -77,20 +73,6 @@ export class GlobeViewerCesium extends GlobeViewer<
     this.on('optionsChanged', (_event) => {
       this.onOptionsChanged();
     });
-  }
-
-  public addPrimitiveSource(source: ZirconDataProvider<CesiumPrimitive>): void {
-    if (!source) {
-      return;
-    }
-    this.primitiveSources[source.getId()] = source;
-  }
-
-  public removePrimitiveSource(sourceId: string): void {
-    if (!sourceId || !this.primitiveSources[sourceId]) {
-      return;
-    }
-    delete this.primitiveSources[sourceId];
   }
 
   private onOptionsChanged(): void {

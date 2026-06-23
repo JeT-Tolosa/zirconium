@@ -66,6 +66,10 @@ export class ZirconDataAdapter<
     this.setState(state);
   }
 
+  public override getType(): string {
+    return ZIRCON_DATA_ADAPTER_TYPE;
+  }
+
   public override async setState(state: ZirconDataAdapterState): Promise<void> {
     await super.setState(state);
     if (!state) {
@@ -121,9 +125,9 @@ export class ZirconDataAdapter<
     if (this.getDataSourceId() !== dataSourceDescriptor.id) {
       return;
     }
-    if (this._inputDataType !== dataSourceDescriptor.dataType) {
+    if (this._inputDataType !== dataSourceDescriptor.outputDataType) {
       throw new Error(
-        `Source data type ${dataSourceDescriptor.dataType} does not match adapter input type ${this._inputDataType}`,
+        `Source data type ${dataSourceDescriptor.outputDataType} does not match adapter input type ${this._inputDataType}`,
       );
     }
     if (!this.__transformData) {

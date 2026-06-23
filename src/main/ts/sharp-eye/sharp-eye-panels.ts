@@ -1,4 +1,3 @@
-import { VizBarJSChart } from '../zircon-visualizers/jschart/bar-jschart';
 import { DataSeries } from '../libraries/data-series/data-series';
 import { ChartData } from 'chart.js';
 import { VizCesium } from '../zircon-visualizers/cesium/viz-eye-cesium';
@@ -7,7 +6,6 @@ import { VizFetch } from '../zircon-visualizers/fetch/viz-eye-fetch';
 import { VizThreeJS } from '../zircon-visualizers/threeJS/viz-eye-threeJS';
 import { VizHelmetSampleThreeJS } from '../zircon-visualizers/threeJS/viz-eye-helmet-sample-threeJS';
 import { VizLeaflet } from '../zircon-visualizers/leaflet/viz-eye-leaflet';
-import { VizLineJSChart } from '../zircon-visualizers/jschart/line-jschart';
 import { VizEventLogger } from '../zircon-visualizers/logger/viz-eye-event-logger';
 import { VizOpenGlobus } from '../zircon-visualizers/openglobus/viz-eye-openglobus';
 import { VizSatelliteCatalogTabulator } from '../zircon-visualizers/spatial/viz-eye-satellite-catalog-tabulator';
@@ -29,62 +27,62 @@ export function createVisualizerLogger(): VizEventLogger {
   return viz;
 }
 
-interface FunctionData {
-  label: string;
-  data: number[];
-  borderColor: string;
-}
+// interface FunctionData {
+//   label: string;
+//   data: number[];
+//   borderColor: string;
+// }
 
-interface FunctionsData {
-  labels: string[];
-  datasets: FunctionData[];
-}
+// interface FunctionsData {
+//   labels: string[];
+//   datasets: FunctionData[];
+// }
 
-/**
- * Chart 2
- */
+// /**
+//  * Chart 2
+//  */
 
-export function createSeriesLine(): DataSeries<FunctionsData> {
-  const series = new DataSeries<FunctionsData>();
-  series.setData({
-    labels: Array.from({ length: 20 }, (_, i) => `Label ${i + 1}`),
-    datasets: [
-      {
-        label: 'Dataset 1',
-        data: Array.from({ length: 20 }, () => Math.random()),
-        borderColor: 'rgb(12, 84, 241)',
-      },
-      {
-        label: 'Dataset 2',
-        data: Array.from({ length: 20 }, () => Math.random()),
-        borderColor: 'rgb(218, 143, 4)',
-      },
-      {
-        label: 'Dataset 3',
-        data: Array.from({ length: 20 }, () => Math.random()),
-        borderColor: 'rgb(192, 2, 2)',
-      },
-    ],
-  });
-  setInterval(() => {
-    const data: FunctionsData = series.getData();
-    for (let i = 0; i <= 2; i++) {
-      const values: number[] = <number[]>data.datasets[i].data;
-      const newValues: number[] = values.slice(1);
-      newValues.push(newValues[newValues.length - 1] + Math.random() * 10 - 5);
-      data.datasets[i].data = newValues;
-    }
-    series.setData(data);
-  }, 500);
-  return series;
-}
+// export function createSeriesLine(): DataSeries<FunctionsData> {
+//   const series = new DataSeries<FunctionsData>();
+//   series.setData({
+//     labels: Array.from({ length: 20 }, (_, i) => `Label ${i + 1}`),
+//     datasets: [
+//       {
+//         label: 'Dataset 1',
+//         data: Array.from({ length: 20 }, () => Math.random()),
+//         borderColor: 'rgb(12, 84, 241)',
+//       },
+//       {
+//         label: 'Dataset 2',
+//         data: Array.from({ length: 20 }, () => Math.random()),
+//         borderColor: 'rgb(218, 143, 4)',
+//       },
+//       {
+//         label: 'Dataset 3',
+//         data: Array.from({ length: 20 }, () => Math.random()),
+//         borderColor: 'rgb(192, 2, 2)',
+//       },
+//     ],
+//   });
+//   setInterval(() => {
+//     const data: FunctionsData = series.getData();
+//     for (let i = 0; i <= 2; i++) {
+//       const values: number[] = <number[]>data.datasets[i].data;
+//       const newValues: number[] = values.slice(1);
+//       newValues.push(newValues[newValues.length - 1] + Math.random() * 10 - 5);
+//       data.datasets[i].data = newValues;
+//     }
+//     series.setData(data);
+//   }, 500);
+//   return series;
+// }
 
-export function createVisualizerLineJS(): VizLineJSChart {
-  const viz: VizLineJSChart = new VizLineJSChart();
-  viz.setSeries(createSeriesLine());
+// export function createVisualizerLineJS(): VizLineJSChart {
+//   const viz: VizLineJSChart = new VizLineJSChart();
+//   viz.setDataProvider(createSeriesLine());
 
-  return viz;
-}
+//   return viz;
+// }
 
 export function createVisualizerLeafletJS(): VizLeaflet {
   const viz: VizLeaflet = new VizLeaflet();
@@ -150,8 +148,8 @@ export function createSeriesBar(): DataSeries<ChartData<'bar'>> {
   return series;
 }
 
-export function createVisualizerBarJS(): VizBarJSChart {
-  const viz: VizBarJSChart = new VizBarJSChart();
-  viz.setSeries(createSeriesBar());
-  return viz;
-}
+// export function createVisualizerBarJS(): VizBarJSChart {
+//   const viz: VizBarJSChart = new VizBarJSChart();
+//   viz.setDataProvider(createSeriesBar());
+//   return viz;
+// }

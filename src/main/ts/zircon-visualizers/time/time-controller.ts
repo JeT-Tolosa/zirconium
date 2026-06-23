@@ -25,7 +25,7 @@ import {
 
 export interface TimeControllerState extends ZirconVizState {
   type: typeof TimeController.TIME_CONTROLLER_VISUALIZER_TYPE;
-  timeDescriptorId: string;
+  timeSource: string;
 }
 
 export type TimeControllerEventRegistry = MergeZirconRegistries<
@@ -37,7 +37,8 @@ export type TimeControllerEventRegistry = MergeZirconRegistries<
       [
         PickEvents<
           TimeManagerEngineEvents,
-          'SIMULATED_SET_TIMEDESCRIPTOR_REQUEST'
+          | 'SIMULATED_SET_TIMEDESCRIPTOR_REQUEST'
+          | 'SIMULATED_TIMEDESCRIPTOR_REQUEST'
         >,
       ]
     >;
@@ -49,35 +50,41 @@ export class TimeController<
   R extends TimeControllerEventRegistry = TimeControllerEventRegistry,
 > extends ZirconViz<R> {
   public static readonly TIME_CONTROLLER_VISUALIZER_TYPE =
-    'TIME_CONTROLLER_VISUALIZER_TYPE';
+    'time-controller-visualizer-type';
 
-  private _mainDiv: HTMLDivElement = null;
+  private __mainDiv: HTMLDivElement = null;
 
-  private _endDateEnabledCheckbox: HTMLIonCheckboxElement = null;
-  private _endDurationSelect: HTMLIonSelectElement = null;
+  private __headerDiv: HTMLDivElement = null;
+  private __timeSourceLabel: HTMLLabelElement = null;
+  private __timeDescriptorStatusLabel: HTMLLabelElement = null;
 
-  private _timeSlider: HTMLIonRangeElement = null;
-  private _sliderDateLabel: HTMLDivElement = null;
+  private __endDateEnabledCheckbox: HTMLIonCheckboxElement = null;
+  private __endDurationSelect: HTMLIonSelectElement = null;
 
-  private _startDateReadableLabel: HTMLDivElement = null;
-  private _endDateReadableLabel: HTMLDivElement = null;
+  private __timeSlider: HTMLIonRangeElement = null;
+  private __sliderDateLabel: HTMLDivElement = null;
 
-  private _startButton: HTMLIonButtonElement = null;
-  private _stopButton: HTMLIonButtonElement = null;
-  private _restartButton: HTMLIonButtonElement = null;
+  private __startDateReadableLabel: HTMLDivElement = null;
+  private __endDateReadableLabel: HTMLDivElement = null;
 
-  private _timeFactorSelect: HTMLIonSelectElement = null;
-  private _timeFactor = 1;
+  private __startButton: HTMLIonButtonElement = null;
+  private __stopButton: HTMLIonButtonElement = null;
+  private __restartButton: HTMLIonButtonElement = null;
 
-  private _startDatePicker: HTMLIonDatetimeElement = null;
-  private _endDatePicker: HTMLIonDatetimeElement = null;
+  private __timeFactorSelect: HTMLIonSelectElement = null;
+  private __timeFactor = 1;
 
-  private _startDateModal: HTMLIonModalElement = null;
-  private _endDateModal: HTMLIonModalElement = null;
+  private __startDatePicker: HTMLIonDatetimeElement = null;
+  private __endDatePicker: HTMLIonDatetimeElement = null;
 
-  private _liveNowInterval: any = null;
-  private _isLiveNow = false;
-  private _timeRunner: TimeRunner = null;
+  private __startDateModal: HTMLIonModalElement = null;
+  private __endDateModal: HTMLIonModalElement = null;
+
+  private __liveNowInterval: any = null;
+  private __isLiveNow = false;
+  private __timeRunner: TimeRunner = null;
+
+  private _timeSource: string = null;
 
   private readonly _durations = [
     { label: '10 minutes', ms: 10 * 60 * 1000 },
@@ -102,34 +109,65 @@ export class TimeController<
     });
   }
 
+  public override getType(): string {
+    return TimeController.TIME_CONTROLLER_VISUALIZER_TYPE;
+  }
+
+  protected override async setState(state: TimeControllerState): Promise<void> {
+    await super.setState(state);
+    if (!state) {
+      return;
+    }
+    this.setTimeSource(state.timeSource);
+  }
+
   private getStartTime(): number {
-    return new Date(this._startDatePicker?.value as string)?.getTime();
+    return new Date(this.__startDatePicker?.value as string)?.getTime();
   }
 
   private getEndTime(): number {
-    return new Date(this._endDatePicker?.value as string)?.getTime();
+    return new Date(this.__endDatePicker?.value as string)?.getTime();
   }
 
   private getCurrentTime(): number {
-    return Number(this._timeSlider.value);
+    return Number(this.__timeSlider.value);
   }
 
   private setCurrentTime(value: number): void {
-    if (this._timeSlider.value !== value) {this._timeSlider.value = value;}
+    if (this.__timeSlider.value !== value) {
+      this.__timeSlider.value = value;
+    }
   }
 
   /**
    * Get Time Runner
    */
   public getTimeRunner(): TimeRunner {
-    if (this._timeRunner) {return this._timeRunner;}
-    this._timeRunner = new TimeRunner();
-    this._timeRunner.addTimeChangeCallback(this.onTimeChange.bind(this));
-    return this._timeRunner;
+    if (this.__timeRunner) {
+      return this.__timeRunner;
+    }
+    this.__timeRunner = new TimeRunner();
+    this.__timeRunner.addTimeChangeCallback(this.onTimeChange.bind(this));
+    return this.__timeRunner;
   }
 
   private onTimeChange(runner: TimeRunner): void {
     this.setCurrentTime(runner.getCurrentSimulatedTime());
+  }
+
+  private setTimeSource(timeSource: string): boolean {
+    if (this._timeSource === timeSource) {
+      return false;
+    }
+    this._timeSource = timeSource;
+    this.displayTimeSource(this._timeSource);
+    this.getTimeRunner().setTimeDescriptor(null);
+    this.requestTimeDescriptor();
+    return true;
+  }
+
+  public getTimeSource(): string {
+    return this._timeSource;
   }
 
   /**
@@ -137,24 +175,66 @@ export class TimeController<
    * @param timeDescriptor
    */
   public setTimeDescriptor(
-    _timeSource: string,
+    timeSource: string,
     timeDescriptor: TimeDescriptor,
   ): void {
+    this.displayTimeDescriptorStatus(`time descriptor ${timeSource} received`);
     this.getTimeRunner()?.setTimeDescriptor(timeDescriptor);
   }
 
   public getContainer(): HTMLDivElement {
-    if (this._mainDiv) {return this._mainDiv;}
+    if (this.__mainDiv) {
+      return this.__mainDiv;
+    }
 
-    this._mainDiv = document.createElement('div');
-    this._mainDiv.classList.add('time-controller-range');
+    this.__mainDiv = document.createElement('div');
+    this.__mainDiv.classList.add('time-controller-range');
 
-    this.addStartDateEditor(this._mainDiv);
-    this.addEndDateEditor(this._mainDiv);
-    this.addCurrentTime(this._mainDiv);
-    this.addControlButtons(this._mainDiv);
+    this.addHeader(this.__mainDiv);
+    this.addStartDateEditor(this.__mainDiv);
+    this.addEndDateEditor(this.__mainDiv);
+    this.addCurrentTime(this.__mainDiv);
+    this.addControlButtons(this.__mainDiv);
 
-    return this._mainDiv;
+    return this.__mainDiv;
+  }
+
+  private addHeader(parent: HTMLElement): void {
+    this.__headerDiv = document.createElement('div');
+
+    const timeSourceFieldset = document.createElement('fieldset');
+    const legend = document.createElement('legend');
+    legend.innerText = 'Time Source';
+    timeSourceFieldset.appendChild(legend);
+    this.__timeSourceLabel = document.createElement('label');
+    this.__timeSourceLabel.innerText = this.getTimeSource();
+    timeSourceFieldset.appendChild(this.__timeSourceLabel);
+    this.__headerDiv.appendChild(timeSourceFieldset);
+
+    const timeDescriptorStatusFieldset = document.createElement('fieldset');
+    const legend2 = document.createElement('legend');
+    legend.innerText = 'Status';
+    timeDescriptorStatusFieldset.appendChild(legend2);
+    this.__timeDescriptorStatusLabel = document.createElement('label');
+    this.__timeDescriptorStatusLabel.innerText = 'unknown';
+    timeDescriptorStatusFieldset.appendChild(this.__timeDescriptorStatusLabel);
+    this.__headerDiv.appendChild(timeDescriptorStatusFieldset);
+
+    parent.appendChild(this.__headerDiv);
+  }
+
+  private displayTimeDescriptorStatus(status: string): void {
+    if (!this.__timeDescriptorStatusLabel) {
+      return;
+    }
+    this.__timeDescriptorStatusLabel.innerText = status;
+  }
+
+  private displayTimeSource(timeSource: string): void {
+    if (!this.__timeSourceLabel) {
+      return;
+    }
+    this.__timeSourceLabel.innerText = timeSource;
   }
 
   // =====================================================
@@ -182,35 +262,35 @@ export class TimeController<
     liveNowBtn.color = 'warning';
     liveNowBtn.textContent = 'Live now';
 
-    this._startDateReadableLabel = document.createElement('div');
-    this._startDateReadableLabel.classList.add('time-display');
+    this.__startDateReadableLabel = document.createElement('div');
+    this.__startDateReadableLabel.classList.add('time-display');
 
-    this._startDatePicker = document.createElement('ion-datetime');
-    this._startDatePicker.value = new Date().toISOString();
+    this.__startDatePicker = document.createElement('ion-datetime');
+    this.__startDatePicker.value = new Date().toISOString();
 
-    this._startDateModal = document.createElement('ion-modal');
-    this._startDateModal.keepContentsMounted = true;
-    this._startDateModal.appendChild(this._startDatePicker);
+    this.__startDateModal = document.createElement('ion-modal');
+    this.__startDateModal.keepContentsMounted = true;
+    this.__startDateModal.appendChild(this.__startDatePicker);
 
     const updateStart = (ts: number) => {
-      this._startDateReadableLabel.textContent = this.formatTimestamp(ts);
+      this.__startDateReadableLabel.textContent = this.formatTimestamp(ts);
       this.updateEndDateFromDuration();
       this.updateSliderBounds();
     };
 
-    this._startDateReadableLabel.addEventListener('click', () => {
-      this._startDateModal.present();
+    this.__startDateReadableLabel.addEventListener('click', () => {
+      this.__startDateModal.present();
     });
 
     nowBtn.addEventListener('click', () => {
       this.stopLiveNow();
       const now = Date.now();
-      this._startDatePicker.value = new Date(now).toISOString();
+      this.__startDatePicker.value = new Date(now).toISOString();
       updateStart(now);
     });
 
     liveNowBtn.addEventListener('click', () => {
-      if (this._isLiveNow) {
+      if (this.__isLiveNow) {
         this.stopLiveNow();
         liveNowBtn.color = 'warning';
         return;
@@ -218,36 +298,36 @@ export class TimeController<
       this.startLiveNow(liveNowBtn);
     });
 
-    this._startDatePicker.addEventListener('ionChange', () => {
+    this.__startDatePicker.addEventListener('ionChange', () => {
       const ts = this.getStartTime();
       updateStart(ts);
     });
 
     header.appendChild(nowBtn);
     header.appendChild(liveNowBtn);
-    header.appendChild(this._startDateReadableLabel);
+    header.appendChild(this.__startDateReadableLabel);
 
     container.appendChild(header);
-    container.appendChild(this._startDateModal);
+    container.appendChild(this.__startDateModal);
 
     parent.appendChild(container);
 
     const ts = this.getStartTime();
-    this._startDateReadableLabel.textContent = this.formatTimestamp(ts);
+    this.__startDateReadableLabel.textContent = this.formatTimestamp(ts);
   }
 
   // =====================================================
   // LIVE NOW
   // =====================================================
   private startLiveNow(btn: HTMLIonButtonElement): void {
-    this._isLiveNow = true;
+    this.__isLiveNow = true;
     btn.color = 'danger';
 
-    this._liveNowInterval = setInterval(() => {
+    this.__liveNowInterval = setInterval(() => {
       const now = Date.now();
 
-      this._startDatePicker.value = new Date(now).toISOString();
-      this._startDateReadableLabel.textContent = this.formatTimestamp(now);
+      this.__startDatePicker.value = new Date(now).toISOString();
+      this.__startDateReadableLabel.textContent = this.formatTimestamp(now);
 
       this.updateEndDateFromDuration();
       this.updateSliderBounds();
@@ -255,11 +335,11 @@ export class TimeController<
   }
 
   private stopLiveNow(): void {
-    this._isLiveNow = false;
+    this.__isLiveNow = false;
 
-    if (this._liveNowInterval) {
-      clearInterval(this._liveNowInterval);
-      this._liveNowInterval = null;
+    if (this.__liveNowInterval) {
+      clearInterval(this.__liveNowInterval);
+      this.__liveNowInterval = null;
     }
   }
 
@@ -275,29 +355,31 @@ export class TimeController<
     label.innerText = 'End Date/Time';
     container.appendChild(legend);
 
-    this._endDateEnabledCheckbox = document.createElement('ion-checkbox');
-    this._endDateEnabledCheckbox.checked = true;
-    this._endDateEnabledCheckbox.id = uuid();
+    this.__endDateEnabledCheckbox = document.createElement('ion-checkbox');
+    this.__endDateEnabledCheckbox.checked = true;
+    this.__endDateEnabledCheckbox.id = uuid();
 
-    legend.setAttribute('for', this._endDateEnabledCheckbox.id);
+    legend.setAttribute('for', this.__endDateEnabledCheckbox.id);
 
-    this._endDateReadableLabel = document.createElement('div');
-    this._endDateReadableLabel.classList.add('time-display');
+    this.__endDateReadableLabel = document.createElement('div');
+    this.__endDateReadableLabel.classList.add('time-display');
 
-    this._endDatePicker = document.createElement('ion-datetime');
+    this.__endDatePicker = document.createElement('ion-datetime');
 
-    this._endDateModal = document.createElement('ion-modal');
-    this._endDateModal.keepContentsMounted = true;
-    this._endDateModal.appendChild(this._endDatePicker);
+    this.__endDateModal = document.createElement('ion-modal');
+    this.__endDateModal.keepContentsMounted = true;
+    this.__endDateModal.appendChild(this.__endDatePicker);
 
-    this._endDateReadableLabel.addEventListener('click', () => {
-      if (!this._endDateEnabledCheckbox.checked) {return;}
-      this._endDateModal.present();
+    this.__endDateReadableLabel.addEventListener('click', () => {
+      if (!this.__endDateEnabledCheckbox.checked) {
+        return;
+      }
+      this.__endDateModal.present();
     });
 
-    this._endDatePicker.addEventListener('ionChange', () => {
+    this.__endDatePicker.addEventListener('ionChange', () => {
       const ts = this.getEndTime();
-      this._endDateReadableLabel.textContent = this.formatTimestamp(ts);
+      this.__endDateReadableLabel.textContent = this.formatTimestamp(ts);
       this.updateSliderBounds();
     });
 
@@ -309,30 +391,30 @@ export class TimeController<
     const durationLabel = document.createElement('label');
     durationLabel.textContent = 'Duration';
 
-    this._endDurationSelect = document.createElement('ion-select');
-    this._endDurationSelect.interface = 'popover';
+    this.__endDurationSelect = document.createElement('ion-select');
+    this.__endDurationSelect.interface = 'popover';
 
     this._durations.forEach((d) => {
       const opt = document.createElement('ion-select-option');
       opt.value = d.ms;
       opt.textContent = d.label;
-      this._endDurationSelect.appendChild(opt);
+      this.__endDurationSelect.appendChild(opt);
     });
 
-    this._endDurationSelect.value = this._durations[2].ms;
+    this.__endDurationSelect.value = this._durations[2].ms;
 
-    this._endDurationSelect.addEventListener('ionChange', () => {
+    this.__endDurationSelect.addEventListener('ionChange', () => {
       this.updateEndDateFromDuration();
       this.updateSliderBounds();
     });
 
-    this._endDateEnabledCheckbox.addEventListener('ionChange', (e: any) => {
+    this.__endDateEnabledCheckbox.addEventListener('ionChange', (e: any) => {
       const checked = e.detail.checked;
 
-      this._endDatePicker.disabled = !checked;
+      this.__endDatePicker.disabled = !checked;
 
       if (!checked) {
-        this._endDurationSelect.value =
+        this.__endDurationSelect.value =
           this._durations[this._durations.length - 1].ms;
 
         this.updateEndDateFromDuration();
@@ -341,15 +423,15 @@ export class TimeController<
       this.updateSliderBounds();
     });
 
-    legend.appendChild(this._endDateEnabledCheckbox);
+    legend.appendChild(this.__endDateEnabledCheckbox);
     legend.appendChild(label);
 
     durationRow.appendChild(durationLabel);
-    durationRow.appendChild(this._endDurationSelect);
+    durationRow.appendChild(this.__endDurationSelect);
 
     container.appendChild(durationRow);
-    container.appendChild(this._endDateModal);
-    container.appendChild(this._endDateReadableLabel);
+    container.appendChild(this.__endDateModal);
+    container.appendChild(this.__endDateReadableLabel);
 
     parent.appendChild(container);
 
@@ -358,12 +440,12 @@ export class TimeController<
 
   private updateEndDateFromDuration(): void {
     const start = this.getStartTime();
-    const duration = Number(this._endDurationSelect.value);
+    const duration = Number(this.__endDurationSelect.value);
     const end = new Date(start + duration);
 
-    this._endDatePicker.value = end.toISOString();
+    this.__endDatePicker.value = end.toISOString();
 
-    this._endDateReadableLabel.textContent = this.formatTimestamp(
+    this.__endDateReadableLabel.textContent = this.formatTimestamp(
       end.getTime(),
     );
   }
@@ -382,36 +464,36 @@ export class TimeController<
     header.style.display = 'flex';
     header.style.justifyContent = 'space-between';
 
-    this._sliderDateLabel = document.createElement('div');
-    this._sliderDateLabel.classList.add('time-display');
+    this.__sliderDateLabel = document.createElement('div');
+    this.__sliderDateLabel.classList.add('time-display');
 
-    header.appendChild(this._sliderDateLabel);
+    header.appendChild(this.__sliderDateLabel);
 
-    this._timeSlider = document.createElement('ion-range');
+    this.__timeSlider = document.createElement('ion-range');
 
     const start = this.getStartTime();
     const end = this.getEndTime();
 
-    this._timeSlider.min = start;
-    this._timeSlider.max = end;
-    this._timeSlider.value = start;
+    this.__timeSlider.min = start;
+    this.__timeSlider.max = end;
+    this.__timeSlider.value = start;
 
-    this._sliderDateLabel.textContent = this.formatTimestamp(start);
+    this.__sliderDateLabel.textContent = this.formatTimestamp(start);
 
-    this._timeSlider.addEventListener('ionInput', (e: any) => {
-      this._sliderDateLabel.textContent = this.formatTimestamp(e.detail.value);
+    this.__timeSlider.addEventListener('ionInput', (e: any) => {
+      this.__sliderDateLabel.textContent = this.formatTimestamp(e.detail.value);
     });
 
-    this._timeSlider.addEventListener('mousedown', () => {
+    this.__timeSlider.addEventListener('mousedown', () => {
       this.requestSetTime(false);
     });
 
-    this._timeSlider.addEventListener('ionChange', () => {
+    this.__timeSlider.addEventListener('ionChange', () => {
       this.requestSetTime(false);
     });
 
     container.appendChild(header);
-    container.appendChild(this._timeSlider);
+    container.appendChild(this.__timeSlider);
 
     parent.appendChild(container);
   }
@@ -420,16 +502,20 @@ export class TimeController<
     const start = this.getStartTime();
     const end = this.getEndTime();
 
-    this._timeSlider.min = start;
-    this._timeSlider.max = end;
+    this.__timeSlider.min = start;
+    this.__timeSlider.max = end;
 
-    let v = Number(this._timeSlider.value);
+    let v = Number(this.__timeSlider.value);
 
-    if (v < start) {v = start;}
-    if (v > end) {v = end;}
+    if (v < start) {
+      v = start;
+    }
+    if (v > end) {
+      v = end;
+    }
 
-    this._timeSlider.value = v;
-    this._sliderDateLabel.textContent = this.formatTimestamp(v);
+    this.__timeSlider.value = v;
+    this.__sliderDateLabel.textContent = this.formatTimestamp(v);
   }
 
   // =====================================================
@@ -442,8 +528,8 @@ export class TimeController<
     const label = document.createElement('label');
     label.textContent = 'Time Factor';
 
-    this._timeFactorSelect = document.createElement('ion-select');
-    this._timeFactorSelect.interface = 'popover';
+    this.__timeFactorSelect = document.createElement('ion-select');
+    this.__timeFactorSelect.interface = 'popover';
 
     const values = [0.5, 0.75, 1, 1.5, 2, 5, 10, 100];
 
@@ -451,17 +537,17 @@ export class TimeController<
       const o = document.createElement('ion-select-option');
       o.value = v;
       o.textContent = `x${v}`;
-      this._timeFactorSelect.appendChild(o);
+      this.__timeFactorSelect.appendChild(o);
     });
 
-    this._timeFactorSelect.value = 1;
+    this.__timeFactorSelect.value = 1;
 
-    this._timeFactorSelect.addEventListener('ionChange', (e: any) => {
-      this._timeFactor = Number(e.detail.value);
+    this.__timeFactorSelect.addEventListener('ionChange', (e: any) => {
+      this.__timeFactor = Number(e.detail.value);
     });
 
     container.appendChild(label);
-    container.appendChild(this._timeFactorSelect);
+    container.appendChild(this.__timeFactorSelect);
 
     parent.appendChild(container);
   }
@@ -479,35 +565,35 @@ export class TimeController<
 
     this.addTimeFactorSelect(container);
 
-    this._startButton = document.createElement('ion-button');
-    this._startButton.color = 'success';
-    this._startButton.textContent = 'Run from current';
+    this.__startButton = document.createElement('ion-button');
+    this.__startButton.color = 'success';
+    this.__startButton.textContent = 'Run from current';
 
-    this._stopButton = document.createElement('ion-button');
-    this._stopButton.color = 'danger';
-    this._stopButton.textContent = 'Stop';
+    this.__stopButton = document.createElement('ion-button');
+    this.__stopButton.color = 'danger';
+    this.__stopButton.textContent = 'Stop';
 
-    this._restartButton = document.createElement('ion-button');
-    this._restartButton.color = 'warning';
-    this._restartButton.textContent = 'Run from start';
+    this.__restartButton = document.createElement('ion-button');
+    this.__restartButton.color = 'warning';
+    this.__restartButton.textContent = 'Run from start';
 
-    this._startButton.addEventListener('click', () =>
+    this.__startButton.addEventListener('click', () =>
       this.requestSetTime(true),
     );
 
-    this._restartButton.addEventListener('click', () => {
-      this._timeSlider.value = this.getStartTime();
+    this.__restartButton.addEventListener('click', () => {
+      this.__timeSlider.value = this.getStartTime();
       this.requestSetTime(true);
     });
 
-    this._stopButton.addEventListener('click', () =>
+    this.__stopButton.addEventListener('click', () =>
       this.requestSetTime(false),
     );
 
     const buttonsContainer = document.createElement('div');
-    buttonsContainer.appendChild(this._restartButton);
-    buttonsContainer.appendChild(this._startButton);
-    buttonsContainer.appendChild(this._stopButton);
+    buttonsContainer.appendChild(this.__restartButton);
+    buttonsContainer.appendChild(this.__startButton);
+    buttonsContainer.appendChild(this.__stopButton);
 
     container.appendChild(buttonsContainer);
     parent.appendChild(container);
@@ -519,7 +605,7 @@ export class TimeController<
 
     let stop = 0;
 
-    if (this._endDateEnabledCheckbox.checked) {
+    if (this.__endDateEnabledCheckbox.checked) {
       stop = this.getEndTime();
     }
 
@@ -527,21 +613,29 @@ export class TimeController<
       realStartTime: TimingHelper.computeRealStartTime(
         start,
         current,
-        this._timeFactor,
+        this.__timeFactor,
       ),
       simulatedStartTime: start,
       simulatedCurrentTime: current,
       simulatedStopTime: stop,
-      timeMultiplicator: this._timeFactor,
+      timeMultiplicator: this.__timeFactor,
       running,
     };
-
     this.emit('SIMULATED_SET_TIMEDESCRIPTOR_REQUEST', {
       timeSource: TimeManagerEngine.DEFAULT_TIME_SOURCE,
       timeDescriptor: td,
     });
   }
 
+  private requestTimeDescriptor(): void {
+    this.displayTimeDescriptorStatus(
+      `time descriptor ${this.getTimeSource()} requested`,
+    );
+
+    this.emit('SIMULATED_TIMEDESCRIPTOR_REQUEST', {
+      timeSource: this.getTimeSource(),
+    });
+  }
   // =====================================================
   // FORMAT
   // =====================================================

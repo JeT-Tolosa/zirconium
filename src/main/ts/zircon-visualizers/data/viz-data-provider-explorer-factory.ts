@@ -10,7 +10,10 @@ export class VizDataProviderFactory extends SimpleZirconObjectFactory {
   private _app: ZirconApplication = null;
 
   constructor(app: ZirconApplication) {
-    super(VizDataProviderExplorer.VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
+    super(
+      VizDataProviderExplorer.DATA_EXPLORER_VISUALIZER_TYPE,
+      SHARP_EYE_VIZ_TYPE,
+    );
     this._app = app;
   }
 

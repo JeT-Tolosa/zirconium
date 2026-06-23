@@ -84,6 +84,16 @@ export const ZirconObjectHierarchy: {
     className: 'ZirconViz',
     parent: ZIRCON_APP_OBJECT_TYPE,
   },
+  [ZIRCON_DATA_ADAPTER_TYPE]: {
+    type: ZIRCON_DATA_ADAPTER_TYPE,
+    className: 'ZirconDataAdapter',
+    parent: ZIRCON_DATA_PROVIDER_TYPE,
+  },
+  [ZIRCON_DATA_PROVIDER_TYPE]: {
+    type: ZIRCON_DATA_PROVIDER_TYPE,
+    className: 'ZirconDataProvider',
+    parent: ZIRCON_OBJECT_TYPE,
+  },
 } as const;
 
 export type ZirconType = keyof typeof ZirconObjectHierarchy;

@@ -8,7 +8,7 @@ export class ZirconAppObjectFactory implements ZirconObjectFactory {
   private _app: ZirconApplication = null;
 
   public name = `zircon-app-object-factory`;
-  public type = ZIRCON_APP_OBJECT_TYPE;
+  public objectType = ZIRCON_APP_OBJECT_TYPE;
   public ancestorType: string = ZIRCON_OBJECT_TYPE;
   public contextMenuFactory: ZirconContextMenuFactory = null;
 

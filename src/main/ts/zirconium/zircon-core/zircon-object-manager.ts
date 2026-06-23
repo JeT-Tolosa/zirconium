@@ -43,12 +43,12 @@ export class ZirconObjectManager extends ZirconAppObject {
   }
 
   public async registerObjectFactory(
-    factory: ZirconObjectFactory<ZirconObjectState, ZirconObject>,
+    factory: ZirconObjectFactory<any, any>,
   ): Promise<boolean> {
     if (!factory) {
       return false;
     }
-    if (!factory.type) {
+    if (!factory.objectType) {
       throw new Error(
         `Object factory must handle an object type. Factory name = ${factory.name}`,
       );
@@ -58,16 +58,16 @@ export class ZirconObjectManager extends ZirconAppObject {
         `Object factory must inherent from an object type. Factory name = ${factory.name}. default should be ${ZIRCON_OBJECT_TYPE}`,
       );
     }
-    const existingFactory = this.getHandlingFactory(factory.type);
+    const existingFactory = this.getHandlingFactory(factory.objectType);
     if (existingFactory && existingFactory.name === factory.name) {
       this.getLogger().warn(
-        `Factory  ${factory.name} already registerd for type ${factory.type}. Skip multiple registrations`,
+        `Factory  ${factory.name} already registerd for type ${factory.objectType}. Skip multiple registrations`,
       );
       return Promise.resolve(true);
     }
     if (existingFactory) {
       throw new Error(
-        `Factory  ${factory.name} cannot be registerd. A factory already exists for type ${factory.type}: ${existingFactory.name}`,
+        `Factory  ${factory.name} cannot be registerd. A factory already exists for type ${factory.objectType}: ${existingFactory.name}`,
       );
     }
     // test object creation
@@ -75,22 +75,29 @@ export class ZirconObjectManager extends ZirconAppObject {
       const instance = await factory.create(null);
       if (!instance) {
         throw new Error(
-          `factory ${factory.name} handling type ${factory.type} creates null objects`,
+          `factory ${factory.name} handling type ${factory.objectType} creates null objects`,
         );
       }
       if (!(instance instanceof ZirconObject)) {
         throw new Error(
-          `factory ${factory.name} handling type ${factory.type} creates objects which are not ZirconObjects`,
+          `factory ${factory.name} handling type ${factory.objectType} creates objects which are not ZirconObjects`,
+        );
+      }
+      if (!this.isTypeOf(instance.getType(), factory.objectType)) {
+        throw new Error(
+          `Factory ${factory.name} for object type ${factory.objectType} creates a wrong object type ${instance.getType()}`,
         );
       }
     }
+
     // everythings ok: register factory
     this.getObjectRegistry().registerObjectFactory(factory);
     this.getLogger().info(
-      `object factory ${factory.name} registered. Handled type = ${factory.type} [ancestor of ${factory.ancestorType}]`,
+      `object factory ${factory.name} registered. Handled type = ${factory.objectType} [ancestor of ${factory.ancestorType}]`,
     );
+
     // store object hierarchy
-    this.__objectHierarchy[factory.type] = factory.ancestorType;
+    this.__objectHierarchy[factory.objectType] = factory.ancestorType;
     return true;
   }
 
@@ -122,6 +129,12 @@ export class ZirconObjectManager extends ZirconAppObject {
         `Factory for object type ${state.type} does not create an object type ZirconObject`,
       );
     }
+    if (instance.getType() !== state.type) {
+      throw new Error(
+        `Factory for object type ${state.type} creates a wrong object type ${instance.getType()}`,
+      );
+    }
+
     instance.setEventDispatcher(this.getEventDispatcher());
     return instance;
   }
@@ -223,10 +236,10 @@ export class ZirconObjectManager extends ZirconAppObject {
     }
     return Object.values(this.getObjectRegistry().getFactories())
       .filter((factory: ZirconObjectFactory) => {
-        return this.isTypeOf(factory.type, rootType);
+        return this.isTypeOf(factory.objectType, rootType);
       })
       .map((factory: ZirconObjectFactory) => {
-        return factory.type;
+        return factory.objectType;
       });
   }
 
@@ -241,6 +254,18 @@ export class ZirconObjectManager extends ZirconAppObject {
         return this.isTypeOf(state?.type, type);
       },
     );
+  }
+
+  public getExistingObjects(type: string = ZIRCON_OBJECT_TYPE): ZirconObject[] {
+    const states: ZirconObjectState[] = this.getRegisteredObjectsStates(type);
+    const objects: ZirconObject[] = states
+      .map((state: ZirconObjectState) => {
+        return this.getApplication()
+          .getObjectManager()
+          .getExistingInstance(state.id);
+      })
+      .filter((v) => v !== null);
+    return objects;
   }
 
   public isTypeOf(type: string, parentType: string): boolean {

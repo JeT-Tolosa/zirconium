@@ -8,7 +8,7 @@ export interface ZirconObjectFactory<
   TObject extends ZirconObject = ZirconObject,
 > {
   name: string;
-  type: string;
+  objectType: string;
   ancestorType: string;
   create: (state: TState) => Promise<TObject>;
   contextMenuFactory: ZirconContextMenuFactory;
@@ -32,26 +32,26 @@ export interface ZirconObjectFactory<
 
 export class ZirconFactoriesRegistry {
   private _objectFactories: {
-    [type: string]: ZirconObjectFactory<ZirconObjectState, ZirconObject>;
+    [type: string]: ZirconObjectFactory<any, any>;
   } = {};
 
   constructor() {}
 
   public registerObjectFactory(
-    factory: ZirconObjectFactory<ZirconObjectState, ZirconObject>,
+    factory: ZirconObjectFactory<any, any>,
   ): boolean {
     if (!factory) {
       return false;
     }
-    if (!factory.type) {
+    if (!factory.objectType) {
       throw new Error(
         `Asked to register a valid factory with invalid type ... factory = ${jQueryFactory.name}`,
       );
     }
-    if (this._objectFactories[factory.type]) {
+    if (this._objectFactories[factory.objectType]) {
       return false;
     }
-    this._objectFactories[factory.type] = factory;
+    this._objectFactories[factory.objectType] = factory;
     return true;
   }
 
@@ -121,14 +121,14 @@ export class ZirconFactoriesRegistry {
 
 export abstract class SimpleZirconObjectFactory implements ZirconObjectFactory {
   name: string = null;
-  type: string = null;
+  objectType: string = null;
   ancestorType: string = null;
   create: (state: any) => Promise<any>;
   contextMenuFactory: ZirconContextMenuFactory = null;
 
-  constructor(type: string, ancestorType: string) {
-    this.name = `${type}-factory`;
-    this.type = type;
+  constructor(objectType: string, ancestorType: string) {
+    this.name = `${objectType}-factory`;
+    this.objectType = objectType;
     this.ancestorType = ancestorType;
     this.create = (state: ZirconObjectState) => {
       return this.createObject(state);

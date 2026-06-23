@@ -3,9 +3,14 @@ import {
   ZirconObjectState,
   ZirconObjectEventRegistry,
 } from '../zircon-core/zircon-object';
-import { MergeZirconRegistries, PickEvents } from '../zircon-event';
+import {
+  MergePickEvents,
+  MergeZirconRegistries,
+  PickEvents,
+} from '../zircon-event';
 import { ZirconVizWindow } from './zircon-viz-window';
 import { ZIRCON_VISUALIZER_TYPE } from '../zircon-core/zircon-types';
+import { ZirconDataProviderEvents } from '../zircon-data/zircon-data-provider';
 /**
  * Base state for all zircon objects UI
  */
@@ -20,9 +25,17 @@ export type ZirconVizEvents = {
 export type ZirconVizEventRegistry = MergeZirconRegistries<
   {
     incoming: PickEvents<ZirconVizEvents, 'VISUALIZER_DISPLAY_REQUEST'>;
-    outgoing: PickEvents<
-      ZirconVizEvents,
-      'VISUALIZER_DISPLAYED' | 'VISUALIZER_REMOVED_FROM_WINDOW'
+    outgoing: MergePickEvents<
+      [
+        PickEvents<
+          ZirconVizEvents,
+          'VISUALIZER_DISPLAYED' | 'VISUALIZER_REMOVED_FROM_WINDOW'
+        >,
+        PickEvents<
+          ZirconDataProviderEvents,
+          'DATA_PROVIDER_FULL_CONTENT_REQUEST'
+        >,
+      ]
     >;
   },
   ZirconObjectEventRegistry

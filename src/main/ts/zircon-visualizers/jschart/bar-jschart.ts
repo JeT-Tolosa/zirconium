@@ -1,6 +1,4 @@
-import { DataSeries } from '../../libraries/data-series/data-series';
-import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
-import { VizJSChart } from './viz-eye-chartJS';
+import { VizJSChart, VizJSChartState } from './viz-jschart';
 import {
   Chart,
   BarController,
@@ -9,19 +7,21 @@ import {
   LinearScale,
   Tooltip,
   Legend,
-  ChartData,
-} from 'chart.js'; /**
+} from 'chart.js';
+
+/**
  * Bar chart receives an input series with format:
  * https://www.chartjs.org/docs/latest/charts/bar.html
  * https://www.chartjs.org/docs/latest/samples/bar/vertical.html
  */
-export interface VizBarJSChartState extends ZirconVizState {
-  series?: DataSeries<ChartData<'bar'>>;
+
+export interface VizBarJSChartState extends VizJSChartState<'bar'> {
+  chartType: 'bar';
 }
 
 export class VizBarJSChart extends VizJSChart<'bar'> {
   public static readonly BAR_JSCHART_VISUALIZER_TYPE =
-    'BAR_JSCHART_VISUALIZER_TYPE';
+    'jschar-bar-visualizer-type';
 
   constructor(state?: VizBarJSChartState) {
     super(state);
@@ -37,13 +37,5 @@ export class VizBarJSChart extends VizJSChart<'bar'> {
 
   public override getType(): string {
     return VizBarJSChart.BAR_JSCHART_VISUALIZER_TYPE;
-  }
-
-  /**
-   * get chart JS type
-   * @returns chart type to set into 'type' field of chart config
-   */
-  public getChartType(): 'bar' {
-    return 'bar';
   }
 }

@@ -52,7 +52,7 @@ export async function createDesktop6(
     type: ZIRCON_VISUALIZER_WINDOW_TYPE,
     id: `window-${uuid()}`,
     title: 'TLE Propagator',
-    left: 0,
+    left: 820,
     top: 10,
     width: 800,
     height: 600,

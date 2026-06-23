@@ -10,7 +10,7 @@ export interface VizSatelliteCatalogTabulatorState extends VizCollectionCatalogT
 
 export class VizSatelliteCatalogTabulator extends VizCollectionCatalogTabulator<Satellite> {
   public static readonly VIZ_SATELLITE_CATALOG_TABULATOR_TYPE =
-    'VIZ_SATELLITE_CATALOG_TABULATOR_TYPE';
+    'satellite-tabulator-catalog-visualizer-type';
 
   constructor(state?: VizSatelliteCatalogTabulatorState) {
     super('Satellite', (el: Satellite) => el.OBJECT_ID);
@@ -19,5 +19,9 @@ export class VizSatelliteCatalogTabulator extends VizCollectionCatalogTabulator<
       ...state,
       type: VizSatelliteCatalogTabulator.VIZ_SATELLITE_CATALOG_TABULATOR_TYPE,
     });
+  }
+
+  public override getType(): string {
+    return VizSatelliteCatalogTabulator.VIZ_SATELLITE_CATALOG_TABULATOR_TYPE;
   }
 }

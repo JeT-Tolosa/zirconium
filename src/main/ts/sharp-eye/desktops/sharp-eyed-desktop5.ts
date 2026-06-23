@@ -4,7 +4,7 @@ import { ZirconVizWindowState } from '../../zirconium/zircon-ui/zircon-viz-windo
 import { ZirconDesktopState } from '../../zirconium/zircon-ui/zircon-desktop';
 import { VizAISLoaderFactory } from '../../zircon-visualizers/maritime/viz-eye-ais-loader-factory';
 import {
-  VIZ_AIS_CATALOG_TABULATOR_TYPE,
+  VizAISCatalogTabulator,
   VizAISCatalogTabulatorState,
 } from '../../zircon-visualizers/maritime/viz-eye-ais-catalog-tabulator';
 import { VIZ_AIS_LOADER_TYPE } from '../../zircon-visualizers/maritime/viz-eye-ais-loader';
@@ -14,10 +14,7 @@ import {
 } from '../../zirconium/zircon-core/zircon-types';
 import { VizAISCatalogTabulatorFactory } from '../../zircon-visualizers/maritime/viz-eye-ais-catalog-tabulator-factory';
 import { VizDataProviderFactory } from '../../zircon-visualizers/data/viz-data-provider-explorer-factory';
-import {
-  VizDataProviderExplorer,
-  VizDataProviderExplorerState,
-} from '../../zircon-visualizers/data/viz-data-provider-explorer';
+
 import { VizLoaderState } from '../../zircon-visualizers/data-loader/viz-loader';
 
 /**
@@ -51,7 +48,7 @@ export async function createDesktop5(
 
   const aisCatalogViz: VizAISCatalogTabulatorState = {
     id: 'aisCatalogVizId',
-    type: VIZ_AIS_CATALOG_TABULATOR_TYPE,
+    type: VizAISCatalogTabulator.VIZ_AIS_CATALOG_TABULATOR_TYPE,
     name: 'AIS Catalog',
   };
   app.registerObjectState(aisCatalogViz);
@@ -68,34 +65,11 @@ export async function createDesktop5(
   };
   app.registerObjectState(AISCatalogWindowState);
 
-  const dataProviderExplorerVizState: VizDataProviderExplorerState = {
-    id: 'dataProviderExplorerVizId',
-    type: VizDataProviderExplorer.VISUALIZER_TYPE,
-    name: 'Data Provider Explorer',
-  };
-  app.registerObjectState(dataProviderExplorerVizState);
-
-  const dataProviderExplorerWindowState: ZirconVizWindowState = {
-    type: ZIRCON_VISUALIZER_WINDOW_TYPE,
-    id: `window-${uuid()}`,
-    title: 'Data Provider Explorer',
-    left: 10,
-    top: 10,
-    width: 400,
-    height: 400,
-    vizId: dataProviderExplorerVizState.id,
-  };
-  app.registerObjectState(dataProviderExplorerWindowState);
-
   const desktop5State: ZirconDesktopState = {
     type: ZIRCON_DESKTOP_TYPE,
     id: `desktop5-${uuid()}`,
     name: 'Maritime',
-    windowIds: [
-      AISLoaderWindowState.id,
-      AISCatalogWindowState.id,
-      dataProviderExplorerWindowState.id,
-    ],
+    windowIds: [AISLoaderWindowState.id, AISCatalogWindowState.id],
   };
   app.registerObjectState(desktop5State);
   return Promise.resolve(desktop5State);

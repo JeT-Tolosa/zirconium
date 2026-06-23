@@ -14,7 +14,7 @@ interface EventDescriptor {
 
 export class VizEventLogger extends ZirconViz {
   public static readonly EVENT_LOGGER_VISUALIZER_TYPE =
-    'EVENT_LOGGER_VISUALIZER_TYPE';
+    'event-logger-visualizer-type';
   private _mainDiv: HTMLDivElement = null;
   private _loggerDiv: HTMLDivElement = null;
   private _detailDiv: HTMLDivElement = null;
@@ -98,7 +98,9 @@ export class VizEventLogger extends ZirconViz {
    * Get Logger's div element
    */
   public getContainer(): HTMLDivElement {
-    if (this._mainDiv) {return this._mainDiv;}
+    if (this._mainDiv) {
+      return this._mainDiv;
+    }
     this._mainDiv = document.createElement('div');
     this._mainDiv.id = uuid();
     this._mainDiv.classList.add('event-logger');
@@ -111,7 +113,9 @@ export class VizEventLogger extends ZirconViz {
    * @returns Logs div element
    */
   public getLoggerDiv(): HTMLDivElement {
-    if (this._loggerDiv) {return this._loggerDiv;}
+    if (this._loggerDiv) {
+      return this._loggerDiv;
+    }
     this._loggerDiv = document.createElement('div');
     this._loggerDiv.classList.add('event-container');
     return this._loggerDiv;
@@ -121,7 +125,9 @@ export class VizEventLogger extends ZirconViz {
    * @returns Log detail div element
    */
   public getDetailDiv(): HTMLDivElement {
-    if (this._detailDiv) {return this._detailDiv;}
+    if (this._detailDiv) {
+      return this._detailDiv;
+    }
     this._detailDiv = document.createElement('div');
     this._detailDiv.classList.add('event-detail');
     return this._detailDiv;

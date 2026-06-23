@@ -10,7 +10,7 @@ export class ItemCollectionDataProvider<T> extends ZirconDataProvider<T> {
     super('unknown-data', {
       name,
       type: CATALOG_DATA_PROVIDER_TYPE,
-      dataType: 'unknown',
+      outputDataType: 'unknown',
     });
     this.setItemCollection(itemCollection);
   }
@@ -36,7 +36,7 @@ export class ItemCollectionDataProvider<T> extends ZirconDataProvider<T> {
     );
     this.emit('ITEM_COLLECTION_CONTENT', {
       dataProviderId: this.getId(),
-      dataType: this.getDataType(),
+      dataType: this.getOutputDataType(),
     });
   }
 

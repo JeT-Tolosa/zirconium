@@ -8,6 +8,10 @@ export default defineConfig({
   },
   plugins: [cesium()],
 
+  worker: {
+    format: 'es',
+  },
+
   optimizeDeps: {
     exclude: ['@ionic/core'],
   },

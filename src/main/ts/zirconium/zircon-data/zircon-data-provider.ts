@@ -17,7 +17,7 @@ export interface ZirconDataProviderDescriptor {
   id: string;
   name: string;
   type: string;
-  dataType: string;
+  outputDataType: string;
 }
 
 export interface DiffData {
@@ -80,7 +80,8 @@ export type ZirconDataProviderEventRegistry = MergeZirconRegistries<
 
 export interface ZirconDataProviderState extends ZirconObjectState {
   type: typeof ZIRCON_DATA_PROVIDER_TYPE;
-  dataType: string;
+  active?: boolean;
+  outputDataType: string;
 }
 
 function compareDefaultData<T>(a: T, b: T): number {
@@ -106,10 +107,12 @@ function compareDefaultData<T>(a: T, b: T): number {
 }
 
 export class ZirconDataProvider<
-  T = unknown,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T = any,
   R extends ZirconDataProviderEventRegistry = ZirconDataProviderEventRegistry,
 > extends ZirconObject<R> {
-  private _dataType: string = null; // output data type
+  private _outputDataType: string = null; // output data type
+  private _active: boolean = false;
   private __data: T = null;
   private __version: number = 0;
   private __compareElements: (a: T, b: T) => number = compareDefaultData;
@@ -120,26 +123,72 @@ export class ZirconDataProvider<
     compareElements: (a: T, b: T) => number = compareDefaultData,
   ) {
     super(state);
-    this._dataType = outDataType;
+    this._outputDataType = outDataType;
     if (compareElements) {
       this.__compareElements = compareElements;
     }
+  }
+
+  protected override async setState(
+    state: ZirconDataProviderState,
+  ): Promise<void> {
+    await super.setState(state);
     if (!state) {
       return;
     }
-    if (!state.dataType) {
-      throw new Error(
-        `state dataType ${state.dataType} is not defined but should be ${outDataType}`,
-      );
-    }
-        if (state.dataType !== outDataType) {
-      throw new Error(
-        `state dataType ${state.dataType} does not match provided dataType ${this._dataType} in ${this.constructor.name} constructor`,
-      );
-    }
-
+    this.setOutputDataType(state.outputDataType);
+    this.setActive(state.active);
   }
 
+  private setOutputDataType(dataType: string): void {
+    if (!dataType) {
+      return;
+    }
+    if (dataType !== this._outputDataType) {
+      throw new Error(
+        `provider state dataType cannot be changed dynamically. Existing data type ${this._outputDataType} != requested data type ${dataType}`,
+      );
+    }
+    this._outputDataType = dataType;
+  }
+
+  public getOutputDataType(): string {
+    return this._outputDataType;
+  }
+
+  private async setActive(active: boolean): Promise<void> {
+    if (active === undefined) {
+      return;
+    }
+    if (active === this._active) {
+      return;
+    }
+    if (!active) {
+      await this.stop();
+      this._active = false;
+    } else {
+      await this.start();
+      this._active = true;
+    }
+  }
+
+  public isActive(): boolean {
+    return this._active;
+  }
+
+  public async activate(active: boolean): Promise<void> {
+    return this.setActive(active);
+  }
+
+  // this  method should be overriden if data are non static
+  protected start(): Promise<void> {
+    return;
+  }
+
+  // this  method should be overriden if data are non static
+  protected stop(): Promise<void> {
+    return;
+  }
   // -----------------------
   // CORE DATA
   // -----------------------
@@ -153,14 +202,6 @@ export class ZirconDataProvider<
       data: this.__data,
       version: this.__version,
     };
-  }
-
-  public getDataType(): string {
-    return this._dataType;
-  }
-
-  public setDataType(dataType: string): void {
-    this._dataType = dataType;
   }
 
   public getType(): string {
@@ -263,7 +304,21 @@ export class ZirconDataProvider<
       id: this.getId(),
       name: this.getName(),
       type: this.getType(),
-      dataType: this.getDataType(),
+      outputDataType: this.getOutputDataType(),
     };
+  }
+}
+
+export class ZirconDataProviderConstant<
+  T = unknown,
+> extends ZirconDataProvider<T> {
+  constructor(
+    outDataType: string,
+    state: ZirconDataProviderState,
+    data: T,
+    compareElements: (a: T, b: T) => number = compareDefaultData,
+  ) {
+    super(outDataType, state, compareElements);
+    this.setData(data);
   }
 }

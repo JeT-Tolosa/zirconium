@@ -11,7 +11,7 @@ export interface AISCatalogEngineState extends ZirconEngineState {
   type: typeof AISCatalogEngine.AIS_CATALOG_ENGINE_TYPE;
 }
 
-export const AIS_CATALOG_DATA_PROVIDER = 'ais-catalog-data-provider';
+export const AIS_CATALOG_DATA_PROVIDER_TYPE = 'ais-catalog-data-provider';
 
 // dataProviderCreator: (data: T[]) => ZirconDataProvider<ItemArray<T>>,
 const aisArrayDataProviderCreator: ItemArrayDataProviderCreatorFunction<AIS> = (
@@ -19,9 +19,13 @@ const aisArrayDataProviderCreator: ItemArrayDataProviderCreatorFunction<AIS> = (
   dataType: string,
   items: AIS[] = [],
 ): ZirconDataProvider<ItemArray<AIS>> => {
+  if (dataType !== AIS_TYPE) {
+    throw new Error(`${dataType} should be ${AIS_TYPE}`);
+  }
   const dataProvider = new ZirconDataProvider<ItemArray<AIS>>(dataType, {
-    type: AIS_CATALOG_DATA_PROVIDER,
-    dataType: AIS_TYPE,
+    id: `ais-data-provider-engine-${dataProviderName}`,
+    type: AIS_CATALOG_DATA_PROVIDER_TYPE,
+    outputDataType: dataType,
     name: dataProviderName,
   });
   const itemArray = new ItemArray<AIS>({

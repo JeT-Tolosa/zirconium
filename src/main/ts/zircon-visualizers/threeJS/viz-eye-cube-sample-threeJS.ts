@@ -11,7 +11,7 @@ export interface VizCubeSampleThreeJSState extends ZirconVizState {
  */
 export class VizCubeSampleThreeJS extends VizThreeJS {
   public static readonly CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE =
-    'CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE';
+    'cube-sample-threejs-visualizer-type';
   private _cube: THREE.Mesh = null;
   private _geometry: THREE.BoxGeometry = null;
   private _scene: THREE.Scene = null;
@@ -26,6 +26,9 @@ export class VizCubeSampleThreeJS extends VizThreeJS {
     super(state);
   }
 
+  public override getType(): string {
+    return VizCubeSampleThreeJS.CUBE_SAMPLE_THREEJS_VISUALIZER_TYPE;
+  }
   /**
    */
   public createScene(): void {

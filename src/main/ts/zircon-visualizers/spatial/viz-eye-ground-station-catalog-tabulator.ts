@@ -10,7 +10,7 @@ export interface VizGroundStationCatalogTabulatorState extends VizCollectionCata
 
 export class VizGroundStationCatalogTabulator extends VizCollectionCatalogTabulator<GroundStation> {
   public static readonly VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE =
-    'VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE';
+    'ground-station-tabulator-catalog-visualizer-type';
 
   constructor(state?: VizGroundStationCatalogTabulatorState) {
     super('GroundStation', (el: GroundStation) => el.name, state);
@@ -19,5 +19,9 @@ export class VizGroundStationCatalogTabulator extends VizCollectionCatalogTabula
       ...state,
       type: VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE,
     });
+  }
+
+  public override getType(): string {
+    return VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE;
   }
 }

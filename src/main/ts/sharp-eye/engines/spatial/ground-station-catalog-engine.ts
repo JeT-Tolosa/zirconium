@@ -14,6 +14,9 @@ export interface GroundStationCatalogEngineState extends ZirconEngineState {
   type: typeof GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE;
 }
 
+export const GROUND_STATION_CATALOG_DATA_PROVIDER_TYPE =
+  'ground-station-catalog-data-provider';
+
 const groundStationArrayDataProviderCreator: ItemArrayDataProviderCreatorFunction<
   GroundStation
 > = (
@@ -21,12 +24,20 @@ const groundStationArrayDataProviderCreator: ItemArrayDataProviderCreatorFunctio
   dataType: string,
   items: GroundStation[] = [],
 ): ZirconDataProvider<ItemArray<GroundStation>> => {
+  if (dataType !== GROUND_STATION_TYPE) {
+    throw new Error(`${dataType} should be ${GROUND_STATION_TYPE}`);
+  }
   const dataProvider = new ZirconDataProvider<ItemArray<GroundStation>>(
     dataType,
-    { type: dataProviderName, dataType: GROUND_STATION_TYPE },
+    {
+      id: `ground-station-data-provider-engine-${dataProviderName}`,
+      type: GROUND_STATION_CATALOG_DATA_PROVIDER_TYPE,
+      outputDataType: dataType,
+      name: dataProviderName,
+    },
   );
   const itemArray = new ItemArray<GroundStation>({
-    itemType: GROUND_STATION_TYPE,
+    itemType: dataType,
     name: `${dataProviderName}-item-array`,
   });
   itemArray.setItems(items);

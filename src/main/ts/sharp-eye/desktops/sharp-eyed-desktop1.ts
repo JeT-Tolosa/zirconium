@@ -3,7 +3,6 @@ import { v4 as uuid } from 'uuid';
 import { ZirconVizWindowState } from '../../zirconium/zircon-ui/zircon-viz-window';
 import { ZirconDesktopState } from '../../zirconium/zircon-ui/zircon-desktop';
 
-import { createSeriesBar } from '.././sharp-eye-panels';
 import { VizThreeJSState } from '../../zircon-visualizers/threeJS/viz-eye-threeJS';
 import {
   VizCubeSampleThreeJS,
@@ -32,6 +31,99 @@ import { AnalogClockFactory } from '../../zircon-visualizers/time/analog-clock-f
 import { VizCubeSampleThreeJSFactory } from '../../zircon-visualizers/threeJS/viz-eye-cube-sample-threeJS-factory';
 import { VizHelmetSampleThreeJSFactory } from '../../zircon-visualizers/threeJS/viz-eye-helmet-sample-threeJS-factory';
 import { VizOpenGlobusFactory } from '../../zircon-visualizers/openglobus/viz-eye-openglobus-factory';
+import { ZirconDataProviderState } from '../../zirconium/zircon-data/zircon-data-provider';
+import { ZIRCON_DATA_PROVIDER_TYPE } from '../../zirconium/zircon-core/zircon-types';
+import { DataProviderChartJS } from '../../zircon-visualizers/jschart/jschart-data-provider';
+import { ChartData, ChartOptions } from 'chart.js';
+import { ZirconApplication } from '../../zirconium/zircon-core/zircon-app';
+import { VIZ_JSCHART_REGISTRY } from '../../zircon-visualizers/jschart/viz-jschart-types';
+
+function barChartOptions(): ChartOptions<'bar'> {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+
+    plugins: {
+      legend: {
+        display: false,
+      },
+      title: {
+        display: true,
+        text: 'Évolution du chiffre d’affaires 2025',
+        font: {
+          size: 20,
+          weight: 'bold',
+        },
+        padding: {
+          bottom: 30,
+        },
+      },
+      tooltip: {
+        backgroundColor: '#111827',
+        padding: 12,
+        cornerRadius: 8,
+        callbacks: {
+          label: (context) => context.parsed.y.toLocaleString('fr-FR') + ' €',
+        },
+      },
+    },
+
+    scales: {
+      x: {
+        grid: {
+          display: false,
+        },
+      },
+      y: {
+        beginAtZero: true,
+        grid: {
+          color: '#E5E7EB99',
+        },
+        ticks: {
+          callback: (value) => value.toLocaleString('fr-FR') + ' €',
+        },
+      },
+    },
+  };
+}
+
+function registerDataProviderBar(
+  app: ZirconApplication,
+): DataProviderChartJS<'bar'> {
+  const state: ZirconDataProviderState = {
+    id: 'bar-data-provider',
+    name: 'bar-data-provider',
+    type: ZIRCON_DATA_PROVIDER_TYPE,
+    outputDataType: VIZ_JSCHART_REGISTRY['bar'].dataType,
+  };
+  const data: ChartData<'bar'> = {
+    labels: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin'],
+    datasets: [
+      {
+        label: 'CA 2024',
+        data: [10500, 14500, 13200, 17800, 21000, 24500],
+        backgroundColor: '#406fb2',
+        borderRadius: 4,
+        borderSkipped: false,
+      },
+      {
+        label: 'CA 2025',
+        data: [12500, 19200, 15800, 24300, 28100, 32500],
+        backgroundColor: '#e54646',
+        borderRadius: 4,
+        borderSkipped: false,
+      },
+    ],
+  };
+  const dataProvider: DataProviderChartJS<'bar'> =
+    new DataProviderChartJS<'bar'>('bar', state);
+  dataProvider.setData(data);
+
+  app.registerDataProviderFactory(`${state.id}-factory`, state.outputDataType);
+  app.getDataProviderManager().registerDataProvider(dataProvider);
+
+  return dataProvider;
+}
 
 export async function createDesktop1(
   app: SharpEyedApp,
@@ -42,12 +134,17 @@ export async function createDesktop1(
   await app.registerObjectFactory(new VizHelmetSampleThreeJSFactory());
   await app.registerObjectFactory(new VizOpenGlobusFactory());
 
+  const dataProviderBar: DataProviderChartJS<'bar'> =
+    registerDataProviderBar(app);
+
   // Chart.js Visualizers
   const barChartVizState: VizBarJSChartState = {
     id: 'barChartVizId',
     type: VizBarJSChart.BAR_JSCHART_VISUALIZER_TYPE,
+    chartType: 'bar',
     name: 'Bar Chart',
-    series: createSeriesBar(),
+    chartOptions: barChartOptions(),
+    dataProviderId: dataProviderBar.getId(),
   };
   app.registerObjectState(barChartVizState);
 

@@ -17,7 +17,7 @@ export interface VizHelmetSampleThreeJSState extends ZirconVizState {
  */
 export class VizHelmetSampleThreeJS extends VizThreeJS {
   public static readonly HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE =
-    'HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE';
+    'helmet-sample-threejs-visualizer-type';
   private _cube: THREE.Mesh = null;
   private _geometry: THREE.BoxGeometry = null;
   private _scene: THREE.Scene = null;
@@ -30,6 +30,10 @@ export class VizHelmetSampleThreeJS extends VizThreeJS {
    */
   constructor(state?: VizHelmetSampleThreeJSState) {
     super(state);
+  }
+
+  public override getType(): string {
+    return VizHelmetSampleThreeJS.HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE;
   }
 
   /**

@@ -12,7 +12,7 @@ export class ZirconDesktopManagerFactory implements ZirconObjectFactory {
   private _app: ZirconApplication = null;
 
   public name = `zircon-desktop-manager-factory`;
-  public type = ZIRCON_DESKTOP_MANAGER_TYPE;
+  public objectType = ZIRCON_DESKTOP_MANAGER_TYPE;
   public ancestorType: string = ZIRCON_APP_OBJECT_TYPE;
   public contextMenuFactory: ZirconContextMenuFactory = null;
 

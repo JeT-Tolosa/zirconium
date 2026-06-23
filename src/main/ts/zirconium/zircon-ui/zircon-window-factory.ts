@@ -20,7 +20,7 @@ export class ZirconWindowFactory implements ZirconObjectFactory {
   private readonly _app: ZirconApplication;
 
   public name = `zircon-window-factory`;
-  public type = ZIRCON_WINDOW_TYPE;
+  public objectType = ZIRCON_WINDOW_TYPE;
   public ancestorType: string = ZIRCON_APP_OBJECT_TYPE;
   public contextMenuFactory: ZirconContextMenuFactory = null;
 
@@ -47,7 +47,7 @@ export class ZirconWindowFactory implements ZirconObjectFactory {
 
 export class ZirconVizWindowFactory extends ZirconWindowFactory {
   public override name = `zircon-visualizer-window-factory`;
-  public override type = ZIRCON_VISUALIZER_WINDOW_TYPE;
+  public override objectType = ZIRCON_VISUALIZER_WINDOW_TYPE;
   public override ancestorType: string = ZIRCON_WINDOW_TYPE;
   public override contextMenuFactory: ZirconContextMenuFactory = null;
 
@@ -66,7 +66,7 @@ export class ZirconVizWindowFactory extends ZirconWindowFactory {
 
 export class ZirconParamWindowFactory extends ZirconWindowFactory {
   public override name = `zircon-parameters-window-factory`;
-  public override type = ZIRCON_PARAMETER_WINDOW_TYPE;
+  public override objectType = ZIRCON_PARAMETER_WINDOW_TYPE;
   public override ancestorType: string = ZIRCON_WINDOW_TYPE;
   public override contextMenuFactory: ZirconContextMenuFactory = null;
 

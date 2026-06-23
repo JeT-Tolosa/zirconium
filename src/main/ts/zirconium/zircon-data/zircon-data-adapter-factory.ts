@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ZirconApplication } from '../zircon-core/zircon-app';
+import { ZirconObjectState } from '../zircon-core/zircon-object';
 import { ZirconObjectFactory } from '../zircon-core/zircon-object-factory';
 import {
   ZIRCON_DATA_ADAPTER_TYPE,
@@ -14,24 +16,23 @@ export class ZirconDataAdapterFactory implements ZirconObjectFactory<
   ZirconDataAdapterState,
   ZirconDataAdapter
 > {
-  private __transformData: (data: unknown) => unknown = null;
-  private __compareData: (a: unknown, b: unknown) => number = null;
+  private __transformData: (data: any) => any = null;
+  private __compareData: (a: any, b: any) => number = null;
   private _outputDataType: string = null;
   private _inputDataType: string = null;
 
-  public name = `zircon-desktop-factory`;
-  public type = ZIRCON_DATA_ADAPTER_TYPE;
+  public name = `zircon-data-adapter-factory`;
+  public objectType = ZIRCON_DATA_ADAPTER_TYPE;
   public ancestorType: string = ZIRCON_DATA_PROVIDER_TYPE;
   public contextMenuFactory: ZirconContextMenuFactory = null;
 
   constructor(
     app: ZirconApplication,
     name: string,
-    type: string,
     inputDataType: string,
     outputDataType: string,
-    transformData?: (data: unknown) => unknown,
-    comparData?: (a: unknown, b: unknown) => number,
+    transformData?: (data: any) => any,
+    comparData?: (a: any, b: any) => number,
   ) {
     if (!app) {
       throw new Error(
@@ -39,21 +40,17 @@ export class ZirconDataAdapterFactory implements ZirconObjectFactory<
       );
     }
     this.name = name;
-    this.type = type;
-    this.ancestorType = ZIRCON_DATA_ADAPTER_TYPE;
     this._inputDataType = inputDataType;
     this._outputDataType = outputDataType;
     this.__transformData = transformData;
     this.__compareData = comparData;
   }
 
-  public async create(
-    state: ZirconDataAdapterState,
-  ): Promise<ZirconDataAdapter> {
+  public async create(state: ZirconObjectState): Promise<ZirconDataAdapter> {
     return new ZirconDataAdapter(
       this._inputDataType,
       this._outputDataType,
-      state,
+      state as ZirconDataAdapterState,
       this.__transformData,
       this.__compareData,
     );

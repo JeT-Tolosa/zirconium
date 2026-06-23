@@ -1,5 +1,5 @@
 // import { ZirconDataProvider, ZirconDataProviderEventRegistry } from '../../../zirconium/zircon-data/zircon-data-provider';
-// export const CESIUM_LAYER_TYPE = 'cesium-layer';
+export const CESIUM_LAYER_TYPE = 'cesium-layer';
 // export const CESIUM_PRIMITIVE_DATA_PROVIDER = 'cesium-primitive-data-provider';
 
 // export type CesiumPrimitiveDataProviderEventRegistry = ZirconDataProviderEventRegistry;

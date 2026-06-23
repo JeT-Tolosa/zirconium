@@ -8,11 +8,7 @@ import { VizEventLoggerFactory } from '../../zircon-visualizers/logger/viz-eye-e
 import { VizFetchFactory } from '../../zircon-visualizers/fetch/viz-eye-fetch-factory';
 import { VizLeafletFactory } from '../../zircon-visualizers/leaflet/viz-eye-leaflet-factory';
 import { VizLineJSChartFactory } from '../../zircon-visualizers/jschart/line-jschart-factory';
-import {
-  VizLineJSChart,
-  VizLineJSChartState,
-} from '../../zircon-visualizers/jschart/line-jschart';
-import { createSeriesLine } from '.././sharp-eye-panels';
+
 import {
   VizEventLogger,
   VizEventLoggerState,
@@ -35,9 +31,69 @@ import {
   TimeControllerState,
 } from '../../zircon-visualizers/time/time-controller';
 import {
+  ZIRCON_DATA_PROVIDER_TYPE,
   ZIRCON_DESKTOP_TYPE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
 } from '../../zirconium/zircon-core/zircon-types';
+import {
+  VizLineJSChart,
+  VizLineJSChartState,
+} from '../../zircon-visualizers/jschart/line-jschart';
+import { DataProviderChartJS } from '../../zircon-visualizers/jschart/jschart-data-provider';
+import { VIZ_JSCHART_REGISTRY } from '../../zircon-visualizers/jschart/viz-jschart-types';
+import { ZirconDataProviderState } from '../../zirconium/zircon-data/zircon-data-provider';
+import { ZirconApplication } from '../../zirconium/zircon-core/zircon-app';
+import { ChartData, ChartOptions } from 'chart.js';
+
+function lineChartOptions(): ChartOptions<'line'> {
+  return {
+    animation: false,
+    responsive: true,
+    scales: {
+      x: {
+        display: false,
+      },
+      y: {
+        min: -1.5,
+        max: 1.5,
+      },
+    },
+  };
+}
+
+function registerDataProviderLine(
+  app: ZirconApplication,
+): DataProviderChartJS<'line'> {
+  const state: ZirconDataProviderState = {
+    id: 'line-data-provider',
+    name: 'line-data-provider',
+    type: ZIRCON_DATA_PROVIDER_TYPE,
+    outputDataType: VIZ_JSCHART_REGISTRY['line'].dataType,
+  };
+  const data: ChartData<'line'> = {
+    labels: [],
+    datasets: [
+      {
+        label: 'Signal',
+        data: [],
+        borderColor: '#4F46E5',
+        backgroundColor: 'rgba(79,70,229,0.15)',
+        borderWidth: 2,
+        tension: 0.3,
+        pointRadius: 0,
+        fill: true,
+      },
+    ],
+  };
+  const dataProvider: DataProviderChartJS<'line'> =
+    new DataProviderChartJS<'line'>('line', state);
+  dataProvider.setData(data);
+
+  app.registerDataProviderFactory(`${state.id}-factory`, state.outputDataType);
+  app.getDataProviderManager().registerDataProvider(dataProvider);
+
+  return dataProvider;
+}
 
 /**
  * DESKTOP2
@@ -52,11 +108,16 @@ export async function createDesktop2(
   await app.registerObjectFactory(new VizLeafletFactory());
   await app.registerObjectFactory(new VizLineJSChartFactory());
 
+  const dataProviderLine: DataProviderChartJS<'line'> =
+    registerDataProviderLine(app);
+
   const lineChartVizState: VizLineJSChartState = {
     id: 'lineChartVizId',
     type: VizLineJSChart.LINE_JSCHART_VISUALIZER_TYPE,
-    series: createSeriesLine(),
+    chartType: 'line',
     name: 'Line Chart',
+    chartOptions: lineChartOptions(),
+    dataProviderId: dataProviderLine.getId(),
   };
 
   app.registerObjectState(lineChartVizState);
@@ -74,7 +135,7 @@ export async function createDesktop2(
     type: DigitalClock.DIGITAL_CLOCK_VISUALIZER_TYPE,
     timeZoneOffset: +2,
     timeSource: null,
-    locationName: 'Paris',
+    locationName: 'Moscow',
     name: 'Digital Clock',
   };
   app.registerObjectState(clock1VizState);
@@ -83,7 +144,7 @@ export async function createDesktop2(
     id: 'timeControllerVizId',
     type: TimeController.TIME_CONTROLLER_VISUALIZER_TYPE,
     name: 'Time Controller',
-    timeDescriptorId: TimingHelper.MAIN_TIME_SOURCE_ID,
+    timeSource: TimingHelper.MAIN_TIME_SOURCE_ID,
   };
   app.registerObjectState(timeControllerVizState);
 
@@ -113,17 +174,17 @@ export async function createDesktop2(
     vizId: leafletVizState.id,
   };
 
-  const lineChartWindowState: ZirconVizWindowState = {
-    type: ZIRCON_VISUALIZER_WINDOW_TYPE,
-    id: `window-${uuid()}`,
-    title: 'Line Chart',
-    left: 10,
-    top: 550,
-    width: 320,
-    height: 520,
-    vizId: lineChartVizState.id,
-  };
-  app.registerObjectState(lineChartWindowState);
+  // const lineChartWindowState: ZirconVizWindowState = {
+  //   type: ZIRCON_VISUALIZER_WINDOW_TYPE,
+  //   id: `window-${uuid()}`,
+  //   title: 'Line Chart',
+  //   left: 10,
+  //   top: 550,
+  //   width: 320,
+  //   height: 520,
+  //   vizId: lineChartVizState.id,
+  // };
+  // app.registerObjectState(lineChartWindowState);
 
   // createVisualizerLeafletJS(),
   app.registerObjectState(leafletWindowState);
@@ -190,7 +251,7 @@ export async function createDesktop2(
       loggerWindowState.id,
       fetchWindowState.id,
       leafletWindowState.id,
-      lineChartWindowState.id,
+      // lineChartWindowState.id,
     ],
   };
   app.registerObjectState(desktop2State);

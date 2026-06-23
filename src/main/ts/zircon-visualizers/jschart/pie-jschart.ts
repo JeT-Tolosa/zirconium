@@ -1,15 +1,12 @@
 import {
   CategoryScale,
   Chart,
-  ChartData,
   Legend,
   LinearScale,
   PieController,
   Tooltip,
 } from 'chart.js';
-import { VizJSChart } from './viz-eye-chartJS';
-import { DataSeries } from '../../libraries/data-series/data-series';
-import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
+import { VizJSChart, VizJSChartState } from './viz-jschart';
 
 /**
  * Pie chart receives an input series with format:
@@ -17,24 +14,17 @@ import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
  * https://www.chartjs.org/docs/latest/samples/other-charts/pie.html
  */
 
-export interface VizPieJSChartState extends ZirconVizState {
-  series?: DataSeries<ChartData<'pie'>>;
+export interface VizPieJSChartState extends VizJSChartState<'pie'> {
+  dataType: 'pie';
 }
 
 export class VizPieJSChart extends VizJSChart<'pie'> {
   public static readonly PIE_JSCHART_VISUALIZER_TYPE =
-    'PIE_JSCHART_VISUALIZER_TYPE';
+    'jschar-pie-visualizer-type';
+
   constructor(state?: VizPieJSChartState) {
     super(state);
     Chart.register(PieController, CategoryScale, LinearScale, Tooltip, Legend);
-  }
-
-  /**
-   * get chart JS type
-   * @returns chart type to set into 'type' field of chart config
-   */
-  public getChartType(): 'pie' {
-    return 'pie';
   }
 
   public override getType(): string {

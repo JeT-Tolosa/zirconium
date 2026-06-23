@@ -22,7 +22,7 @@ export interface VizOpenGlobusState extends ZirconVizState {
 
 export class VizOpenGlobus extends ZirconViz {
   public static readonly OPENGLOBUS_VISUALIZER_TYPE =
-    'OPENGLOBUS_VISUALIZER_TYPE';
+    'openglobus-visualizer-type';
   private _mainDiv: HTMLDivElement = null;
   private _globe: OG.Globe = null;
   private _osm: OG.OpenStreetMap = null;

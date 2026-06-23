@@ -54,7 +54,8 @@ const loaderDescriptors: { [id: string]: LoaderDescriptor<Satellite> } = {
 };
 
 export class VizSatCatLoader extends VizLoader<Satellite> {
-  public static readonly VIZ_SAT_CAT_LOADER_TYPE = 'VIZ_SAT_CAT_LOADER_TYPE';
+  public static readonly VIZ_SAT_CAT_LOADER_TYPE =
+    'satcat-loader-visualizer-type';
 
   constructor(state?: VizLoaderState) {
     super(SATELLITE_TYPE, loaderDescriptors, state);

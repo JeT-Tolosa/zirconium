@@ -25,6 +25,7 @@ import { ZirconEngine, ZirconEngineEvents } from './zircon-engine';
 import { ZirconVizWindowEvents } from '../zircon-ui/zircon-viz-window';
 import { ZirconParamWindowEvents } from '../zircon-params/zircon-param-window';
 import {
+  ZIRCON_DATA_PROVIDER_TYPE,
   ZIRCON_DESKTOP_MANAGER_TYPE,
   ZIRCON_ENGINE_TYPE,
   ZIRCON_OBJECT_TYPE,
@@ -39,6 +40,9 @@ import { ZirconAppFactory } from './zircon-app-factory';
 import { ZirconPluginManager } from '../zircon-plugin/zircon-plugin-manager';
 import { ZirconPlugin } from '../zircon-plugin/zircon-plugin';
 import { ZirconDataProviderManager } from '../zircon-data/zircon-data-provider-manager';
+import { ZirconDataAdapterFactory } from '../zircon-data/zircon-data-adapter-factory';
+import { ZirconDataProviderFactory } from '../zircon-data/zircon-data-provider-factory';
+import { ZirconDataProvider } from '../zircon-data/zircon-data-provider';
 
 /**
  * Composition of this application UI
@@ -155,9 +159,10 @@ export class ZirconApplication<
     this.__dataProviderManager = new ZirconDataProviderManager(this);
     // register default factories
 
-    this.registerDefaultFactories();
-    this.registerDefaultObjectStates();
-    this.listenToEvents();
+    this.registerDefaultFactories().then(() => {
+      this.registerDefaultObjectStates();
+      this.listenToEvents();
+    });
   }
 
   private listenToEvents(): void {
@@ -237,7 +242,8 @@ export class ZirconApplication<
     }
   }
 
-  public registerObjectFactory(factory: ZirconObjectFactory) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public registerObjectFactory(factory: ZirconObjectFactory<any, any>) {
     return this.getObjectManager().registerObjectFactory(factory);
   }
 
@@ -251,19 +257,51 @@ export class ZirconApplication<
     this.getObjectManager().registerObjectState(desktopManagerState);
   }
 
-  private registerDefaultFactories(): void {
-    this.registerObjectFactory(new ZirconAppFactory(this));
-    this.registerObjectFactory(new ZirconWindowFactory(this));
-    this.registerObjectFactory(new ZirconDesktopFactory(this));
-    this.registerObjectFactory(new ZirconDesktopManagerFactory(this));
-    this.registerObjectFactory(new ZirconVizWindowFactory(this));
-    this.registerObjectFactory(new ZirconAppObjectFactory(this));
-    this.registerObjectFactory(new ZirconEngineFactory(this));
+  private async registerDefaultFactories(): Promise<void> {
+    await this.registerObjectFactory(new ZirconAppFactory(this));
+    await this.registerObjectFactory(new ZirconWindowFactory(this));
+    await this.registerObjectFactory(new ZirconDesktopFactory(this));
+    await this.registerObjectFactory(new ZirconDesktopManagerFactory(this));
+    await this.registerObjectFactory(new ZirconVizWindowFactory(this));
+    await this.registerObjectFactory(new ZirconAppObjectFactory(this));
+    await this.registerObjectFactory(new ZirconEngineFactory(this));
 
     // may be we should not add param window as they are not stored windows...
     // this.registerObjectFactory(
     //   new ZirconParamWindowFactory(this),
     // );
+  }
+
+  public async registerDataAdapterFactory(
+    name: string,
+    inputDataType: string,
+    outputDataType: string,
+    transformData?: (data: unknown) => unknown,
+    comparData?: (a: unknown, b: unknown) => number,
+  ): Promise<void> {
+    const factory = new ZirconDataAdapterFactory(
+      this,
+      name,
+      inputDataType,
+      outputDataType,
+      transformData,
+      comparData,
+    );
+    await this.registerObjectFactory(factory);
+  }
+
+  public async registerDataProviderFactory(
+    name: string,
+    outputDataType: string,
+    comparData?: (a: unknown, b: unknown) => number,
+  ): Promise<void> {
+    const factory = new ZirconDataProviderFactory(
+      this,
+      name,
+      outputDataType,
+      comparData,
+    );
+    await this.registerObjectFactory(factory);
   }
 
   public getContextMenu(): ZirconContextMenu {
@@ -371,7 +409,12 @@ export class ZirconApplication<
         .getRegisteredObjectsStates(ZIRCON_ENGINE_TYPE)
         .map(async (state) => {
           const engine = await this.getInstance(state.id, ZIRCON_ENGINE_TYPE);
-          return this.startEngine(engine as ZirconEngine);
+          if (!(engine instanceof ZirconEngine)) {
+            throw new Error(
+              `engine ${engine.getId()} with type ${engine.getType()} is not a subclass of ${ZirconEngine.name}`,
+            );
+          }
+          return this.startEngine(engine);
         }),
     );
   }
@@ -382,6 +425,36 @@ export class ZirconApplication<
     engine.setEventDispatcher(this.getEventDispatcher());
   }
 
+  private async startDataProviders(): Promise<void> {
+    await Promise.all(
+      this.getObjectManager()
+        .getRegisteredObjectsStates(ZIRCON_DATA_PROVIDER_TYPE)
+        .map(async (state) => {
+          const dataProvider = await this.getInstance(
+            state.id,
+            ZIRCON_DATA_PROVIDER_TYPE,
+          );
+          if (!(dataProvider instanceof ZirconDataProvider)) {
+            throw new Error(
+              `data provider ${dataProvider.getId()} with type ${dataProvider.getType()} is not a subclass of ${ZirconDataProvider.name}`,
+            );
+          }
+          if (dataProvider instanceof ZirconDataProvider) {
+            this.getDataProviderManager().registerDataProvider(dataProvider);
+            return this.startDataProvider(dataProvider);
+          }
+        }),
+    );
+  }
+
+  private async startDataProvider(
+    dataProvider: ZirconDataProvider,
+  ): Promise<void> {
+    await dataProvider?.activate(true);
+    // connect dispatcher
+    dataProvider.setEventDispatcher(this.getEventDispatcher());
+  }
+
   /**
    * start application UI by displaying it in the body and starting engines
    */
@@ -389,6 +462,7 @@ export class ZirconApplication<
     await this.createDesktopManager();
     await this.getPluginManager().startPlugins();
     await this.startEngines();
+    await this.startDataProviders();
     this.__isStarted = true;
     await this.displayUIIn(document.body);
     // activate first desktop if at least one exist

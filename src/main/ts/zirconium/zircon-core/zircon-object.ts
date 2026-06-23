@@ -105,8 +105,16 @@ export abstract class ZirconObject<
     }
   }
 
+  private createValidId(id: string): string {
+    if (!id) {
+      return uuid();
+    }
+    return id.replaceAll(' ', '-');
+  }
+
   /**
-   * set object id
+   * set object id.
+   * Stored id is a validated version of the given id
    * @param new object id
    * @fires OBJECT_ID_CHANGED
    * @returns
@@ -115,10 +123,9 @@ export abstract class ZirconObject<
     if (!id) {
       return false;
     }
+    id = this.createValidId(id);
+
     const oldId: string = this._id;
-    if (id.indexOf(' ') !== -1) {
-      throw new Error(`IDs cannot contain spaces '${id}' is invalid`);
-    }
     if (oldId === id) {
       return false;
     }
@@ -244,17 +251,17 @@ export abstract class ZirconObject<
   //   return this;
   // }
 
-  // /**
-  //  * Removes a listener
-  //  * @param event
-  //  * @param listener
-  //  * @returns
-  //  */
-  // public removeListener(
-  //   event: string | symbol,
-  //   listener: (...args: unknown[]) => void,
-  // ): this {
-  //   this.getApplication().removeListener(event, listener);
-  //   return this;
-  // }
+  /**
+   * Removes a listener
+   * @param event
+   * @param listener
+   * @returns
+   */
+  public removeListener(
+    event: string | symbol,
+    listener: (...args: unknown[]) => void,
+  ): this {
+    this.getEventDispatcher().removeListener(event, listener);
+    return this;
+  }
 }

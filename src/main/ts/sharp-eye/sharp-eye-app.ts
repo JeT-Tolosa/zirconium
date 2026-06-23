@@ -37,6 +37,7 @@ import { createDesktop3 } from './desktops/sharp-eyed-desktop3';
 import { createDesktop4 } from './desktops/sharp-eyed-desktop4';
 import { createDesktop5 } from './desktops/sharp-eyed-desktop5';
 import { createDesktop6 } from './desktops/sharp-eyed-desktop6';
+import { createDesktop7 } from './desktops/sharp-eyed-desktop7';
 
 export const SHARP_EYE_ENGINE_TYPE = ZIRCON_ENGINE_TYPE;
 export const SHARP_EYE_VIZ_TYPE = ZIRCON_VISUALIZER_TYPE;
@@ -69,6 +70,7 @@ export class SharpEyedApp extends ZirconApplication {
     const desktop4State: ZirconDesktopState = await createDesktop4(this);
     const desktop5State: ZirconDesktopState = await createDesktop5(this);
     const desktop6State: ZirconDesktopState = await createDesktop6(this);
+    const desktop7State: ZirconDesktopState = await createDesktop7(this);
 
     const desktopManagerState: ZirconDesktopManagerState = {
       type: ZIRCON_DESKTOP_MANAGER_TYPE,
@@ -80,6 +82,7 @@ export class SharpEyedApp extends ZirconApplication {
         desktop4State.id,
         desktop5State.id,
         desktop6State.id,
+        desktop7State.id,
       ],
     };
     this.registerObjectState(desktopManagerState);

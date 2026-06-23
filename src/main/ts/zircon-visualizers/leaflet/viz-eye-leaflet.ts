@@ -19,7 +19,7 @@ export interface VizLeafletState extends ZirconVizState {
 //const MAPTILER_API_KEY = 'fMewEQFJcPQN35729l8o';
 
 export class VizLeaflet extends ZirconViz {
-  public static readonly LEAFLET_VISUALIZER_TYPE = 'LEAFLET_VISUALIZER_TYPE';
+  public static readonly LEAFLET_VISUALIZER_TYPE = 'leaflet-visualizer-type';
   private _mainDiv: HTMLDivElement = null;
   private _map: Leaflet.Map = null;
   private _apiKey: string = 'no API key defined. Go to www.maptiler.com';

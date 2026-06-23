@@ -12,16 +12,18 @@ import { ZirconApplication } from '../../zirconium/zircon-core/zircon-app';
 import {
   ZirconDataProvider,
   ZirconDataProviderDescriptor,
+  ZirconDataProviderEvents,
 } from '../../zirconium/zircon-data/zircon-data-provider';
 import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
 } from '../../zirconium/zircon-event';
+// import { ZirconDataProviderManagerEvents } from '../../zirconium/zircon-data/zircon-data-provider-manager';
 import { ZirconDataProviderManagerEvents } from '../../zirconium/zircon-data/zircon-data-provider-manager';
 
 export interface VizDataProviderExplorerState {
-  type: typeof VizDataProviderExplorer.VISUALIZER_TYPE;
+  type: typeof VizDataProviderExplorer.DATA_EXPLORER_VISUALIZER_TYPE;
   id?: string;
   name?: string;
 }
@@ -35,10 +37,18 @@ export type VizDataProviderExplorerEventRegistry = MergeZirconRegistries<
           | 'DATA_PROVIDER_MANAGER_DESCRIPTORS'
           | 'DATA_PROVIDER_MANAGER_PROVIDER_REGISTERED'
         >,
+        PickEvents<ZirconDataProviderEvents, 'DATA_PROVIDER_FULL_CONTENT'>,
       ]
     >;
 
-    outgoing: MergePickEvents<[]>;
+    outgoing: MergePickEvents<
+      [
+        PickEvents<
+          ZirconDataProviderEvents,
+          'DATA_PROVIDER_FULL_CONTENT_REQUEST'
+        >,
+      ]
+    >;
   },
   ZirconVizEventRegistry
 >;
@@ -47,16 +57,17 @@ export class VizDataProviderExplorer<
   R extends VizDataProviderExplorerEventRegistry =
     VizDataProviderExplorerEventRegistry,
 > extends ZirconViz<R> {
-  public static readonly VISUALIZER_TYPE =
-    'DATA_PROVIDER_EXPLORER_VISUALIZER_TYPE';
+  public static readonly DATA_EXPLORER_VISUALIZER_TYPE =
+    'data-provider-explorer-visualizer-type';
 
   private _jsonEditorContainer: HTMLDivElement = null;
   private _jsonEditor: JSONEditor = null;
   private _div: HTMLDivElement = null;
-  private _providerSelect: HTMLSelectElement = null;
+  private _dataProviderSelect: HTMLSelectElement = null;
   private _refreshButton: HTMLIonButtonElement = null;
   private _output: HTMLParagraphElement = null;
   private _app: ZirconApplication = null;
+  private _currentSelectedDataProviderId: string = null;
 
   constructor(app: ZirconApplication, state?: VizDataProviderExplorerState) {
     super(state);
@@ -65,26 +76,44 @@ export class VizDataProviderExplorer<
   protected override listenToEvents(): void {
     super.listenToEvents();
     this.addListener('DATA_PROVIDER_MANAGER_DESCRIPTORS', (_arg) => {
-      this.refreshProviderList();
+      this.refreshDataProviderList();
     });
     this.addListener('DATA_PROVIDER_MANAGER_PROVIDER_REGISTERED', (_arg) => {
-      this.refreshProviderList();
+      this.refreshDataProviderList();
     });
+    this.addListener('DATA_PROVIDER_FULL_CONTENT', (arg) => {
+      this.onDATA_PROVIDER_FULL_CONTENT(arg.dataProviderDescriptor);
+    });
+  }
+  public override getType(): string {
+    return VizDataProviderExplorer.DATA_EXPLORER_VISUALIZER_TYPE;
+  }
+
+  private onDATA_PROVIDER_FULL_CONTENT(
+    dataProviderDescriptor: ZirconDataProviderDescriptor,
+  ) {
+    if (
+      !dataProviderDescriptor ||
+      dataProviderDescriptor.id !== this.getSelectedProviderId()
+    ) {
+      return;
+    }
+    this.displaySelectedProvider();
   }
 
   private getApplication(): ZirconApplication {
     return this._app;
   }
 
-  public updateData(): boolean {
-    this.refreshProviderList();
+  public updateDataProviderList(): boolean {
+    this.refreshDataProviderList();
     return true;
   }
 
   public update(): void {}
 
   public start(): void {
-    this.refreshProviderList();
+    this.refreshDataProviderList();
   }
 
   public close(): void {
@@ -99,7 +128,9 @@ export class VizDataProviderExplorer<
   }
 
   private getJsonEditorContainer(): HTMLElement {
-    if (this._jsonEditorContainer) {return this._jsonEditorContainer;}
+    if (this._jsonEditorContainer) {
+      return this._jsonEditorContainer;
+    }
     this._jsonEditorContainer = document.createElement('div');
     this._jsonEditorContainer.classList.add('provider-json-view');
     this._jsonEditor = new JSONEditor(this._jsonEditorContainer, {
@@ -112,10 +143,9 @@ export class VizDataProviderExplorer<
     return this._jsonEditorContainer;
   }
 
-  private async refreshProviderList(): Promise<void> {
+  private async refreshDataProviderList(): Promise<void> {
     const select = this.getProviderSelector();
     const previousSelection = select.value;
-
     select.innerHTML = '';
 
     const manager = this.getApplication().getDataProviderManager();
@@ -141,18 +171,44 @@ export class VizDataProviderExplorer<
     }
   }
 
+  private getSelectedProviderId(): string {
+    return this._dataProviderSelect?.value;
+  }
+
   private async displaySelectedProvider(): Promise<void> {
     try {
-      const providerId = this.getProviderSelector().value;
-      const manager = this.getApplication().getDataProviderManager();
-      const provider: ZirconDataProvider = manager.getDataProvider(providerId);
+      const providerId = this.getSelectedProviderId();
+      if (!providerId) {
+        return;
+      }
+
+      const obj: ZirconDataProvider = this.getApplication()
+        .getDataProviderManager()
+        .getDataProvider(providerId);
+      // const obj = this.getApplication()
+      //   .getObjectManager()
+      //   .getExistingInstance(providerId);
+      if (!obj) {
+        return;
+      }
+
+      const provider: ZirconDataProvider = obj;
 
       if (!provider) {
+        this._currentSelectedDataProviderId = null;
         this._jsonEditor?.set({});
         this.displayMessage('Provider not found', 'warning');
         return;
       }
+
       const data = await provider.getData();
+      if (!data) {
+        this.emit('DATA_PROVIDER_FULL_CONTENT_REQUEST', {
+          dataProviderId: providerId,
+        });
+        this.displayMessage('No data stored, waiting for content');
+        return;
+      }
       this._jsonEditor?.set(data);
       const count =
         data && typeof data === 'object' ? Object.keys(data).length : 0;
@@ -166,44 +222,45 @@ export class VizDataProviderExplorer<
   }
 
   private getRefreshButton(): HTMLIonButtonElement {
-    if (this._refreshButton) {return this._refreshButton;}
-
+    if (this._refreshButton) {
+      return this._refreshButton;
+    }
     this._refreshButton = document.createElement('ion-button');
     this._refreshButton.classList.add('provider-refresh-button');
     this._refreshButton.innerText = 'Refresh';
-
     this._refreshButton.addEventListener('click', () => {
-      this.refreshProviderList();
+      this.refreshDataProviderList();
       this.displaySelectedProvider();
     });
-
     return this._refreshButton;
   }
 
   private getProviderSelector(): HTMLSelectElement {
-    if (this._providerSelect) {return this._providerSelect;}
-
-    this._providerSelect = document.createElement('select');
-    this._providerSelect.classList.add('provider-selector');
-
-    this._providerSelect.addEventListener('change', () =>
+    if (this._dataProviderSelect) {
+      return this._dataProviderSelect;
+    }
+    this._dataProviderSelect = document.createElement('select');
+    this._dataProviderSelect.classList.add('provider-selector');
+    this._dataProviderSelect.addEventListener('change', () =>
       this.displaySelectedProvider(),
     );
 
-    return this._providerSelect;
+    return this._dataProviderSelect;
   }
 
   private getOutputElement(): HTMLParagraphElement {
-    if (this._output) {return this._output;}
-
+    if (this._output) {
+      return this._output;
+    }
     this._output = document.createElement('p');
     this._output.classList.add('provider-output');
-
     return this._output;
   }
 
   public getContainer(): HTMLDivElement {
-    if (this._div) {return this._div;}
+    if (this._div) {
+      return this._div;
+    }
 
     this._div = document.createElement('div');
     this._div.id = uuid();

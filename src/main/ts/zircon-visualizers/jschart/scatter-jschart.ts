@@ -1,19 +1,16 @@
 import {
   CategoryScale,
   Chart,
-  ChartData,
   Legend,
   LinearScale,
   PointElement,
   ScatterController,
   Tooltip,
 } from 'chart.js';
-import { VizJSChart } from './viz-eye-chartJS';
-import { DataSeries } from '../../libraries/data-series/data-series';
-import { ZirconVizState } from '../../zirconium/zircon-ui/zircon-visualizer';
+import { VizJSChart, VizJSChartState } from './viz-jschart';
 
-export interface VizScatterJSChartState extends ZirconVizState {
-  series?: DataSeries<ChartData<'scatter'>>;
+export interface VizScatterJSChartState extends VizJSChartState<'scatter'> {
+  dataType: 'scatter';
 }
 /**
  * Scatter chart receives an input series with format:
@@ -23,7 +20,8 @@ export interface VizScatterJSChartState extends ZirconVizState {
 
 export class VizScatterJSChart extends VizJSChart<'scatter'> {
   public static readonly SCATTER_JSCHART_VISUALIZER_TYPE =
-    'SCATTER_JSCHART_VISUALIZER_TYPE';
+    'jschar-scatter-visualizer-type';
+
   constructor(state?: VizScatterJSChartState) {
     super(state);
     Chart.register(
@@ -34,14 +32,6 @@ export class VizScatterJSChart extends VizJSChart<'scatter'> {
       Legend,
       PointElement,
     );
-  }
-
-  /**
-   * get chart JS type
-   * @returns chart type to set into 'type' field of chart config
-   */
-  public getChartType(): 'scatter' {
-    return 'scatter';
   }
 
   public override getType(): string {
