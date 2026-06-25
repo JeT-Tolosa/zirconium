@@ -63,7 +63,6 @@ export class ZirconDataAdapter<
     super(outputDataType, state, compareData);
     this._inputDataType = inputDataType;
     this.__transformData = transformData;
-    this.setState(state);
   }
 
   public override getType(): string {

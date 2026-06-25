@@ -86,9 +86,8 @@ export async function createDesktop4(
   await app.registerObjectFactory(new VizCesiumFactory());
   await app.registerObjectFactory(
     new ZirconDataAdapterFactory(
-      app,
       'default-ground-station-to-cesium-adapter',
-      GROUND_STATION_TO_CESIUM_ADAPTER_TYPE,
+      GROUND_STATION_TYPE,
       CESIUM_LAYER_TYPE,
       transformGroundStationToCesiumLayer,
       compareGroundStation,

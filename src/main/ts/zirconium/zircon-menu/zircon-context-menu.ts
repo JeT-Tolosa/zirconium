@@ -197,11 +197,16 @@ export class ZirconContextMenu<
         if (!factory?.handledThisElement(element)) {
           return;
         }
-        const objItems: ZirconContextMenuItem[] =
+        let objItems: ZirconContextMenuItem[] =
           factory.getContextMenuElements(element);
         if (!objItems) {
           return;
         }
+        objItems = objItems.concat(
+          this.getApplication()
+            .getContextMenuFactory()
+            ?.getContextMenuElements(element),
+        );
         objItems.forEach((objItem) => {
           if (objItem) {
             menuItems.push(objItem);

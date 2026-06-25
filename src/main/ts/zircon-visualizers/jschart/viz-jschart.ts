@@ -135,6 +135,10 @@ export abstract class VizJSChart<
     this.setData(data as ChartData<TType>);
   }
 
+  public override getType(): string {
+    return `jschart-visualizer-${this.getChartType()}-type`;
+  }
+
   public getChartType(): TType {
     return this._chartType;
   }

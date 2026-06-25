@@ -5,17 +5,18 @@ import {
   VizHelmetSampleThreeJSState,
 } from './viz-eye-helmet-sample-threeJS';
 
+async function createObject(
+  state: VizHelmetSampleThreeJSState,
+): Promise<VizHelmetSampleThreeJS> {
+  return new VizHelmetSampleThreeJS(state);
+}
 export class VizHelmetSampleThreeJSFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(
       VizHelmetSampleThreeJS.HELMET_SAMPLE_THREEJS_VISUALIZER_TYPE,
       SHARP_EYE_VIZ_TYPE,
+      createObject,
+      null,
     );
-  }
-
-  public override async createObject(
-    state: VizHelmetSampleThreeJSState,
-  ): Promise<VizHelmetSampleThreeJS> {
-    return new VizHelmetSampleThreeJS(state);
   }
 }

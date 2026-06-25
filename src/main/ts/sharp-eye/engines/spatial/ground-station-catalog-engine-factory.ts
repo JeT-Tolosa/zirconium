@@ -5,17 +5,19 @@ import {
   GroundStationCatalogEngineState,
 } from './ground-station-catalog-engine';
 
+async function createGroundStationCatalogEngine(
+  state: GroundStationCatalogEngineState,
+): Promise<GroundStationCatalogEngine> {
+  return new GroundStationCatalogEngine(state?.name);
+}
+
 export class GroundStationCatalogEngineFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(
       GroundStationCatalogEngine.GROUND_STATION_CATALOG_ENGINE_TYPE,
       SHARP_EYE_ENGINE_TYPE,
+      createGroundStationCatalogEngine,
+      null,
     );
-  }
-
-  public override async createObject(
-    state: GroundStationCatalogEngineState,
-  ): Promise<GroundStationCatalogEngine> {
-    return new GroundStationCatalogEngine(state?.name);
   }
 }

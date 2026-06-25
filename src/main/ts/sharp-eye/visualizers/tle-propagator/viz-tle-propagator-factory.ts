@@ -6,14 +6,13 @@ import {
   VizTLEPropagatorState,
 } from './viz-tle-propagator';
 
+async function createObject(
+  state: VizTLEPropagatorState,
+): Promise<VizTLEPropagator> {
+  return new VizTLEPropagator(state);
+}
 export class VizTLEPropagatorFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super(VIZ_TLE_PROPAGATOR_TYPE, SHARP_EYE_VIZ_TYPE);
-  }
-
-  public override async createObject(
-    state: VizTLEPropagatorState,
-  ): Promise<VizTLEPropagator> {
-    return new VizTLEPropagator(state);
+    super(VIZ_TLE_PROPAGATOR_TYPE, SHARP_EYE_VIZ_TYPE, createObject, null);
   }
 }

@@ -2,14 +2,16 @@ import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-ob
 import { VizCesium, VizCesiumState } from './viz-eye-cesium';
 import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
 
+async function createObject(state: VizCesiumState): Promise<VizCesium> {
+  return new VizCesium(state);
+}
 export class VizCesiumFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super(VizCesium.CESIUM_VISUALIZER_TYPE, SHARP_EYE_VIZ_TYPE);
-  }
-
-  public override async createObject(
-    state: VizCesiumState,
-  ): Promise<VizCesium> {
-    return new VizCesium(state);
+    super(
+      VizCesium.CESIUM_VISUALIZER_TYPE,
+      SHARP_EYE_VIZ_TYPE,
+      createObject,
+      null,
+    );
   }
 }

@@ -22,6 +22,7 @@ import {
   ZIRCON_PARAMETER_WINDOW_TYPE,
   ZIRCON_VISUALIZER_WINDOW_TYPE,
 } from '../zircon-core/zircon-types';
+import { ZirconObject } from '../zircon-core/zircon-object';
 
 export const ZIRCON_VISUALIZER_WINDOW_CLASS: string = 'zircon-viz';
 
@@ -170,21 +171,30 @@ export class ZirconVizWindow<
     });
   }
 
-  public getVisualizer(): Promise<ZirconViz> {
+  public async getVisualizer(): Promise<ZirconViz> {
     if (this.__viz && this.__viz.getId() === this._vizId) {
       return Promise.resolve(this.__viz);
     }
-    return this.getApplication()
-      .getInstance(this._vizId)
-      .then((instance) => {
-        if (!instance || !(instance instanceof ZirconViz)) {
-          throw new Error(
-            `Unable to retrieve Visualizer Id ${this._vizId} in window ${this.getId()}`,
-          );
-        }
-        this.__viz = instance;
-        return this.__viz;
-      });
+    const instance: ZirconObject = await this.getApplication().getInstance(
+      this._vizId,
+    );
+    if (!instance) {
+      throw new Error(
+        `Unable to retrieve Visualizer Id ${this._vizId} in window ${this.getName()} / ${this.getId()}`,
+      );
+    }
+    if (!(instance instanceof ZirconViz)) {
+      const availableViz: string[] = this.getApplication()
+        .getObjectManager()
+        .getExistingObjects()
+        .filter((obj) => obj instanceof ZirconViz)
+        .map((obj) => obj.getId());
+      throw new Error(
+        `Retrieved Object Id ${this._vizId} in window ${this.getId()} is not a visualizer: type = ${(instance as ZirconObject).getType()} available viz = ${JSON.stringify(availableViz)}`,
+      );
+    }
+    this.__viz = instance;
+    return this.__viz;
   }
 
   private removeVisualizer(): void {

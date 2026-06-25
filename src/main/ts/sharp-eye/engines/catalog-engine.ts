@@ -10,6 +10,7 @@ import {
 } from '../../zirconium/zircon-core/zircon-engine';
 import { ZirconDataProvider } from '../../zirconium/zircon-data/zircon-data-provider';
 import { ZirconDataProviderManagerEvents } from '../../zirconium/zircon-data/zircon-data-provider-manager';
+import { ZirconDataProviderFactory } from '../../zirconium/zircon-data/zircon-data-provider-factory';
 
 import {
   MergePickEvents,
@@ -189,7 +190,12 @@ export type CatalogEngineEventRegistry<T> = MergeZirconRegistries<
         PickEvents<
           ZirconDataProviderManagerEvents,
           'REGISTER_DATA_PROVIDER_REQUEST' | 'UNREGISTER_DATA_PROVIDER_REQUEST'
+          // | 'REGISTER_DATA_PROVIDER_FACTORY_REQUEST'
         >,
+        // PickEvents<
+        //   ZirconObjectManagerEvents,
+        //   'REGISTER_DATA_PROVIDER_FACTORY_REQUEST'
+        // >,
       ]
     >;
   },
@@ -213,6 +219,7 @@ export abstract class CatalogEngine<
     [id: string]: CatalogEngineEntry<T>;
   } = {};
   private _dataType: string = 'unknown data type';
+  private _dataProviderFactory: ZirconDataProviderFactory = null;
   private __dataProviderCreator: ItemArrayDataProviderCreatorFunction<T> = null;
   // private _indexationmethod: (el: T) => string;
 
@@ -302,6 +309,16 @@ export abstract class CatalogEngine<
     }
   }
 
+  private getDataProviderFactory(): ZirconDataProviderFactory {
+    if (!this._dataProviderFactory) {
+      this._dataProviderFactory = new ZirconDataProviderFactory(
+        `${this.getName()}-data-provider-factory`,
+        this.getDataType(),
+      );
+    }
+    return this._dataProviderFactory;
+  }
+
   private synchronizeDataProvider(cat: CatalogEngineEntry<T>) {
     cat?.dataProvider?.setData(cat?.collection);
   }
@@ -380,7 +397,6 @@ export abstract class CatalogEngine<
       this.synchronizeDataProvider(cat);
       this.emit('CATALOG_ENGINE_COLLECTION_CLEARED', {
         catalogDescriptor: this.getCatalogEngineDescriptor(),
-
         itemCollectionId: itemCollectionId,
       });
     }

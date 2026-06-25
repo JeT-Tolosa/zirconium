@@ -40,6 +40,7 @@ export type ZirconDataProviderManagerEvents = {
   REGISTER_DATA_PROVIDER_REQUEST: {
     dataProvider: ZirconDataProvider<unknown>;
   };
+
   UNREGISTER_DATA_PROVIDER_REQUEST: {
     dataProviderId: string;
   };

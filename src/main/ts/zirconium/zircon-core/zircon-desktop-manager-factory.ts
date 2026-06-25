@@ -1,34 +1,39 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ZirconApplication } from '../zircon-core/zircon-app';
-import { ZirconObjectFactory } from './zircon-object-factory';
-import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
 import { ZirconDesktopManager } from './zircon-desktop-manager';
 import {
   ZIRCON_APP_OBJECT_TYPE,
   ZIRCON_DESKTOP_MANAGER_TYPE,
 } from './zircon-types';
 import { ZirconContextMenuFactoryDesktopManager } from '../zircon-menu/zircon-desktop-manager-context-menu';
+import { ZirconAppObjectFactory } from './zircon-app-object-factory';
+import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
 
-export class ZirconDesktopManagerFactory implements ZirconObjectFactory {
-  private _app: ZirconApplication = null;
-
-  public name = `zircon-desktop-manager-factory`;
-  public objectType = ZIRCON_DESKTOP_MANAGER_TYPE;
-  public ancestorType: string = ZIRCON_APP_OBJECT_TYPE;
-  public contextMenuFactory: ZirconContextMenuFactory = null;
+export class ZirconDesktopManagerFactory extends ZirconAppObjectFactory {
+  private _contextMenuFactory: ZirconContextMenuFactoryDesktopManager = null;
 
   constructor(app: ZirconApplication) {
-    if (!app) {
-      throw new Error(
-        `parent application cannot be null in ${this.constructor.name} constructor`,
+    super(app, `zircon-desktop-manager-factory`);
+  }
+
+  public override getObjectType(): string {
+    return ZIRCON_DESKTOP_MANAGER_TYPE;
+  }
+
+  public override getAncestorType(): string {
+    return ZIRCON_APP_OBJECT_TYPE;
+  }
+
+  public override getContextMenuFactory(): ZirconContextMenuFactory {
+    if (!this._contextMenuFactory) {
+      this._contextMenuFactory = new ZirconContextMenuFactoryDesktopManager(
+        this.getApplication(),
       );
     }
-    this._app = app;
-    this.contextMenuFactory = new ZirconContextMenuFactoryDesktopManager(
-      this._app,
-    );
+    return this._contextMenuFactory;
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async create(state: any): Promise<ZirconDesktopManager> | null {
-    return new ZirconDesktopManager(this._app, state);
+
+  public override async createObject(state: any): Promise<any> {
+    return new ZirconDesktopManager(this.getApplication(), state);
   }
 }

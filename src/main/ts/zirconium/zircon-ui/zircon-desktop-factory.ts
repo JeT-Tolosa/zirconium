@@ -1,33 +1,43 @@
 import { ZirconApplication } from '../zircon-core/zircon-app';
 import { ZirconDesktop } from './zircon-desktop';
-import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
-import { ZirconContextMenuFactoryDesktop } from '../zircon-menu/zircon-desktop-context-menu';
 import {
   ZIRCON_APP_OBJECT_TYPE,
   ZIRCON_DESKTOP_TYPE,
 } from '../zircon-core/zircon-types';
-import { ZirconObjectFactory } from '../zircon-core/zircon-object-factory';
+import { ZirconAppObjectFactory } from '../zircon-core/zircon-app-object-factory';
+import { ZirconContextMenuFactoryDesktop } from '../zircon-menu/zircon-desktop-context-menu';
+import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
 
-export class ZirconDesktopFactory implements ZirconObjectFactory {
-  private _app: ZirconApplication = null;
-
-  public name = `zircon-desktop-factory`;
-  public objectType = ZIRCON_DESKTOP_TYPE;
-  public ancestorType: string = ZIRCON_APP_OBJECT_TYPE;
-  public contextMenuFactory: ZirconContextMenuFactory = null;
-
+export class ZirconDesktopFactory extends ZirconAppObjectFactory {
+  private _contextMenuFactory: ZirconContextMenuFactoryDesktop = null;
   constructor(app: ZirconApplication) {
+    super(app, `zircon-desktop-factory`);
     if (!app) {
       throw new Error(
         `parent application cannot be null in ${this.constructor.name} constructor`,
       );
     }
-    this._app = app;
-    this.contextMenuFactory = new ZirconContextMenuFactoryDesktop(this._app);
+  }
+
+  public override getObjectType(): string {
+    return ZIRCON_DESKTOP_TYPE;
+  }
+
+  public override getAncestorType(): string {
+    return ZIRCON_APP_OBJECT_TYPE;
+  }
+
+  public override getContextMenuFactory(): ZirconContextMenuFactory {
+    if (!this._contextMenuFactory) {
+      this._contextMenuFactory = new ZirconContextMenuFactoryDesktop(
+        this.getApplication(),
+      );
+    }
+    return this._contextMenuFactory;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async create(state: any): Promise<ZirconDesktop> {
-    return new ZirconDesktop(this._app, state);
+  public override async createObject(state: any): Promise<ZirconDesktop> {
+    return new ZirconDesktop(this.getApplication(), state);
   }
 }

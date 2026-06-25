@@ -1,25 +1,24 @@
 import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
 import { ZirconApplication } from '../../zirconium/zircon-core/zircon-app';
-import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
+import { SimpleZirconAppObjectFactory } from '../../zirconium/zircon-core/zircon-app-object-factory';
 import {
   VizDataProviderExplorer,
   VizDataProviderExplorerState,
 } from './viz-data-provider-explorer';
 
-export class VizDataProviderFactory extends SimpleZirconObjectFactory {
-  private _app: ZirconApplication = null;
-
+export class VizDataProviderFactory extends SimpleZirconAppObjectFactory {
   constructor(app: ZirconApplication) {
     super(
+      app,
       VizDataProviderExplorer.DATA_EXPLORER_VISUALIZER_TYPE,
       SHARP_EYE_VIZ_TYPE,
+      async (
+        app: ZirconApplication,
+        state: VizDataProviderExplorerState,
+      ): Promise<VizDataProviderExplorer> => {
+        return new VizDataProviderExplorer(app, state);
+      },
+      null,
     );
-    this._app = app;
-  }
-
-  public override async createObject(
-    state: VizDataProviderExplorerState,
-  ): Promise<VizDataProviderExplorer> {
-    return new VizDataProviderExplorer(this._app, state);
   }
 }

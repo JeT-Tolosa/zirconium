@@ -52,7 +52,10 @@ export class VizEventLogger extends ZirconViz {
 
   public addEvent(eventDescriptor: EventDescriptor) {
     this._events.push(eventDescriptor);
-    this.displayEvent(eventDescriptor);
+    if (this._events.length > 100) {
+      this._events.shift();
+    }
+    this.displayEvents();
   }
 
   public updateData(): boolean {
@@ -65,17 +68,29 @@ export class VizEventLogger extends ZirconViz {
 
   public close(): void {}
 
-  private displayEvent(eventDescriptor: EventDescriptor) {
+  private displayEvents() {
+    const fragment = document.createDocumentFragment();
+    for (let i = this._events.length - 1; i >= 0; i--) {
+      fragment.appendChild(this.createEventElement(this._events[i]));
+    }
+    this.getLoggerDiv().replaceChildren(fragment);
+  }
+
+  private createEventElement(eventDescriptor: EventDescriptor): HTMLElement {
     const p: HTMLParagraphElement = document.createElement('p');
     p.classList.add('event');
     p.innerText = `[${new Date().toLocaleString()}]: ${eventDescriptor.event}`;
-    this.getLoggerDiv().appendChild(p);
     p.addEventListener('click', () => {
       this._selectedParagraph?.classList.remove('selected');
       this.displayEventDetail(eventDescriptor);
       p.classList.add('selected');
       this._selectedParagraph = p;
     });
+    return p;
+  }
+
+  private displayEvent(eventDescriptor: EventDescriptor) {
+    this.getLoggerDiv().appendChild(this.createEventElement(eventDescriptor));
   }
 
   private displayEventDetail(eventDescriptor: EventDescriptor) {

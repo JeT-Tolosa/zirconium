@@ -1,3 +1,4 @@
+export const ZIRCON_APPLICATION_TYPE: string = 'zircon-application';
 export const ZIRCON_OBJECT_TYPE: string = 'zircon-object';
 export const ZIRCON_APP_OBJECT_TYPE: string = 'zircon-app-object';
 export const ZIRCON_DESKTOP_TYPE: string = 'zircon-desktop';
@@ -34,6 +35,11 @@ type ZirconObjectProperties = {
 export const ZirconObjectHierarchy: {
   [key: string]: ZirconObjectProperties;
 } = {
+  [ZIRCON_APPLICATION_TYPE]: {
+    type: ZIRCON_APPLICATION_TYPE,
+    className: 'ZirconApplication',
+    parent: null,
+  },
   [ZIRCON_OBJECT_TYPE]: {
     type: ZIRCON_OBJECT_TYPE,
     className: 'ZirconObject',

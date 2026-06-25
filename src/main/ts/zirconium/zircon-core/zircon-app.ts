@@ -18,8 +18,8 @@ import { ZirconContextMenu } from '../zircon-menu/zircon-context-menu';
 import pino from 'pino';
 import { ZirconObject, ZirconObjectState } from './zircon-object';
 import {
-  ZirconVizWindowFactory as ZirconVizWindowFactory,
-  ZirconWindowFactory as ZirconWindowFactory,
+  ZirconParamWindowFactory,
+  ZirconVizWindowFactory,
 } from '../zircon-ui/zircon-window-factory';
 import { ZirconEngine, ZirconEngineEvents } from './zircon-engine';
 import { ZirconVizWindowEvents } from '../zircon-ui/zircon-viz-window';
@@ -33,16 +33,14 @@ import {
 import { ZirconObjectManager } from './zircon-object-manager';
 import { ZirconDesktopFactory } from '../zircon-ui/zircon-desktop-factory';
 import { ZirconDesktopManagerFactory } from './zircon-desktop-manager-factory';
-import { ZirconAppObjectFactory } from './zircon-app-object-factory';
-import { ZirconEngineFactory } from './zircon-engine-factory';
 import { ZirconObjectFactory } from './zircon-object-factory';
-import { ZirconAppFactory } from './zircon-app-factory';
 import { ZirconPluginManager } from '../zircon-plugin/zircon-plugin-manager';
 import { ZirconPlugin } from '../zircon-plugin/zircon-plugin';
 import { ZirconDataProviderManager } from '../zircon-data/zircon-data-provider-manager';
 import { ZirconDataAdapterFactory } from '../zircon-data/zircon-data-adapter-factory';
 import { ZirconDataProviderFactory } from '../zircon-data/zircon-data-provider-factory';
 import { ZirconDataProvider } from '../zircon-data/zircon-data-provider';
+import { ZirconContextMenuFactoryApplication } from '../zircon-menu/zircon-app-context-menu';
 
 /**
  * Composition of this application UI
@@ -125,6 +123,7 @@ export class ZirconApplication<
   private __contextMenu: ZirconContextMenu = null;
 
   private _desktopManagerId: string = 'application-desktop-manager';
+  private __contextMenuFactory: ZirconContextMenuFactoryApplication = null;
   private __desktopManager: ZirconDesktopManager = null;
   private __objectManager: ZirconObjectManager = null;
   private __pluginManager: ZirconPluginManager = null;
@@ -209,6 +208,13 @@ export class ZirconApplication<
     return this.__logger;
   }
 
+  public getContextMenuFactory(): ZirconContextMenuFactoryApplication {
+    if (!this.__contextMenuFactory) {
+      this.__contextMenuFactory = new ZirconContextMenuFactoryApplication(this);
+    }
+    return this.__contextMenuFactory;
+  }
+
   public getObjectManager(): ZirconObjectManager {
     if (!this.__objectManager) {
       this.__objectManager = new ZirconObjectManager(this);
@@ -242,8 +248,7 @@ export class ZirconApplication<
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public registerObjectFactory(factory: ZirconObjectFactory<any, any>) {
+  public registerObjectFactory(factory: ZirconObjectFactory) {
     return this.getObjectManager().registerObjectFactory(factory);
   }
 
@@ -258,13 +263,13 @@ export class ZirconApplication<
   }
 
   private async registerDefaultFactories(): Promise<void> {
-    await this.registerObjectFactory(new ZirconAppFactory(this));
-    await this.registerObjectFactory(new ZirconWindowFactory(this));
+    // await this.registerObjectFactory(new ZirconAppFactory(this));
+    // await this.registerObjectFactory(new ZirconWindowFactory(this));
     await this.registerObjectFactory(new ZirconDesktopFactory(this));
     await this.registerObjectFactory(new ZirconDesktopManagerFactory(this));
     await this.registerObjectFactory(new ZirconVizWindowFactory(this));
-    await this.registerObjectFactory(new ZirconAppObjectFactory(this));
-    await this.registerObjectFactory(new ZirconEngineFactory(this));
+    await this.registerObjectFactory(new ZirconParamWindowFactory(this));
+    // await this.registerObjectFactory(new ZirconEngineFactory(this));
 
     // may be we should not add param window as they are not stored windows...
     // this.registerObjectFactory(
@@ -280,7 +285,6 @@ export class ZirconApplication<
     comparData?: (a: unknown, b: unknown) => number,
   ): Promise<void> {
     const factory = new ZirconDataAdapterFactory(
-      this,
       name,
       inputDataType,
       outputDataType,
@@ -293,13 +297,12 @@ export class ZirconApplication<
   public async registerDataProviderFactory(
     name: string,
     outputDataType: string,
-    comparData?: (a: unknown, b: unknown) => number,
+    compareData?: (a: unknown, b: unknown) => number,
   ): Promise<void> {
     const factory = new ZirconDataProviderFactory(
-      this,
       name,
       outputDataType,
-      comparData,
+      compareData,
     );
     await this.registerObjectFactory(factory);
   }

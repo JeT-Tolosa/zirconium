@@ -238,7 +238,7 @@ export class ZirconDesktop<
       this.getId(),
     );
     this.__container.setAttribute(ZIRCON_TARGET_DESKTOP_ID, this.getId());
-    this.displayWindows();
+    // this.displayWindows();
     return this.__container;
   }
 

@@ -45,6 +45,7 @@ export type ZirconObjectEventRegistry = MergeZirconRegistries<
 export interface ZirconObjectState {
   id?: string;
   name?: string;
+  factoryId?: string; // if set, given factory must exist and be used
   type: typeof ZIRCON_OBJECT_TYPE;
 }
 

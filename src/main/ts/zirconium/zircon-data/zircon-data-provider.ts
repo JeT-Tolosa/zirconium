@@ -80,8 +80,9 @@ export type ZirconDataProviderEventRegistry = MergeZirconRegistries<
 
 export interface ZirconDataProviderState extends ZirconObjectState {
   type: typeof ZIRCON_DATA_PROVIDER_TYPE;
-  active?: boolean;
   outputDataType: string;
+  active?: boolean;
+  minEventEmissionThresholdInterval?: number; // min time between two DATA_CHANGED event
 }
 
 function compareDefaultData<T>(a: T, b: T): number {
@@ -113,6 +114,8 @@ export class ZirconDataProvider<
 > extends ZirconObject<R> {
   private _outputDataType: string = null; // output data type
   private _active: boolean = false;
+  private _minEventEmissionThresholdInterval: number = 0; // in milliseconds
+  private __lastEmitTime: number = null;
   private __data: T = null;
   private __version: number = 0;
   private __compareElements: (a: T, b: T) => number = compareDefaultData;
@@ -138,6 +141,17 @@ export class ZirconDataProvider<
     }
     this.setOutputDataType(state.outputDataType);
     this.setActive(state.active);
+    this.setMinEventEmissionThresholdInterval(
+      state.minEventEmissionThresholdInterval,
+    );
+  }
+
+  private setMinEventEmissionThresholdInterval(intervalMS: number) {
+    this._minEventEmissionThresholdInterval = intervalMS;
+  }
+
+  private getMinEventEmissionThresholdInterval(): number {
+    return this._minEventEmissionThresholdInterval;
   }
 
   private setOutputDataType(dataType: string): void {
@@ -278,7 +292,15 @@ export class ZirconDataProvider<
   public setData(data: T): void {
     this.__data = data;
     this.__version++;
-
+    const now = Date.now();
+    if (
+      this.__lastEmitTime !== undefined &&
+      this.__lastEmitTime !== null &&
+      now - this.__lastEmitTime < this.getMinEventEmissionThresholdInterval()
+    ) {
+      return;
+    }
+    this.__lastEmitTime = now;
     const descriptor = this.getDescriptor();
 
     // 1. event change léger (for Cesium diff systems)
@@ -287,12 +309,12 @@ export class ZirconDataProvider<
       version: this.__version,
     });
 
-    // 2. full payload (legacy compatibility)
-    this.emit('DATA_PROVIDER_FULL_CONTENT', {
-      dataProviderDescriptor: descriptor,
-      data: this.__data,
-      version: this.__version,
-    });
+    // // 2. full payload (legacy compatibility)
+    // this.emit('DATA_PROVIDER_FULL_CONTENT', {
+    //   dataProviderDescriptor: descriptor,
+    //   data: this.__data,
+    //   version: this.__version,
+    // });
   }
 
   // -----------------------

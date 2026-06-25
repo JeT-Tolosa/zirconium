@@ -5,17 +5,19 @@ import {
   SatelliteCatalogEngineState,
 } from './satellite-catalog-engine';
 
+async function createObject(
+  state: SatelliteCatalogEngineState,
+): Promise<SatelliteCatalogEngine> {
+  return new SatelliteCatalogEngine(state?.name);
+}
+
 export class SatelliteCatalogEngineFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(
       SatelliteCatalogEngine.SATELLITE_CATALOG_ENGINE_TYPE,
       SHARP_EYE_ENGINE_TYPE,
+      createObject,
+      null,
     );
-  }
-
-  public override async createObject(
-    state: SatelliteCatalogEngineState,
-  ): Promise<SatelliteCatalogEngine> {
-    return new SatelliteCatalogEngine(state?.name);
   }
 }

@@ -98,7 +98,7 @@ export interface ZirconWindowState extends ZirconAppObjectState {
 /**
  * A Zircon Frame is a floating window which can be docked in a Zircon Desktop
  */
-export abstract class ZirconWindow<
+export class ZirconWindow<
   R extends ZirconWindowEventRegistry = ZirconWindowEventRegistry,
 > extends ZirconAppObject<R> {
   private __parentDesktop: ZirconDesktop = null;
@@ -339,7 +339,9 @@ export abstract class ZirconWindow<
     return this.__panel;
   }
 
-  protected abstract onPanelCreated(panel: IJSPanelInstance): Promise<void>;
+  protected async onPanelCreated(_panel: IJSPanelInstance): Promise<void> {
+    return;
+  }
 
   public getContainer(): HTMLElement {
     if (this.__panel) {

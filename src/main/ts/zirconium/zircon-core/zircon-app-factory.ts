@@ -1,30 +1,40 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ZirconApplication } from './zircon-app';
+import { ZirconContextMenuFactoryApplication } from '../zircon-menu/zircon-app-context-menu';
+import { ZIRCON_APPLICATION_TYPE } from './zircon-types';
 import { ZirconObjectFactory } from './zircon-object-factory';
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
-import { ZIRCON_OBJECT_TYPE } from './zircon-types';
-import { ZirconAppObject } from './zircon-app-object';
-import { ZirconContextMenuFactoryApplication } from '../zircon-menu/zircon-app-context-menu';
 
-export class ZirconAppFactory implements ZirconObjectFactory {
+export class ZirconAppFactory extends ZirconObjectFactory {
   private _app: ZirconApplication = null;
-
-  public name = `zircon-app-factory`;
-  public objectType = 'zircon-application';
-  public ancestorType: string = ZIRCON_OBJECT_TYPE;
-  public contextMenuFactory: ZirconContextMenuFactory = null;
+  private _contextMenuFactory: ZirconContextMenuFactoryApplication = null;
 
   constructor(app: ZirconApplication) {
-    if (!app) {
-      throw new Error(
-        `parent application cannot be null in ${this.constructor.name} constructor`,
-      );
-    }
+    super('application-factory');
     this._app = app;
-    this.contextMenuFactory = new ZirconContextMenuFactoryApplication(
-      this._app,
-    );
+    this._contextMenuFactory = new ZirconContextMenuFactoryApplication(app);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  create: (_state: any) => Promise<ZirconAppObject> = null;
+  public getApplication(): ZirconApplication {
+    return this._app;
+  }
+
+  public override getObjectType(): string {
+    return ZIRCON_APPLICATION_TYPE;
+  }
+
+  // application has no ancestor
+  public override getAncestorType(): string {
+    return null;
+  }
+
+  public override getContextMenuFactory(): ZirconContextMenuFactory {
+    return this._contextMenuFactory;
+  }
+
+  public override createObject(_state: any): Promise<any> {
+    throw new Error(
+      `No one should try to create an object of type ${ZIRCON_APPLICATION_TYPE}`,
+    );
+  }
 }

@@ -1,4 +1,3 @@
-import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-object-factory';
 import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
 import {
   VIZ_JSSANDBOX_TYPE,
@@ -6,18 +5,24 @@ import {
   VizJSSandboxState,
 } from './js-sandbox';
 import { ZirconApplication } from '../../zirconium/zircon-core/zircon-app';
+import { ZirconAppObjectFactory } from '../../zirconium/zircon-core/zircon-app-object-factory';
 
-export class VizJSSandboxFactory extends SimpleZirconObjectFactory {
-  private _app: ZirconApplication = null;
-
+export class VizJSSandboxFactory extends ZirconAppObjectFactory {
   constructor(app: ZirconApplication) {
-    super(VIZ_JSSANDBOX_TYPE, SHARP_EYE_VIZ_TYPE);
-    this._app = app;
+    super(app, 'js-sandbox-factory');
+  }
+
+  public override getObjectType(): string {
+    return VIZ_JSSANDBOX_TYPE;
+  }
+
+  public override getAncestorType(): string {
+    return SHARP_EYE_VIZ_TYPE;
   }
 
   public override async createObject(
     state: VizJSSandboxState,
   ): Promise<VizJSSandbox> {
-    return new VizJSSandbox(this._app, state);
+    return new VizJSSandbox(this.getApplication(), state);
   }
 }

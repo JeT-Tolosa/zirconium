@@ -2,14 +2,19 @@ import { SimpleZirconObjectFactory } from '../../../zirconium/zircon-core/zircon
 import { SHARP_EYE_ENGINE_TYPE } from '../../sharp-eye-app';
 import { AISCatalogEngine, AISCatalogEngineState } from './ais-catalog-engine';
 
+async function createObject(
+  state: AISCatalogEngineState,
+): Promise<AISCatalogEngine> {
+  return new AISCatalogEngine(state?.name);
+}
+
 export class AISCatalogEngineFactory extends SimpleZirconObjectFactory {
   constructor() {
-    super(AISCatalogEngine.AIS_CATALOG_ENGINE_TYPE, SHARP_EYE_ENGINE_TYPE);
-  }
-
-  public override async createObject(
-    state: AISCatalogEngineState,
-  ): Promise<AISCatalogEngine> {
-    return new AISCatalogEngine(state?.name);
+    super(
+      AISCatalogEngine.AIS_CATALOG_ENGINE_TYPE,
+      SHARP_EYE_ENGINE_TYPE,
+      createObject,
+      null,
+    );
   }
 }

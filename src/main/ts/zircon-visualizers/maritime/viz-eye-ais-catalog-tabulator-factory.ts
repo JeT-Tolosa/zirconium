@@ -6,17 +6,18 @@ import {
   VizAISCatalogTabulatorState,
 } from './viz-eye-ais-catalog-tabulator';
 
+async function createObject(
+  state: VizAISCatalogTabulatorState,
+): Promise<VizAISCatalogTabulator> {
+  return new VizAISCatalogTabulator(state);
+}
 export class VizAISCatalogTabulatorFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(
       VizAISCatalogTabulator.VIZ_AIS_CATALOG_TABULATOR_TYPE,
       SHARP_EYE_VIZ_TYPE,
+      createObject,
+      null,
     );
-  }
-
-  public override async createObject(
-    state: VizAISCatalogTabulatorState,
-  ): Promise<VizAISCatalogTabulator> {
-    return new VizAISCatalogTabulator(state);
   }
 }

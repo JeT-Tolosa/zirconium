@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
 import { ZirconObject, ZirconObjectState } from './zircon-object';
 import {
+  ZIRCON_FACTORY_LEVEL_NONE,
   ZirconObjectFactory,
-  ZirconFactoriesRegistry,
 } from './zircon-object-factory';
 import { ZirconApplication } from './zircon-app';
 import { ZirconAppObject } from './zircon-app-object';
@@ -12,11 +11,18 @@ import {
   ZIRCON_OBJECT_TYPE,
   ZirconType,
 } from './zircon-types';
+import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
+
+// TODO: manage this event
+// REGISTER_DATA_PROVIDER_FACTORY_REQUEST: {
+//   dataProviderFactory: ZirconDataProviderFactory;
+// };
+//           | 'REGISTER_DATA_PROVIDER_FACTORY_REQUEST'
 
 export class ZirconObjectManager extends ZirconAppObject {
   private __registeredStates: { [id: string]: ZirconObjectState } = {}; // TODO: UI Object
   private __objectInstances: { [id: string]: ZirconObject } = {}; // TODO: UI Object
-  private __objectFactoriesRegistry: ZirconFactoriesRegistry = null;
+  private __objectFactories: { [id: string]: ZirconObjectFactory } = {};
   private __objectHierarchy: { [id: string]: string } = {};
 
   constructor(app: ZirconApplication) {
@@ -27,47 +33,26 @@ export class ZirconObjectManager extends ZirconAppObject {
     return ZIRCON_OBJECT_MANAGER_TYPE;
   }
 
-  public getContextMenuFactory(type: string): ZirconContextMenuFactory {
-    return this.getObjectRegistry().getContextMenuFactory(type);
-  }
-
-  public getObjectRegistry(): ZirconFactoriesRegistry {
-    if (!this.__objectFactoriesRegistry) {
-      this.__objectFactoriesRegistry = new ZirconFactoriesRegistry();
-    }
-    return this.__objectFactoriesRegistry;
-  }
-
-  public getHandlingFactory(type: string): ZirconObjectFactory {
-    return this.getObjectRegistry().getHandlingFactory(type);
-  }
-
   public async registerObjectFactory(
-    factory: ZirconObjectFactory<any, any>,
+    factory: ZirconObjectFactory,
   ): Promise<boolean> {
     if (!factory) {
       return false;
     }
-    if (!factory.objectType) {
+    const factoryName = factory.getName();
+    if (!factoryName) {
+      throw new Error(`Object factory must have a name...`);
+    }
+    const objectType = factory.getObjectType();
+    if (!factory.getAncestorType()) {
       throw new Error(
-        `Object factory must handle an object type. Factory name = ${factory.name}`,
+        `Object factory must be a child of an object type. Factory name = ${factoryName}. default should be ${ZIRCON_OBJECT_TYPE}`,
       );
     }
-    if (!factory.ancestorType) {
+    const existingFactory = this.__objectFactories[factoryName];
+    if (existingFactory && existingFactory !== factory) {
       throw new Error(
-        `Object factory must inherent from an object type. Factory name = ${factory.name}. default should be ${ZIRCON_OBJECT_TYPE}`,
-      );
-    }
-    const existingFactory = this.getHandlingFactory(factory.objectType);
-    if (existingFactory && existingFactory.name === factory.name) {
-      this.getLogger().warn(
-        `Factory  ${factory.name} already registerd for type ${factory.objectType}. Skip multiple registrations`,
-      );
-      return Promise.resolve(true);
-    }
-    if (existingFactory) {
-      throw new Error(
-        `Factory  ${factory.name} cannot be registerd. A factory already exists for type ${factory.objectType}: ${existingFactory.name}`,
+        `Two factories named ${factoryName} conflict. Already registered factory = ${JSON.stringify(existingFactory)}. New on registration factory = ${JSON.stringify(factory)}`,
       );
     }
     // test object creation
@@ -75,34 +60,95 @@ export class ZirconObjectManager extends ZirconAppObject {
       const instance = await factory.create(null);
       if (!instance) {
         throw new Error(
-          `factory ${factory.name} handling type ${factory.objectType} creates null objects`,
+          `factory ${factoryName} handling type ${objectType} creates null objects`,
         );
       }
       if (!(instance instanceof ZirconObject)) {
         throw new Error(
-          `factory ${factory.name} handling type ${factory.objectType} creates objects which are not ZirconObjects`,
+          `factory ${factoryName} handling type ${objectType} creates objects which are not ZirconObjects`,
         );
       }
-      if (!this.isTypeOf(instance.getType(), factory.objectType)) {
+      if (!this.isTypeOf(instance.getType(), objectType)) {
         throw new Error(
-          `Factory ${factory.name} for object type ${factory.objectType} creates a wrong object type ${instance.getType()}`,
+          `Factory ${factoryName} for object type ${objectType} creates a wrong object type ${instance.getType()}`,
         );
       }
     }
 
     // everythings ok: register factory
-    this.getObjectRegistry().registerObjectFactory(factory);
     this.getLogger().info(
-      `object factory ${factory.name} registered. Handled type = ${factory.objectType} [ancestor of ${factory.ancestorType}]`,
+      `object factory ${factoryName} registered. Handled type = ${factory.getObjectType()} [ancestor of ${factory.getAncestorType()}]`,
     );
 
     // store object hierarchy
-    this.__objectHierarchy[factory.objectType] = factory.ancestorType;
+    this.__objectFactories[factory.getName()] = factory;
+    this.__objectHierarchy[factory.getObjectType()] = factory.getAncestorType();
     return true;
   }
 
-  public getContextMenuFactories(): ZirconContextMenuFactory[] {
-    return this.getObjectRegistry().getContextMenuFactories();
+  public getFactories(): ZirconObjectFactory[] {
+    return Object.values(this.__objectFactories);
+  }
+
+  // public getHandledTypes(): string[] {
+  //   return Object.keys(this.__objectFactories);
+  // }
+
+  private getFactory(state: any): ZirconObjectFactory {
+    if (!state) {
+      return null;
+    }
+    // if a factory is set, use it
+    if (state.factoryId) {
+      return this.__objectFactories[state.factoryId];
+    }
+    // else, choose the most appropriate one
+    const handlingLevels: { [level: number]: ZirconObjectFactory[] } = {};
+    let maxLevel: number = 0;
+    Object.values(this.__objectFactories).forEach((factory) => {
+      if (!factory) {
+        throw new Error(
+          `A null factory has been registereed. It should not happen`,
+        );
+      }
+      const level = factory.handlingLevel(state);
+      (handlingLevels[level] ??= []).push(factory);
+      maxLevel = Math.max(maxLevel, level);
+    });
+
+    if (maxLevel <= ZIRCON_FACTORY_LEVEL_NONE) {
+      return null;
+    }
+    const availableFactories: ZirconObjectFactory[] = handlingLevels[maxLevel];
+    if (!availableFactories) {
+      throw new Error(
+        `Available factories array is null. It should not happen`,
+      );
+    }
+    if (availableFactories.length === 0) {
+      throw new Error(
+        `Available factories array is empty. It should not happen`,
+      );
+    }
+    if (availableFactories.length > 1) {
+      throw new Error(
+        `More than one (${availableFactories.length}) available factory for state ${JSON.stringify(state)} with level ${maxLevel}: ${JSON.stringify(availableFactories.map((e) => e.getName()))}`,
+      );
+    }
+    return availableFactories[0];
+  }
+
+  public createInstance(state: any): Promise<any> {
+    if (!state) {
+      throw new Error(`Cannot create an object with a null state`);
+    }
+    const factory: ZirconObjectFactory = this.getFactory(state);
+    if (!factory) {
+      throw new Error(
+        `Object type ${state.type} has no associated Factory. Please add one for this type using Application.registerObjectFactory(factory: ZirconObjectFactory)`,
+      );
+    }
+    return factory.create(state);
   }
 
   private async createObject(state: ZirconObjectState): Promise<ZirconObject> {
@@ -118,7 +164,7 @@ export class ZirconObjectManager extends ZirconAppObject {
         `Cannot create an object with undefined type: ${JSON.stringify(state)}`,
       );
     }
-    const instance: any = await this.getObjectRegistry().createInstance(state);
+    const instance: any = await this.createInstance(state);
     if (!instance) {
       throw new Error(
         `Factory for object type ${state.type} does not create an object`,
@@ -224,22 +270,41 @@ export class ZirconObjectManager extends ZirconAppObject {
     return instance;
   }
 
-  //   private addEngineInstance(engine: ZirconEngine): ZirconEngine {
-  //     if (!engine) return null;
-  //     this.__engineInstances[engine.getId()] = engine;
-  //     return engine;
-  //   }
+  public getContextMenuFactoriesByType(
+    type: string,
+  ): ZirconContextMenuFactory[] {
+    return Object.values(this.__objectFactories)
+      .filter((factory) => {
+        return factory?.getObjectType() === type;
+      })
+      .map((factory) => {
+        return factory.getContextMenuFactory();
+      })
+      .filter((factory) => {
+        return factory !== null;
+      });
+  }
+
+  public getContextMenuFactories(): ZirconContextMenuFactory[] {
+    return Object.values(this.__objectFactories)
+      .map((factory) => {
+        return factory.getContextMenuFactory();
+      })
+      .filter((factory) => {
+        return factory !== null;
+      });
+  }
 
   public getChildrenObjectTypes(rootType: string): string[] {
     if (!rootType) {
       return;
     }
-    return Object.values(this.getObjectRegistry().getFactories())
+    return Object.values(this.getFactories())
       .filter((factory: ZirconObjectFactory) => {
-        return this.isTypeOf(factory.objectType, rootType);
+        return this.isTypeOf(factory.getObjectType(), rootType);
       })
       .map((factory: ZirconObjectFactory) => {
-        return factory.objectType;
+        return factory.getObjectType();
       });
   }
 

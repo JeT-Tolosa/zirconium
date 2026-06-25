@@ -1,148 +1,82 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { jQueryFactory } from 'jquery/factory';
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
-import { ZirconObject, ZirconObjectState } from './zircon-object';
 
-export interface ZirconObjectFactory<
-  TState extends ZirconObjectState = ZirconObjectState,
-  TObject extends ZirconObject = ZirconObject,
-> {
-  name: string;
-  objectType: string;
-  ancestorType: string;
-  create: (state: TState) => Promise<TObject>;
-  contextMenuFactory: ZirconContextMenuFactory;
-}
+export const ZIRCON_FACTORY_LEVEL_NONE = 0;
+export const ZIRCON_FACTORY_LEVEL_TYPE = 10;
+export const ZIRCON_FACTORY_LEVEL_SUBTYPE = 100;
+export const ZIRCON_FACTORY_LEVEL_FACTORY = 1000;
 
-// export function createObjectFactory<TState, TObject>(
-//   name: string,
-//   type: string,
-//   ancestorType: string,
-//   create: (state: TState) => Promise<TObject> = null,
-//   contextMenuFactory: ZirconContextMenuFactory = null,
-// ) {
-//   return {
-//     name: name,
-//     type: type,
-//     ancestorType: ancestorType,
-//     create: create,
-//     contextMenuFactory: contextMenuFactory,
-//   };
-// }
+export abstract class ZirconObjectFactory {
+  private name: string;
 
-export class ZirconFactoriesRegistry {
-  private _objectFactories: {
-    [type: string]: ZirconObjectFactory<any, any>;
-  } = {};
-
-  constructor() {}
-
-  public registerObjectFactory(
-    factory: ZirconObjectFactory<any, any>,
-  ): boolean {
-    if (!factory) {
-      return false;
-    }
-    if (!factory.objectType) {
-      throw new Error(
-        `Asked to register a valid factory with invalid type ... factory = ${jQueryFactory.name}`,
-      );
-    }
-    if (this._objectFactories[factory.objectType]) {
-      return false;
-    }
-    this._objectFactories[factory.objectType] = factory;
-    return true;
+  constructor(name: string) {
+    this.name = name;
   }
 
-  /**
-   * Look if handeled types contains the state type
-   * @param state
-   * @returns
-   */
-  public isHandled(state: ZirconObjectState): boolean {
-    if (!state) {
-      return false;
+  public getName(): string {
+    return this.name;
+  }
+
+  public abstract createObject(state: any): Promise<any>;
+  public abstract getAncestorType(): string;
+  public abstract getObjectType(): string;
+
+  public create(state: any): Promise<any> {
+    return this.createObject(state);
+  }
+
+  // default behaviour: check factoryId then type
+  public handlingLevel(state: any): number {
+    if (!state || !state.type) {
+      return ZIRCON_FACTORY_LEVEL_NONE;
     }
-    if (!state.type) {
-      throw new Error(
-        `Object states with undefined type are not allowed ID = ${state.id}`,
-      );
+    if (state.factoryId) {
+      return ZIRCON_FACTORY_LEVEL_FACTORY;
     }
-    return true;
-  }
-
-  public getHandlingFactory(type: string): ZirconObjectFactory {
-    if (!type) {
-      return null;
+    if (state.type === this.getObjectType()) {
+      return ZIRCON_FACTORY_LEVEL_TYPE;
     }
-    return this._objectFactories[type];
+    return ZIRCON_FACTORY_LEVEL_NONE;
   }
 
-  public getFactories(): ZirconObjectFactory[] {
-    return Object.values(this._objectFactories);
-  }
-
-  public getHandledTypes(): string[] {
-    return Object.keys(this._objectFactories);
-  }
-
-  public createInstance(state: any): Promise<any> | null {
-    if (!this.isHandled(state)) {
-      return null;
-    }
-    if (!state.type) {
-      throw new Error(
-        `Object state has no type defined:  ${JSON.stringify(state)}}`,
-      );
-    }
-    if (!this._objectFactories[state.type]) {
-      throw new Error(
-        `Object type ${state.type} has no associated Factory. Please add one for this type using Application.registerObjectFactory(factory: ZirconObjectFactory)`,
-      );
-    }
-    return this._objectFactories[state.type].create(state);
-  }
-
-  public getContextMenuFactory(type: string): ZirconContextMenuFactory {
-    return this._objectFactories[type]?.contextMenuFactory;
-  }
-
-  public getContextMenuFactories(): ZirconContextMenuFactory[] {
-    return Object.values(this._objectFactories)
-      .map((factory) => {
-        return factory.contextMenuFactory;
-      })
-      .filter((factory) => {
-        return factory !== null;
-      });
-  }
-}
-
-export abstract class SimpleZirconObjectFactory implements ZirconObjectFactory {
-  name: string = null;
-  objectType: string = null;
-  ancestorType: string = null;
-  create: (state: any) => Promise<any>;
-  contextMenuFactory: ZirconContextMenuFactory = null;
-
-  constructor(objectType: string, ancestorType: string) {
-    this.name = `${objectType}-factory`;
-    this.objectType = objectType;
-    this.ancestorType = ancestorType;
-    this.create = (state: ZirconObjectState) => {
-      return this.createObject(state);
-    };
-    this.contextMenuFactory = null;
-  }
-
-  public abstract createObject(state: ZirconObjectState): Promise<any> | null;
-
-  /**
-   * default context menu is null. override this method if necessary
-   * @returns
-   */
-  public createContextMenu(): ZirconContextMenuFactory {
+  // by default context menu is not defined
+  public getContextMenuFactory(): ZirconContextMenuFactory {
     return null;
+  }
+}
+
+export class SimpleZirconObjectFactory extends ZirconObjectFactory {
+  private _objectType: string = null;
+  private _ancestorType: string = null;
+  private _create: (state: any) => Promise<any>;
+  private _contextMenuFactory: ZirconContextMenuFactory = null;
+
+  constructor(
+    objectType: string,
+    ancestorType: string,
+    create: (state: any) => Promise<any>,
+    contextMenuFactory: ZirconContextMenuFactory,
+  ) {
+    super(`${objectType}-factory`);
+    this._objectType = objectType;
+    this._ancestorType = ancestorType;
+    this._contextMenuFactory = contextMenuFactory;
+    this._create = create;
+  }
+
+  public override getAncestorType(): string {
+    return this._ancestorType;
+  }
+
+  public override getObjectType(): string {
+    return this._objectType;
+  }
+
+  public override getContextMenuFactory(): ZirconContextMenuFactory {
+    return this._contextMenuFactory;
+  }
+
+  public override createObject(state: any): Promise<any> {
+    return this._create(state);
   }
 }
