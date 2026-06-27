@@ -55,7 +55,7 @@ export async function createDesktop3(
     top: 10,
     width: 600,
     height: 1080,
-    vizId: vizSatCatalog1.id,
+    vizIds: [vizSatCatalog1.id],
   };
   app.registerObjectState(satcat1WindowState);
 
@@ -67,7 +67,7 @@ export async function createDesktop3(
     top: 10,
     width: 600,
     height: 1080,
-    vizId: vizSatCatalog2.id,
+    vizIds: [vizSatCatalog2.id],
   };
   app.registerObjectState(satcat2WindowState);
 
@@ -79,7 +79,7 @@ export async function createDesktop3(
     top: 10,
     width: 385,
     height: 220,
-    vizId: vizSatCatLoader.id,
+    vizIds: [vizSatCatLoader.id],
   };
   // window4.setContentObject(new VizSatelliteLoader());
   app.registerObjectState(satelliteLoaderWindowState);

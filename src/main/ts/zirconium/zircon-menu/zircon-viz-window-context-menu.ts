@@ -136,7 +136,7 @@ export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory 
       state: vizState,
     });
     const windowState: ZirconVizWindowState = window.generateCurrentState();
-    windowState.vizId = vizState.id;
+    windowState.vizIds.push(vizState.id);
     this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
       objectId: windowState.id,
       state: windowState,

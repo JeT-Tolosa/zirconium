@@ -351,16 +351,13 @@ export class ZirconDesktopManager<
     this.getApplication()
       ?.getDesktopManager()
       ?.getDesktopsContainer()
-      ?.appendChild(window.getContainer());
+      ?.appendChild(window.getPanel());
   }
 
   public temporaryUnmoveWindowPanelFromDesktopManager(
     window: ZirconWindow,
   ): void {
-    window
-      ?.getParentDesktop()
-      ?.getContainer()
-      ?.appendChild(window.getContainer());
+    window?.getParentDesktop()?.getContainer()?.appendChild(window.getPanel());
   }
 
   /**

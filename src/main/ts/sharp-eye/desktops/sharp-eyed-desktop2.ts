@@ -14,11 +14,6 @@ import {
   VizEventLoggerState,
 } from '../../zircon-visualizers/logger/viz-eye-event-logger';
 import {
-  DigitalClock,
-  DigitalClockState,
-} from '../../zircon-visualizers/time/digital-clock';
-import { TimingHelper } from '../../libraries/timing/timing';
-import {
   VizFetch,
   VizFetchState,
 } from '../../zircon-visualizers/fetch/viz-eye-fetch';
@@ -26,10 +21,6 @@ import {
   VizLeaflet,
   VizLeafletState,
 } from '../../zircon-visualizers/leaflet/viz-eye-leaflet';
-import {
-  TimeController,
-  TimeControllerState,
-} from '../../zircon-visualizers/time/time-controller';
 import {
   ZIRCON_DATA_PROVIDER_TYPE,
   ZIRCON_DESKTOP_TYPE,
@@ -130,23 +121,6 @@ export async function createDesktop2(
   app.registerObjectState(loggerVizState);
 
   // Time Visualizers
-  const clock1VizState: DigitalClockState = {
-    id: 'clock1VizId',
-    type: DigitalClock.DIGITAL_CLOCK_VISUALIZER_TYPE,
-    timeZoneOffset: +2,
-    timeSource: null,
-    locationName: 'Moscow',
-    name: 'Digital Clock',
-  };
-  app.registerObjectState(clock1VizState);
-
-  const timeControllerVizState: TimeControllerState = {
-    id: 'timeControllerVizId',
-    type: TimeController.TIME_CONTROLLER_VISUALIZER_TYPE,
-    name: 'Time Controller',
-    timeSource: TimingHelper.MAIN_TIME_SOURCE_ID,
-  };
-  app.registerObjectState(timeControllerVizState);
 
   // Fetch Visualizer
   const fetchVizState: VizFetchState = {
@@ -171,7 +145,7 @@ export async function createDesktop2(
     top: 550,
     width: 320,
     height: 520,
-    vizId: leafletVizState.id,
+    vizIds: [leafletVizState.id],
   };
 
   // const lineChartWindowState: ZirconVizWindowState = {
@@ -182,7 +156,7 @@ export async function createDesktop2(
   //   top: 550,
   //   width: 320,
   //   height: 520,
-  //   vizId: lineChartVizState.id,
+  //   vizIds: [lineChartVizState.id],
   // };
   // app.registerObjectState(lineChartWindowState);
 
@@ -197,7 +171,7 @@ export async function createDesktop2(
     top: 550,
     width: 320,
     height: 520,
-    vizId: fetchVizState.id,
+    vizIds: [fetchVizState.id],
   };
   // createVisualizerFetch(),
   app.registerObjectState(fetchWindowState);
@@ -210,44 +184,16 @@ export async function createDesktop2(
     top: 10,
     width: 400,
     height: 480,
-    vizId: loggerVizState.id,
+    vizIds: [loggerVizState.id],
   };
   // createVisualizerLogger(),
   app.registerObjectState(loggerWindowState);
-
-  const clock1WindowState: ZirconVizWindowState = {
-    type: ZIRCON_VISUALIZER_WINDOW_TYPE,
-    id: `window-${uuid()}`,
-    title: 'Clock 1',
-    left: 20,
-    top: 10,
-    width: 250,
-    height: 200,
-    vizId: clock1VizState.id,
-  };
-  // window.setContentObject(digitalClock);
-  app.registerObjectState(clock1WindowState);
-
-  const timeControllerWindowState: ZirconVizWindowState = {
-    type: ZIRCON_VISUALIZER_WINDOW_TYPE,
-    id: `window-${uuid()}`,
-    title: 'Time Controller',
-    left: 850,
-    top: 10,
-    width: 500,
-    height: 650,
-    vizId: timeControllerVizState.id,
-  };
-  //const timeController = new TimeController();
-  app.registerObjectState(timeControllerWindowState);
 
   const desktop2State: ZirconDesktopState = {
     type: ZIRCON_DESKTOP_TYPE,
     id: `desktop2-${uuid()}`,
     name: 'Desktop 2',
     windowIds: [
-      timeControllerWindowState.id,
-      clock1WindowState.id,
       loggerWindowState.id,
       fetchWindowState.id,
       leafletWindowState.id,

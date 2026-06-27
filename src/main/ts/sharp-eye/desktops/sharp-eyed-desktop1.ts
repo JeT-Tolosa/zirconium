@@ -37,6 +37,14 @@ import { DataProviderChartJS } from '../../zircon-visualizers/jschart/jschart-da
 import { ChartData, ChartOptions } from 'chart.js';
 import { ZirconApplication } from '../../zirconium/zircon-core/zircon-app';
 import { VIZ_JSCHART_REGISTRY } from '../../zircon-visualizers/jschart/viz-jschart-types';
+import {
+  DigitalClock,
+  DigitalClockState,
+} from '../../zircon-visualizers/time/digital-clock';
+import {
+  TimeController,
+  TimeControllerState,
+} from '../../zircon-visualizers/time/time-controller';
 
 function barChartOptions(): ChartOptions<'bar'> {
   return {
@@ -148,6 +156,24 @@ export async function createDesktop1(
   };
   app.registerObjectState(barChartVizState);
 
+  const clock1VizState: DigitalClockState = {
+    id: 'clock1VizId',
+    type: DigitalClock.DIGITAL_CLOCK_VISUALIZER_TYPE,
+    timeZoneOffset: +2,
+    timeSource: null,
+    locationName: 'Moscow',
+    name: 'Digital Clock',
+  };
+  app.registerObjectState(clock1VizState);
+
+  const timeControllerVizState: TimeControllerState = {
+    id: 'timeControllerVizId',
+    type: TimeController.TIME_CONTROLLER_VISUALIZER_TYPE,
+    name: 'Time Controller',
+    timeSource: TimingHelper.MAIN_TIME_SOURCE_ID,
+  };
+  app.registerObjectState(timeControllerVizState);
+
   const clock2VizState: AnalogClockState = {
     id: 'clock2VizId',
     type: AnalogClock.ANALOG_CLOCK_VISUALIZER_TYPE,
@@ -180,73 +206,85 @@ export async function createDesktop1(
   };
   app.registerObjectState(helmetVizState);
 
-  const barChartState: ZirconVizWindowState = {
+  const barChartWindowState: ZirconVizWindowState = {
     type: ZIRCON_VISUALIZER_WINDOW_TYPE,
-    id: `window-${uuid()}`,
+    id: `window-bar-chart-${uuid()}`,
     title: 'Bar Chart',
     left: 10,
     top: 10,
     width: 320,
     height: 520,
-    vizId: barChartVizState.id,
+    vizIds: [barChartVizState.id],
   };
-  app.registerObjectState(barChartState);
-  const helmetState: ZirconVizWindowState = {
+  app.registerObjectState(barChartWindowState);
+  const helmetWindowState: ZirconVizWindowState = {
     type: ZIRCON_VISUALIZER_WINDOW_TYPE,
-    id: `window-${uuid()}`,
+    id: `window-helmet-${uuid()}`,
     title: 'Helmet 3D',
     left: 350,
     top: 10,
     width: 320,
     height: 520,
-    vizId: helmetVizState.id,
+    vizIds: [helmetVizState.id],
   };
-  app.registerObjectState(helmetState);
-  const cubeState: ZirconVizWindowState = {
+  app.registerObjectState(helmetWindowState);
+  const cubeWindowState: ZirconVizWindowState = {
     type: ZIRCON_VISUALIZER_WINDOW_TYPE,
-    id: `window-${uuid()}`,
+    id: `window-cube-${uuid()}`,
     title: 'Cube3D',
     left: 700,
     top: 10,
     width: 320,
     height: 520,
-    vizId: cubeVizState.id,
+    vizIds: [cubeVizState.id],
   };
-  app.registerObjectState(cubeState);
-  const globusState: ZirconVizWindowState = {
+  app.registerObjectState(cubeWindowState);
+  const globusWindowState: ZirconVizWindowState = {
     type: ZIRCON_VISUALIZER_WINDOW_TYPE,
-    id: `window-${uuid()}`,
+    id: `window-globus-${uuid()}`,
     title: 'Globus',
     left: 510,
     top: 550,
     width: 520,
     height: 520,
-    vizId: globusVizState.id,
+    vizIds: [globusVizState.id],
   };
-  app.registerObjectState(globusState);
+  app.registerObjectState(globusWindowState);
 
-  const clock2State: ZirconVizWindowState = {
+  const clocksWindowState: ZirconVizWindowState = {
     type: ZIRCON_VISUALIZER_WINDOW_TYPE,
-    id: `window-${uuid()}`,
-    title: 'Clock2',
+    id: `window-clocks-${uuid()}`,
+    title: 'Clocks',
     left: 50,
     top: 550,
     width: 385,
     height: 420,
-    vizId: clock2VizState.id,
+    vizIds: [clock1VizState.id, clock2VizState.id],
   };
-  app.registerObjectState(clock2State);
+  app.registerObjectState(clocksWindowState);
+  const timeControllerWindowState: ZirconVizWindowState = {
+    type: ZIRCON_VISUALIZER_WINDOW_TYPE,
+    id: `window-time-controller-${uuid()}`,
+    title: 'Time Controller',
+    left: 850,
+    top: 10,
+    width: 500,
+    height: 650,
+    vizIds: [timeControllerVizState.id],
+  };
+  app.registerObjectState(timeControllerWindowState);
 
   const desktop1State: ZirconDesktopState = {
     type: ZIRCON_DESKTOP_TYPE,
     id: `desktop1-${uuid()}`,
     name: 'Desktop 1',
     windowIds: [
-      barChartState.id,
-      helmetState.id,
-      cubeState.id,
-      globusState.id,
-      clock2State.id,
+      barChartWindowState.id,
+      helmetWindowState.id,
+      cubeWindowState.id,
+      globusWindowState.id,
+      clocksWindowState.id,
+      timeControllerWindowState.id,
     ],
   };
   app.registerObjectState(desktop1State);

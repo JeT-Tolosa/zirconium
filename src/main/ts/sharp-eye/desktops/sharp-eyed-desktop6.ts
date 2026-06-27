@@ -39,7 +39,7 @@ export async function createDesktop6(
     top: 10,
     width: 800,
     height: 600,
-    vizId: jsSandBoxVizState.id,
+    vizIds: [jsSandBoxVizState.id],
   };
   app.registerObjectState(jsSandboxWindowState);
 
@@ -56,7 +56,7 @@ export async function createDesktop6(
     top: 10,
     width: 800,
     height: 600,
-    vizId: tlePropagatorVizState.id,
+    vizIds: [tlePropagatorVizState.id],
   };
   app.registerObjectState(tlePropagatorWindowState);
 

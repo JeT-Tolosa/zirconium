@@ -125,7 +125,7 @@ export class ZirconDesktop<
       this.getWindowIds(),
       windowIds,
     );
-    this._windowIds = windowIds;
+    this._windowIds = windowIds.slice();
     res.inserted?.forEach((windowId) => {
       this.displayWindow(windowId).catch((error) => {
         this.emit('DESKTOP_WINDOW_IDS_ERROR', {
@@ -257,7 +257,7 @@ export class ZirconDesktop<
   }
 
   public displayParamWindow(paramWindow: ZirconParamWindow): void {
-    this.getContainer().appendChild(paramWindow.getContainer());
+    this.getContainer().appendChild(paramWindow.getPanel());
     paramWindow.setParentDesktop(this);
   }
 
@@ -271,13 +271,18 @@ export class ZirconDesktop<
     }
     const window: ZirconObject =
       await this.getApplication().getInstance(windowId);
+    if (!window) {
+      throw new Error(
+        `Cannot retrieve or create Window with id ${windowId}. State ${JSON.stringify(this.getApplication().getObjectManager().getRegisteredObjectState(windowId))}`,
+      );
+    }
     if (!(window instanceof ZirconWindow)) {
       throw new Error(
         `Cannot display Window with id ${windowId} object is not a Window: type ${window.getType()}`,
       );
     }
     // add Window in desktop
-    const panel: HTMLElement = window.getContainer();
+    const panel: HTMLElement = window.getPanel();
     this.getContainer().appendChild(panel);
     window.setParentDesktop(this);
     this.__displayedWindows[windowId] = { window: window, panel: panel };

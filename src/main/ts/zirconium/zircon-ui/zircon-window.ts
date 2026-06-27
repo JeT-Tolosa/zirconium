@@ -193,7 +193,7 @@ export class ZirconWindow<
     this.__parentDesktop = parentDesktop;
   }
 
-  private createPanel(): IJSPanelInstance {
+  public getPanel(): IJSPanelInstance {
     if (this.__panel) {
       return this.__panel;
     }
@@ -343,20 +343,12 @@ export class ZirconWindow<
     return;
   }
 
-  public getContainer(): HTMLElement {
-    if (this.__panel) {
-      return this.__panel;
-    }
-    this.createPanel();
-    return this.__panel;
-  }
-
   public getWindowContent(): HTMLDivElement {
     if (this.__panel) {
       return this.__panel.content;
     }
-    this.createPanel();
-    return this.__panel.content;
+    this.__panel = this.getPanel();
+    return this.__panel?.content;
   }
 
   public isDisplayed(): boolean {

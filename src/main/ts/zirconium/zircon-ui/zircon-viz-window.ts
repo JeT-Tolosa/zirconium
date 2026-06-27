@@ -23,11 +23,20 @@ import {
   ZIRCON_VISUALIZER_WINDOW_TYPE,
 } from '../zircon-core/zircon-types';
 import { ZirconObject } from '../zircon-core/zircon-object';
+// ionic elements
+import { defineCustomElements } from '@ionic/core/loader';
+import '@ionic/core/css/core.css';
+import '@ionic/core/css/structure.css';
+import '@ionic/core/css/typography.css';
+defineCustomElements(window);
 
 export const ZIRCON_VISUALIZER_WINDOW_CLASS: string = 'zircon-viz';
 
 export type ZirconVizWindowEvents = {
-  WINDOW_VISUALIZER_CHANGED: { windowId: string; vizId: string };
+  WINDOW_VIZUALIZER_IDS_CHANGED: {
+    windowId: string;
+    vizIds: string[];
+  };
 };
 
 export type ZirconVizWindowEventRegistry = MergeZirconRegistries<
@@ -36,7 +45,7 @@ export type ZirconVizWindowEventRegistry = MergeZirconRegistries<
       [PickEvents<ZirconVizEvents, 'VISUALIZER_REMOVED_FROM_WINDOW'>]
     >;
     outgoing: MergePickEvents<
-      [PickEvents<ZirconVizWindowEvents, 'WINDOW_VISUALIZER_CHANGED'>]
+      [PickEvents<ZirconVizWindowEvents, 'WINDOW_VIZUALIZER_IDS_CHANGED'>]
     >;
   },
   ZirconWindowEventRegistry
@@ -44,7 +53,8 @@ export type ZirconVizWindowEventRegistry = MergeZirconRegistries<
 
 export interface ZirconVizWindowState extends ZirconWindowState {
   type: typeof ZIRCON_VISUALIZER_WINDOW_TYPE;
-  vizId?: string;
+  vizIds?: string[];
+  activeViz?: string;
 }
 
 export const DEFAULT_VISUALIZER_WINDOW_STATE: ZirconVizWindowState = {
@@ -54,8 +64,15 @@ export const DEFAULT_VISUALIZER_WINDOW_STATE: ZirconVizWindowState = {
   top: 0,
   width: 500,
   height: 500,
-  vizId: null,
+  vizIds: null,
 };
+
+interface VizDock {
+  vizId: string;
+  viz: ZirconViz;
+  headerElement: HTMLIonSegmentButtonElement;
+  viewElement: HTMLDivElement;
+}
 
 /**
  * A Zircon Frame is a floating window which can be docked in a Zircon Desktop
@@ -63,8 +80,12 @@ export const DEFAULT_VISUALIZER_WINDOW_STATE: ZirconVizWindowState = {
 export class ZirconVizWindow<
   R extends ZirconVizWindowEventRegistry = ZirconVizWindowEventRegistry,
 > extends ZirconWindow<R> {
-  private __viz: ZirconViz = null;
-  private _vizId: string = null;
+  private __visualizerDocks: { [vizId: string]: VizDock } = {};
+  private _vizIds: string[] = [];
+  private _activeVizId: string = null;
+  private __tabContainer: HTMLDivElement = null;
+  private __viewContainer: HTMLDivElement = null;
+  private __segment: HTMLIonSegmentElement = null; // tabs container
 
   constructor(app: ZirconApplication, state?: ZirconVizWindowState) {
     super(app, state);
@@ -72,25 +93,26 @@ export class ZirconVizWindow<
 
   protected override listenToEvents(): void {
     super.listenToEvents();
-    this.addListener('VISUALIZER_REMOVED_FROM_WINDOW', (arg) =>
-      this.onVISUALIZER_REMOVED_FROM_WINDOW(arg.windowId, arg.vizId),
-    );
+    // TODO: shouldn't we only uses vizIds config ?
+    // this.addListener('VISUALIZER_REMOVED_FROM_WINDOW', (arg) =>
+    //   this.onVISUALIZER_REMOVED_FROM_WINDOW(arg.windowId, arg.vizId),
+    // );
   }
 
-  private onVISUALIZER_REMOVED_FROM_WINDOW(
-    windowId: string,
-    vizId: string,
-  ): void {
-    if (this.getId() === windowId) {
-      if (this._vizId !== vizId) {
-        console.warn(
-          `Incoherence vizId ${vizId} cannot be removed from window ${windowId}. Current vizId is ${this._vizId}`,
-        );
-        return;
-      }
-      this.removeVisualizer();
-    }
-  }
+  // private onVISUALIZER_REMOVED_FROM_WINDOW(
+  //   windowId: string,
+  //   vizId: string,
+  // ): void {
+  //   if (this.getId() === windowId) {
+  //     if (this._vizIds.indexOf(vizId) === -1) {
+  //       console.warn(
+  //         `Incoherence vizId ${vizId} cannot be removed from window ${windowId}. Current vizIds are ${JSON.stringify(this._vizIds)}`,
+  //       );
+  //       return;
+  //     }
+  //     this.removeVisualizer(vizId);
+  //   }
+  // }
 
   public override getType(): string {
     return ZIRCON_VISUALIZER_WINDOW_TYPE;
@@ -103,25 +125,50 @@ export class ZirconVizWindow<
       return;
     }
     await super.setState(state);
-    await this.setVisualizerId(state.vizId);
+    await this.setVisualizerIds(state.vizIds);
+    this.setActiveVizId(state.activeViz);
   }
 
-  private async setVisualizerId(vizId: string): Promise<boolean> {
-    if (this._vizId === vizId) {
-      return false;
+  private setActiveVizId(vizId: string) {
+    if (this._activeVizId === vizId) {
+      return;
     }
-    this._vizId = vizId;
-    if (this.__viz) {
-      // this.__viz.stop();  // TODO implement stop in visualizers
-      this.__viz = null;
+    this._activeVizId = vizId;
+    this.displayActiveViz();
+  }
+
+  private async setVisualizerIds(vizIds: string[]): Promise<boolean> {
+    if (!vizIds) {
+      vizIds = [];
     }
-    // TODO: change visusalizer's display if window is displayed...
-    // await this.displayVisualizer(); (double function call in onPanelCreated)
+    // let changes: boolean = false;
+    // const res: ArrayComparisonResult = Zircon.arrayComparison(
+    //   this.getVisualizerIds(),
+    //   vizIds,
+    // );
+    // this._vizIds = vizIds.slice();
+    // res.inserted?.forEach((vizId) => {
+    //   this.addVisualizerDock(vizId);
+    //   changes = true;
+    // });
+    // res.deleted?.forEach((vizId) => {
+    //  this.removeVisualizerDock(vizId);
+    //   changes = true;
+    // });
+    // if (changes) {
+    //   this.emit('WINDOW_VIZUALIZER_IDS_CHANGED', {
+    //     windowId: this.getId(),
+    //     vizIds: vizIds,
+    //   });
+    // }
+    this._vizIds = vizIds.slice();
+    // TODO: we may reconstruct only modified docks...
+    this.reconstructUI();
     return true;
   }
 
-  public getVisualizerId(): string {
-    return this._vizId;
+  public getVisualizerIds(): string[] {
+    return this._vizIds.slice();
   }
 
   /**
@@ -131,7 +178,7 @@ export class ZirconVizWindow<
   public override generateCurrentState(): ZirconVizWindowState {
     return {
       ...super.generateCurrentState(),
-      vizId: this._vizId,
+      vizIds: this._vizIds,
       type: ZIRCON_VISUALIZER_WINDOW_TYPE,
     };
   }
@@ -165,22 +212,48 @@ export class ZirconVizWindow<
     }
     panel.classList.add(ZIRCON_VISUALIZER_WINDOW_CLASS);
 
-    await this.displayVisualizer();
     panel?.headerlogo?.addEventListener('click', () => {
       this.displayParameterWindow();
     });
   }
 
-  public async getVisualizer(): Promise<ZirconViz> {
-    if (this.__viz && this.__viz.getId() === this._vizId) {
-      return Promise.resolve(this.__viz);
+  public addVisualizer(vizId: string) {
+    if (!vizId) {
+      return;
     }
-    const instance: ZirconObject = await this.getApplication().getInstance(
-      this._vizId,
-    );
+    if (this._vizIds.indexOf(vizId) !== -1) {
+      return;
+    }
+    const myState = this.generateCurrentState();
+    myState.vizIds.push(vizId);
+    this.setState(myState);
+  }
+
+  public removeVisualizer(vizId: string) {
+    if (!vizId) {
+      return;
+    }
+    if (this._vizIds.indexOf(vizId) === -1) {
+      return;
+    }
+    const myState = this.generateCurrentState();
+    myState.vizIds = myState.vizIds.filter((id) => id !== vizId);
+    this.setState(myState);
+  }
+
+  public async getVisualizer(vizId: string): Promise<ZirconViz> {
+    if (!vizId) {
+      return null;
+    }
+    if (this.__visualizerDocks[vizId]?.viz) {
+      return this.__visualizerDocks[vizId].viz;
+    }
+
+    const instance: ZirconObject =
+      await this.getApplication().getInstance(vizId);
     if (!instance) {
       throw new Error(
-        `Unable to retrieve Visualizer Id ${this._vizId} in window ${this.getName()} / ${this.getId()}`,
+        `Unable to retrieve Visualizer Id ${this._vizIds} in window ${this.getName()} / ${this.getId()}`,
       );
     }
     if (!(instance instanceof ZirconViz)) {
@@ -190,50 +263,190 @@ export class ZirconVizWindow<
         .filter((obj) => obj instanceof ZirconViz)
         .map((obj) => obj.getId());
       throw new Error(
-        `Retrieved Object Id ${this._vizId} in window ${this.getId()} is not a visualizer: type = ${(instance as ZirconObject).getType()} available viz = ${JSON.stringify(availableViz)}`,
+        `Retrieved Object Id ${this._vizIds} in window ${this.getId()} is not a visualizer: type = ${(instance as ZirconObject).getType()} available viz = ${JSON.stringify(availableViz)}`,
       );
     }
-    this.__viz = instance;
-    return this.__viz;
+    return instance;
   }
 
-  private removeVisualizer(): void {
-    if (!this.isDisplayed()) {
+  private removeVisualizerDock(vizId: string): void {
+    const dock = this.__visualizerDocks[vizId];
+    if (!dock) {
       return;
     }
-    this.getWindowContent().innerHTML = '';
-    this._vizId = null;
-    this.__viz = null;
+    dock.viz?.unsetParent();
+    this.getHeaderContainer().removeChild(dock.headerElement);
+    this.getViewContainer().removeChild(dock.viewElement);
+    delete this.__visualizerDocks[vizId];
   }
 
-  private async undisplayVisualizer(): Promise<void> {
-    if (!this.__viz) {
+  private displayDock(dock: VizDock): void {
+    if (!dock) {
       return;
     }
-    this.__viz.undisplayFromParent();
+    dock.viz?.setParent(this);
+    this.getHeaderContainer().appendChild(dock.headerElement);
+    this.getViewContainer().appendChild(dock.viewElement);
+    dock.viz?.onDisplay();
   }
 
-  private async displayVisualizer(): Promise<void> {
-    if (!this.isDisplayed()) {
+  private async addVizualizerDock(vizId: string): Promise<VizDock> {
+    if (!vizId) {
       return;
     }
-    this.getWindowContent().innerHTML = '';
-    if (!this._vizId) {
-      this.getWindowContent().innerHTML = `<p>No Visualizer defined (vizId = null)</p>`;
-      this.getWindowContent().style.background = `orange`;
+    if (this.__visualizerDocks[vizId]) {
       return;
     }
-    this.getVisualizer()
-      .then(async (viz: ZirconViz) => {
-        if (viz) {
-          await viz.displayIn(this);
-          this.__viz = viz;
-        }
-      })
-      .catch((error) => {
-        this.getWindowContent().innerHTML = `<p>${error.toString()}</p>`;
-        this.getWindowContent().style.background = `red`;
-      });
+    const viz = await this.getVisualizer(vizId);
+    const viewElement = this.generateViewElement(viz);
+
+    const vizDock: VizDock = {
+      vizId: vizId,
+      headerElement: this.generateHeaderElement(viz),
+      viewElement: viewElement,
+      viz: viz,
+    };
+    this.__visualizerDocks[vizId] = vizDock;
+
+    this.displayDock(vizDock);
+    return vizDock;
+  }
+
+  // private async removeVizualizerDock(vizId: string): Promise<VizDock> {
+  //   if (!vizId) {
+  //     return;
+  //   }
+  //   const dock = this.__visualizerDocks[vizId];
+  //   if (!dock) {
+  //     return;
+  //   }
+  //   this.undisplayDock(dock);
+  //   delete this.__visualizerDocks[vizId];
+  // }
+
+  public override getWindowContent(): HTMLDivElement {
+    return this.getViewContainer();
+  }
+
+  private generateViewElement(viz: ZirconViz): HTMLDivElement {
+    if (!viz) {
+      return null;
+    }
+    const viewElement = document.createElement('div');
+    viewElement.appendChild(viz.getContainer());
+    return viewElement;
+  }
+
+  private generateHeaderElement(viz: ZirconViz): HTMLIonSegmentButtonElement {
+    if (!viz) {
+      return null;
+    }
+    const headerElement = document.createElement('ion-segment-button');
+    headerElement.value = viz.getId();
+    headerElement.textContent = viz.getName();
+    return headerElement;
+  }
+
+  private getHeaderContainer(): HTMLIonSegmentElement {
+    if (this.__segment) {
+      return this.__segment;
+    }
+    // SEGMENT (tabs)
+    this.__segment = document.createElement('ion-segment');
+    this.__segment.addEventListener('ionChange', (ev: CustomEvent) => {
+      const vizId = ev.detail.value;
+      console.log(`ion-changed vizId = ${vizId}`);
+      this.setActiveVizId(vizId);
+    });
+    return this.__segment;
+  }
+
+  private displayActiveViz() {
+    if (!this._activeVizId) {
+      return;
+    }
+    this.__segment.value = this._activeVizId;
+    Object.values(this.__visualizerDocks).forEach((dock) => {
+      if (dock?.vizId === this._activeVizId) {
+        this.showDock(dock);
+      } else {
+        this.hideDock(dock);
+      }
+    });
+  }
+
+  private showDock(dock: VizDock) {
+    if (!dock) {
+      return;
+    }
+    dock.viewElement.style.display = 'block';
+  }
+
+  private hideDock(dock: VizDock) {
+    if (!dock) {
+      return;
+    }
+    dock.viewElement.style.display = 'none';
+  }
+
+  private getViewContainer(): HTMLDivElement {
+    if (this.__viewContainer) {
+      return this.__viewContainer;
+    }
+    this.__viewContainer = document.createElement('div');
+    this.__viewContainer.classList.add('zircon-window-view');
+
+    // this.__viewContainer.style.flex = '1';
+    // this.__viewContainer.style.position = 'relative';
+    return this.__viewContainer;
+  }
+
+  private getTabContainer(): HTMLElement {
+    if (this.__tabContainer) {
+      return this.__tabContainer;
+    }
+    this.__tabContainer = document.createElement('div');
+    this.__tabContainer.classList.add('zircon-window-tabs');
+    // this.__tabContainer.style.display = 'flex';
+    // this.__tabContainer.style.flexDirection = 'column';
+    // this.__tabContainer.style.height = '100%';
+    this.__tabContainer.appendChild(this.getHeaderContainer());
+    this.__tabContainer.appendChild(this.getViewContainer());
+    return this.__tabContainer;
+  }
+
+  private async reconstructUI(): Promise<void> {
+    super.getWindowContent().innerHTML = '';
+    super.getWindowContent().appendChild(this.getTabContainer());
+    this._vizIds.forEach((vizId) => {
+      this.addVizualizerDock(vizId);
+    });
+    // default activation if none is activated
+    if (!this._activeVizId && this._vizIds.length > 0) {
+      this.setActiveVizId(this._vizIds[this._vizIds.length - 1]);
+    }
+    return;
+
+    // if (!this.isDisplayed()) {
+    //   return;
+    // }
+    // this.getWindowContent().innerHTML = '';
+    // if (!this._vizIds) {
+    //   this.getWindowContent().innerHTML = `<p>No Visualizer defined (vizId = null)</p>`;
+    //   this.getWindowContent().style.background = `orange`;
+    //   return;
+    // }
+    // this.getVisualizer()
+    //   .then(async (viz: ZirconViz) => {
+    //     if (viz) {
+    //       await viz.setParent(this);
+    //       this.__viz = viz;
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     this.getWindowContent().innerHTML = `<p>${error.toString()}</p>`;
+    //     this.getWindowContent().style.background = `red`;
+    //   });
   }
 
   public override displayParameters(container: HTMLElement) {
@@ -258,14 +471,15 @@ export class ZirconVizWindow<
     editor.set(this.generateCurrentState());
 
     h2 = document.createElement('h2');
-    h2.innerText = this.__viz
-      ? `Visualizer ${this.__viz.getId()} [${this.__viz.getType()}]`
-      : `No Visualizer Id ${this._vizId}`;
+    h2.innerText = `Display multiple visualizers...`;
+    // h2.innerText = this.__viz
+    //   ? `Visualizer ${this.__viz.getId()} [${this.__viz.getType()}]`
+    //   : `No Visualizer Id ${this._vizIds}`;
 
-    container.appendChild(h2);
-    if (this.__viz) {
-      const editor = new JSONEditor(container, options);
-      editor.set(this.__viz.generateCurrentState());
-    }
+    // container.appendChild(h2);
+    // if (this.__viz) {
+    //   const editor = new JSONEditor(container, options);
+    //   editor.set(this.__viz.generateCurrentState());
+    // }
   }
 }

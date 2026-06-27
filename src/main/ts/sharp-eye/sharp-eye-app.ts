@@ -78,10 +78,10 @@ export class SharpEyedApp extends ZirconApplication {
       desktopIds: [
         desktop1State.id,
         desktop2State.id,
-        // desktop3State.id,
-        // desktop4State.id,
-        // desktop5State.id,
-        // desktop6State.id,
+        desktop3State.id,
+        desktop4State.id,
+        desktop5State.id,
+        desktop6State.id,
         desktop7State.id,
       ],
     };

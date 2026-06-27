@@ -135,7 +135,7 @@ export async function createDesktop4(
     top: 10,
     width: 385,
     height: 220,
-    vizId: vizGSLoaderState.id,
+    vizIds: [vizGSLoaderState.id],
   };
   app.registerObjectState(groundStationLoaderWindowState);
 
@@ -153,7 +153,7 @@ export async function createDesktop4(
     top: 10,
     width: 600,
     height: 1080,
-    vizId: vizGSCatalogState.id,
+    vizIds: [vizGSCatalogState.id],
   };
   app.registerObjectState(groundStationCatalog1WindowState);
   const vizCesiumState: VizCesiumState = {
@@ -172,7 +172,7 @@ export async function createDesktop4(
     top: 10,
     width: 600,
     height: 1080,
-    vizId: vizCesiumState.id,
+    vizIds: [vizCesiumState.id],
   };
   app.registerObjectState(cesiumWindowState);
 
@@ -191,7 +191,7 @@ export async function createDesktop4(
     top: 300,
     width: 400,
     height: 600,
-    vizId: dataProviderExplorerVizState.id,
+    vizIds: [dataProviderExplorerVizState.id],
   };
   app.registerObjectState(dataProviderExplorerWindowState);
 

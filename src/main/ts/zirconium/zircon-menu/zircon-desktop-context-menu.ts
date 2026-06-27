@@ -93,7 +93,7 @@ export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
       height: 300,
       left: x,
       top: y,
-      vizId: null,
+      vizIds: null,
     };
     this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
       objectId: windowState.id,

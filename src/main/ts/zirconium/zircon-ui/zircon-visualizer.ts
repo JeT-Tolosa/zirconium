@@ -96,40 +96,19 @@ export abstract class ZirconViz<
     return Promise.resolve();
   }
 
-  /**
-   * @returns   true if visualizer was created and docked, false otherwise
-   */
-  public async displayIn(parentWindow: ZirconVizWindow): Promise<boolean> {
+  public async setParent(parentWindow: ZirconVizWindow): Promise<boolean> {
     if (this.__parentWindow === parentWindow) {
       return false;
     }
-    if (this.__parentWindow) {
-      await this.undisplayFromParent();
-    }
+    this.__parentWindow?.removeVisualizer(this.getId());
     this.__parentWindow = parentWindow;
-    if (!this.__parentWindow?.getWindowContent()) {
-      return false;
-    }
-    this.__parentWindow?.getWindowContent().appendChild(this.getContainer());
-    await this.onDisplay();
     return true;
   }
 
-  /**
-   * Remove visualizer from Parent (Visualizer not stopped)
-   * @returns
-   */
-  public async undisplayFromParent(): Promise<boolean> {
+  public async unsetParent(): Promise<boolean> {
     if (!this.__parentWindow) {
       return false;
     }
-    this.__parentWindow.getWindowContent()?.removeChild(this.getContainer());
-    const windowState = this.__parentWindow.generateCurrentState();
-    windowState.vizId = null;
-    this.emit('VISUALIZER_REMOVED_FROM_WINDOW', {
-      windowId: this.__parentWindow.getId(),
-      vizId: this.__parentWindow.getVisualizerId(),
-    });
     this.__parentWindow = null;
     return true;
   }

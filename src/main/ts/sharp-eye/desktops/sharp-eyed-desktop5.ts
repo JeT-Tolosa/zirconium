@@ -42,7 +42,7 @@ export async function createDesktop5(
     top: 470,
     width: 400,
     height: 220,
-    vizId: aisLoaderViz.id,
+    vizIds: [aisLoaderViz.id],
   };
   app.registerObjectState(AISLoaderWindowState);
 
@@ -61,7 +61,7 @@ export async function createDesktop5(
     top: 10,
     width: 600,
     height: 1080,
-    vizId: aisCatalogViz.id,
+    vizIds: [aisCatalogViz.id],
   };
   app.registerObjectState(AISCatalogWindowState);
 

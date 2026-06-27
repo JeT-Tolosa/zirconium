@@ -16,6 +16,7 @@ import {
   ZirconDataProviderEvents,
 } from '../../zirconium/zircon-data/zircon-data-provider';
 import { VIZ_JSCHART_REGISTRY } from './viz-jschart-types';
+import './viz-jschart.css';
 
 export interface VizJSChartState<
   TType extends ChartType,
@@ -310,22 +311,18 @@ export abstract class VizJSChart<
       return this.__canvas;
     }
     this.__canvas = document.createElement('canvas');
-    this.__canvas.style.width = '100%';
-    this.__canvas.style.height = '100%';
+
     this.__canvas.id = uuid();
     return this.__canvas;
   }
 
-  /**
-   * Get Logger's div element
-   */
   public getContainer(): HTMLDivElement {
     if (this.__mainDiv) {
       return this.__mainDiv;
     }
     this.__mainDiv = document.createElement('div');
     this.__mainDiv.id = uuid();
-    this.__mainDiv.classList.add('event-logger');
+    this.__mainDiv.classList.add('js-chart-container');
     this.__mainDiv.appendChild(this.getCanvas());
     return this.__mainDiv;
   }

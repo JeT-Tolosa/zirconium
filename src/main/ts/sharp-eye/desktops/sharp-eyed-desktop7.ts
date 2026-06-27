@@ -264,7 +264,7 @@ export async function createDesktop7(
     top: 10,
     width: 400,
     height: 480,
-    vizId: cardiacChartVizState.id,
+    vizIds: [cardiacChartVizState.id],
   };
   // createVisualizerLogger(),
   app.registerObjectState(cardiacChartWindowState);

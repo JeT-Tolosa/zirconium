@@ -1,0 +1,2 @@
+- Comptabiliser les objets qui écoutent les dataProvider pour les arrêter quand ils ne sont plus utilisés
+- faire un TabbedWindow qui permet de mettre plusieurs visualizer dans des tabs
