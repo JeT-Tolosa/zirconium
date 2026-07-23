@@ -1,2 +1,12 @@
 - Comptabiliser les objets qui écoutent les dataProvider pour les arrêter quand ils ne sont plus utilisés
-- faire un TabbedWindow qui permet de mettre plusieurs visualizer dans des tabs
+~- faire un TabbedWindow qui permet de mettre plusieurs visualizer dans des tabs~
+- modifier les ParamWindows pour avoir plusieurs onglets (win, viz win, viz1, viz2, data provider, ...)
+- faire fonctionner les adapters
+- DataProviderSelector: faire un composant graphique permettant de selectionner un ensemble de data provider d'un certain type
+- mettre en place le systeme de notifications / alertes
+- faire la fenetre de parametres permettant d'éditer tous les paramètres (state) d'un ou plusieurs objets
+- faire fonctionner l'authentification
+- remplacer ionic par UI5 Web Components
+- séparer Zircon et sharp-eye. Faire de zircon une librairie avec code et API (utilisée par sharp-eye)
+- Mettre en place un système d'internationalisation
+- 

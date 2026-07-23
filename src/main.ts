@@ -1,24 +1,100 @@
-import { app, BrowserWindow } from 'electron';
 import path from 'node:path';
 import started from 'electron-squirrel-startup';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { promises as fs } from 'node:fs';
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+// Déclaration de la variable globale pour Vite (gérée par le bundler)
+declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
+declare const MAIN_WINDOW_VITE_NAME: string;
+
+let mainWindow: BrowserWindow | null = null;
+
+// Gérer la création/suppression des raccourcis sous Windows à l'installation/désinstallation
 if (started) {
   app.quit();
 }
 
+/**
+ * Enregistrement de tous les gestionnaires IPC (Inter-Process Communication)
+ * Très important : Doit être appelé AVANT de charger l'interface (Vite / HTML)
+ */
+const registerIpcHandlers = (): void => {
+  // 1. Gestionnaire d'écriture JSON
+  ipcMain.handle(
+    'file:saveJson',
+    async (_event, fileNameOrPath: string, data: unknown): Promise<boolean> => {
+      try {
+        // Si c'est juste un nom de fichier, on le met dans le dossier "userData" de l'app.
+        // Si c'est un chemin absolu (choisi via dialog), on le garde tel quel.
+        const targetPath = path.isAbsolute(fileNameOrPath)
+          ? fileNameOrPath
+          : path.join(app.getPath('userData'), fileNameOrPath);
 
-const createWindow = () => {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
+        const jsonString = JSON.stringify(data, null, 2);
+        await fs.writeFile(targetPath, jsonString, 'utf-8');
+
+        return true;
+      } catch (error) {
+        console.error("Échec de l'écriture du fichier JSON :", error);
+        throw error; // Renvoie l'erreur au Renderer pour gestion
+      }
+    },
+  );
+
+  // 2. Gestionnaire de lecture JSON
+  ipcMain.handle(
+    'file:readJson',
+    async (_event, fileNameOrPath: string): Promise<unknown> => {
+      try {
+        const targetPath = path.isAbsolute(fileNameOrPath)
+          ? fileNameOrPath
+          : path.join(app.getPath('userData'), fileNameOrPath);
+
+        const rawData = await fs.readFile(targetPath, 'utf-8');
+        return JSON.parse(rawData);
+      } catch (error) {
+        console.error('Échec de la lecture du fichier JSON :', error);
+        throw error;
+      }
+    },
+  );
+  ipcMain.handle('dialog:openFile', async (): Promise<string | null> => {
+    if (!mainWindow) {
+      return null;
+    }
+
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Choisir un fichier',
+      properties: ['openFile'],
+      filters: [
+        { name: 'Tous les fichiers', extensions: ['*'] },
+        { name: 'JSON', extensions: ['json', 'JSON'] },
+      ],
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return null;
+    }
+
+    return result.filePaths[0];
+  });
+};
+
+/**
+ * Création de la fenêtre principale
+ */
+const createWindow = (): void => {
+  mainWindow = new BrowserWindow({
     width: 1920,
     height: 1200,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true, // Recommandé pour la sécurité
+      nodeIntegration: false,
     },
   });
 
-  // and load the index.html of the app.
+  // Chargement de l'URL de dev (Vite) ou du fichier de build
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
@@ -27,31 +103,34 @@ const createWindow = () => {
     );
   }
 
-  // Open the DevTools.
+  // Ouvrir les outils de développement
   mainWindow.webContents.openDevTools();
+
+  mainWindow.on('closed', () => {
+    mainWindow = null;
+  });
 };
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+// --- Cycle de vie unique de l'application ---
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+app.whenReady().then(() => {
+  // 1. On enregistre les handlers IPC en premier
+  registerIpcHandlers();
+
+  // 2. On crée la fenêtre ensuite
+  createWindow();
+
+  app.on('activate', () => {
+    // Spécifique macOS : recréer la fenêtre au clic sur le dock si elle était fermée
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow();
+    }
+  });
+});
+
+// Quitter quand toutes les fenêtres sont fermées (sauf macOS)
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
-
-app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow();
-  }
-});
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.

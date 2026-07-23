@@ -7,6 +7,6 @@ export default defineConfig({
   },
 
   optimizeDeps: {
-    exclude: ['@ionic/core'],
+    exclude: ['@ionic/core', '@ui5/webcomponents', '@ui5/webcomponents-base'],
   },
 });

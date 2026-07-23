@@ -1,8 +1,16 @@
-import { ZirconApplication } from './zircon-app';
-import { ZirconAppObjectFactory } from './zircon-app-object-factory';
+import { ZirconEngine, ZirconEngineState } from './zircon-engine';
+import { SimpleZirconObjectFactory } from './zircon-object-factory';
+import { ZIRCON_APP_OBJECT_TYPE, ZIRCON_ENGINE_TYPE } from './zircon-types';
 
-export abstract class ZirconEngineFactory extends ZirconAppObjectFactory {
-  constructor(app: ZirconApplication, name: string) {
-    super(app, name);
+export class ZirconEngineFactory extends SimpleZirconObjectFactory {
+  constructor() {
+    super(
+      ZIRCON_ENGINE_TYPE,
+      ZIRCON_APP_OBJECT_TYPE,
+      async (state: ZirconEngineState): Promise<ZirconEngine> => {
+        return new ZirconEngine(state);
+      },
+      null,
+    );
   }
 }

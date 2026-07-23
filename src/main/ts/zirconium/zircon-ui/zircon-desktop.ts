@@ -15,7 +15,6 @@ import {
   ACTIVE_DESKTOP_CLASS,
   ZIRCON_DESKTOP_TYPE,
 } from '../zircon-core/zircon-types';
-import { ZirconParamWindow } from '../zircon-params/zircon-param-window';
 
 export type ZirconDesktopEvents = {
   DESKTOP_ACTIVATE_REQUEST: { desktopId: string };
@@ -147,10 +146,12 @@ export class ZirconDesktop<
       changes = true;
     });
     if (changes) {
-      this.emit('DESKTOP_WINDOW_IDS_CHANGED', {
-        desktopId: this.getId(),
-        windowIds: windowIds,
-      });
+      this.stateModified();
+
+      // this.emit('DESKTOP_WINDOW_IDS_CHANGED', {
+      //   desktopId: this.getId(),
+      //   windowIds: windowIds,
+      // });
     }
   }
 
@@ -256,10 +257,10 @@ export class ZirconDesktop<
     });
   }
 
-  public displayParamWindow(paramWindow: ZirconParamWindow): void {
-    this.getContainer().appendChild(paramWindow.getPanel());
-    paramWindow.setParentDesktop(this);
-  }
+  // public displayParamWindow(paramWindow: ZirconParamWindow): void {
+  //   this.getContainer().appendChild(paramWindow.getPanel());
+  //   paramWindow.setParentDesktop(this);
+  // }
 
   private async displayWindow(windowId: string): Promise<void> {
     if (!windowId) {

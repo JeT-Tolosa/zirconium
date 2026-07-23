@@ -1,0 +1,51 @@
+/***********************************************
+ *        ZIRCON PARAMETER WINDOW              *
+ ***********************************************/
+
+.zircon-ui .jsPanel.zircon-param .jsPanel-headerbar {
+  background: #328b3e;
+}
+.zircon-ui .jsPanel.zircon-param .jsPanel-content {
+  background: linear-gradient(135deg, #21562e 0%, #273b2b 100%);
+}
+
+.zircon-ui .jsPanel.zircon-param .jsPanel-hdr {
+  background-color: green;
+  background: green;
+}
+
+.zircon-ui .jsPanel.zircon-param .main {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.zircon-ui .jsPanel.zircon-param .header {
+  display: flex;
+  flex: 0 0 48px;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #2a672d;
+}
+
+.zircon-ui .jsPanel.zircon-param .view {
+  flex: 1 1 0;
+  overflow: auto;
+  position: relative;
+  border: 1px solid #2a672d;
+}
+
+.zircon-ui .jsPanel.zircon-param .footer {
+  display: flex;
+  flex: 0 0 48px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border: 1px solid #2a672d;
+}
+
+.zircon-ui .jsPanel.zircon-param .header .id-select,
+.zircon-ui .jsPanel.zircon-param .header .editor-select {
+  flex: 1;
+}

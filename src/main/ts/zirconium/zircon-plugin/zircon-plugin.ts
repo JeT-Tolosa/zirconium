@@ -19,6 +19,28 @@ export abstract class ZirconPlugin extends ZirconObject {
   public abstract plugInApplication(app: ZirconApplication): Promise<void>;
 }
 
+export abstract class ZirconAppPlugin extends ZirconPlugin {
+  private __app: ZirconApplication = null;
+
+  constructor(name: string, app: ZirconApplication) {
+    super(name);
+    this.__app = app;
+    this.setEventDispatcher(app.getEventDispatcher());
+  }
+
+  public override getType(): string {
+    return ZIRCON_PLUGIN_TYPE;
+  }
+
+  protected getApplication(): ZirconApplication {
+    return this.__app;
+  }
+
+  public abstract override plugInApplication(
+    app: ZirconApplication,
+  ): Promise<void>;
+}
+
 export class SimpleZirconPlugin extends ZirconPlugin {
   private _plugFn: (app: ZirconApplication) => Promise<void> = null;
 

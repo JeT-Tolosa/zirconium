@@ -3,6 +3,8 @@ export const ZIRCON_OBJECT_TYPE: string = 'zircon-object';
 export const ZIRCON_APP_OBJECT_TYPE: string = 'zircon-app-object';
 export const ZIRCON_DESKTOP_TYPE: string = 'zircon-desktop';
 export const ZIRCON_DESKTOP_MANAGER_TYPE: string = 'zircon-desktop-manager';
+export const ZIRCON_STATE_EDITOR_MANAGER_TYPE: string =
+  'zircon-state-editor-manager';
 export const ZIRCON_WINDOW_TYPE: string = 'zircon-window';
 export const ZIRCON_VISUALIZER_TYPE: string = 'zircon-visualizer';
 export const ZIRCON_VISUALIZER_WINDOW_TYPE: string = 'zircon-viz-window';
@@ -20,7 +22,8 @@ export const ZIRCON_DATA_ADAPTER_TYPE: string = 'zircon-data-adapter';
 export const DESKTOPS_MANAGER_CLASS = 'desktops-manager';
 export const DESKTOPS_MANAGER_HEADER_CLASS = 'desktops-manager-header';
 export const DESKTOP_MANAGER_DESKTOPS_CONTAINER_CLASS = `desktops-container`;
-export const TOOLBAR_CONTAINER_CLASS = `toolbar-container`;
+export const RIGHT_TOOLBAR_CONTAINER_CLASS = `right-toolbar-container`;
+export const LEFT_TOOLBAR_CONTAINER_CLASS = `left-toolbar-container`;
 export const DESKTOPS_CONTAINER_CLASS = `desktops-container`;
 export const DESKTOPS_SELECTOR_CLASS = `desktops-selector`;
 export const DESKTOP_SELECTOR_CLASS = `desktop-selector`;
@@ -32,7 +35,7 @@ type ZirconObjectProperties = {
   parent: ZirconType | null;
 };
 
-export const ZirconObjectHierarchy: {
+export const ZIRCON_OBJECT_HIERARCHY: {
   [key: string]: ZirconObjectProperties;
 } = {
   [ZIRCON_APPLICATION_TYPE]: {
@@ -102,4 +105,4 @@ export const ZirconObjectHierarchy: {
   },
 } as const;
 
-export type ZirconType = keyof typeof ZirconObjectHierarchy;
+export type ZirconType = keyof typeof ZIRCON_OBJECT_HIERARCHY;

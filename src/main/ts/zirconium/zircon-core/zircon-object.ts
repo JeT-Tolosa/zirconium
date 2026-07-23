@@ -7,30 +7,38 @@ import {
 } from '../zircon-event';
 import { ZirconApplicationEvents } from './zircon-app';
 import { ZIRCON_OBJECT_TYPE } from './zircon-types';
+import { ZirconObjectManagerEvents } from './zircon-object-manager';
 
 type PickEvents<E, K extends keyof E> = {
   [P in K]: E[P];
 };
 
 export type ZirconObjectEvents = {
+  ZIRCON_OBJECT_STATE_CHANGED: {
+    id: string;
+    state?: ZirconObjectState;
+  };
   ZIRCON_OBJECT_CREATED: {
     id: string;
     type: string;
     timestamp: number;
   };
-  OBJECT_ID_CHANGED: { oldId: string; newId: string };
-  OBJECT_NAME_CHANGED: { id: string; name: string };
+  ZIRCON_OBJECT_ID_CHANGED: { oldId: string; newId: string };
+  ZIRCON_OBJECT_NAME_CHANGED: { id: string; name: string };
 };
 
 export type ZirconObjectEventRegistry = MergeZirconRegistries<
   {
-    incoming: PickEvents<ZirconApplicationEvents, 'OBJECT_STATE_REGISTERED'>;
+    incoming: PickEvents<ZirconObjectManagerEvents, 'OBJECT_STATE_REGISTERED'>;
 
     outgoing: MergePickEvents<
       [
         PickEvents<
           ZirconObjectEvents,
-          'ZIRCON_OBJECT_CREATED' | 'OBJECT_ID_CHANGED' | 'OBJECT_NAME_CHANGED'
+          | 'ZIRCON_OBJECT_CREATED'
+          | 'ZIRCON_OBJECT_ID_CHANGED'
+          | 'ZIRCON_OBJECT_NAME_CHANGED'
+          | 'ZIRCON_OBJECT_STATE_CHANGED'
         >,
         PickEvents<ZirconApplicationEvents, 'UNCAUGHT_EXCEPTION'>,
       ]
@@ -58,9 +66,11 @@ export interface ZirconObjectState {
 export abstract class ZirconObject<
   R extends ZirconObjectEventRegistry = ZirconObjectEventRegistry,
 > {
-  private _eventEmitter: EventEmitter2 = null;
   private _id: string = null;
-  private _name: string = 'unnamed object';
+  private _name: string = null;
+  private __eventEmitter: EventEmitter2 = null;
+  private __stateModified: boolean = false;
+  private __stateModificationNotification: boolean = true; // fires an event when state is modified
   public static readonly ZIRCON_OBJECT_ATTRIBUTE_ID: string =
     'zircon-object-id';
 
@@ -68,7 +78,7 @@ export abstract class ZirconObject<
    * constructor
    */
   constructor(state?: ZirconObjectState) {
-    this._eventEmitter = new EventEmitter2();
+    this.__eventEmitter = new EventEmitter2();
     this._id = uuid();
     this.setState(state);
   }
@@ -79,13 +89,33 @@ export abstract class ZirconObject<
    * @param eventEmitter
    */
   public setEventDispatcher(eventEmitter: EventEmitter2): void {
-    if (this._eventEmitter === eventEmitter) {
+    if (this.__eventEmitter === eventEmitter) {
       return;
     }
-    this._eventEmitter = eventEmitter;
+    this.__eventEmitter = eventEmitter;
     this.listenToEvents();
   }
 
+  protected stateModified() {
+    this.__stateModified = true;
+  }
+
+  public setStateMoficitationNotification(b: boolean) {
+    // TODO: we may add an interval to avoid huge number of notifications...
+    this.__stateModificationNotification = b;
+    if (!b || !this.__stateModified) {
+      return;
+    }
+    this.__stateModified = false;
+    this.notifyStateModifcation();
+  }
+
+  private notifyStateModifcation() {
+    this.emit('ZIRCON_OBJECT_STATE_CHANGED', {
+      id: this.getId(),
+      state: this.generateCurrentState(),
+    });
+  }
   /**
    * // TODO: memory leak if setEventDispatcher is used (we should remove listeners !)
    * Unset the event emitter to be used
@@ -117,7 +147,7 @@ export abstract class ZirconObject<
    * set object id.
    * Stored id is a validated version of the given id
    * @param new object id
-   * @fires OBJECT_ID_CHANGED
+   * @fires ZIRCON_OBJECT_ID_CHANGED
    * @returns
    */
   public setId(id: string): boolean {
@@ -131,7 +161,8 @@ export abstract class ZirconObject<
       return false;
     }
     this._id = id;
-    this.emit('OBJECT_ID_CHANGED', { oldId: this._id, newId: id });
+    this.emit('ZIRCON_OBJECT_ID_CHANGED', { oldId: this._id, newId: id });
+    this.stateModified();
     return true;
   }
 
@@ -143,7 +174,8 @@ export abstract class ZirconObject<
       return false;
     }
     this._name = name;
-    this.emit('OBJECT_NAME_CHANGED', { id: this._id, name: this._name });
+    this.stateModified();
+    this.emit('ZIRCON_OBJECT_NAME_CHANGED', { id: this._id, name: this._name });
     return true;
   }
 
@@ -164,7 +196,7 @@ export abstract class ZirconObject<
    * @returns event dispatcher. Connot be null
    */
   public getEventDispatcher(): EventEmitter2 {
-    return this._eventEmitter;
+    return this.__eventEmitter;
   }
 
   /**
@@ -181,7 +213,7 @@ export abstract class ZirconObject<
   }
 
   public getName(): string {
-    return this._name;
+    return this._name || this.getId();
   }
 
   /**
@@ -264,5 +296,13 @@ export abstract class ZirconObject<
   ): this {
     this.getEventDispatcher().removeListener(event, listener);
     return this;
+  }
+
+  // public getParameterComponents(): ZirconParameterComponent[] {
+  //   return [new ZirconDefaultParameterComponent(this.getId())];
+  // }
+
+  public getEditedIds(): string[] {
+    return [ ];
   }
 }

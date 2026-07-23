@@ -139,6 +139,7 @@ export class ZirconDataAdapter<
 
   private setDataSourceId(dataProviderSourceId: string): void {
     this._dataProviderSourceId = dataProviderSourceId;
+    this.stateModified();
     this.requestSourceDataProvider();
   }
 

@@ -1,4 +1,63 @@
 /*
+ * Habillage "moderne" du menu contextuel Zircon (ui5-menu / ui5-menu-item).
+ *
+ * Principe : les web components UI5 lisent des CSS Custom Properties
+ * sémantiques (--sapXxx) à l'intérieur de leur Shadow DOM. Ces variables
+ * héritent normalement à travers la frontière du Shadow DOM, donc les
+ * redéfinir sur le host (ici la classe .zircon-context-menu posée sur le
+ * <ui5-menu>) suffit à repeindre tout l'arbre, y compris les sous-menus.
+ *
+ * Ne PAS toucher aux variables --_ui5_* (préfixées underscore) : ce sont
+ * des détails d'implémentation privés qui peuvent changer à chaque version.
+ */
+
+ui5-menu.zircon-context-menu {
+  /* Fond du menu et des sous-menus */
+  --sapList_Background: #1c1f26;
+  --sapGroup_ContentBackground: #1c1f26;
+
+  /* Texte */
+  --sapList_TextColor: #e8eaed;
+  --sapContent_LabelColor: #b4b8c0;
+  --sapTextColor: #e8eaed;
+
+  /* Bordures / séparateurs */
+  --sapList_BorderColor: #2e323c;
+  --sapField_BorderColor: #2e323c;
+
+  /* Etat survolé / focus */
+  --sapList_HoverBackground: #2a2e37;
+  --sapList_Hover_SelectionBackground: #323847;
+
+  /* Etat sélectionné / accent "moderne" */
+  --sapList_SelectionBackgroundColor: #3b6fe0;
+  --sapHighlightColor: #3b6fe0;
+  --sapBrandColor: #5b8def;
+
+  /* Item désactivé */
+  --sapContent_DisabledTextColor: #5c606b;
+
+  /* Ombre portée native, réutilisée par certains composants UI5 */
+  --sapContent_Shadow1: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --sapContent_Shadow2: 0 8px 28px rgba(0, 0, 0, 0.45);
+
+  /* Typo un peu plus aérée pour un rendu "moderne" */
+  --sapFontSize: 0.8125rem;
+}
+
+/* Icônes des items (si tu utilises la propriété `icon`) */
+ui5-menu.zircon-context-menu ui5-menu-item::part(icon) {
+  color: var(--sapContent_LabelColor);
+}
+
+/*
+ * Pour les éléments impossibles à atteindre via variable (border-radius du
+ * popup, box-shadow, backdrop-filter, transitions), voir
+ * zircon-context-menu-theme.ts -> applyModernContextMenuSkin(), qui utilise
+ * l'API officielle addCustomCSS() de UI5 pour ces cas précis.
+ */
+
+/*
 .zircon-context-menu {
   position: absolute;
   min-width: 160px;

@@ -3,7 +3,6 @@ import {
   ZIRCON_DROPPABLE_CLASS,
   ZIRCON_TARGET_DESKTOP_ID,
   ZirconApplication,
-  ZirconApplicationEvents,
 } from './zircon-app';
 import {
   ZirconDesktop,
@@ -32,10 +31,12 @@ import {
   DESKTOPS_MANAGER_CLASS,
   DESKTOPS_MANAGER_HEADER_CLASS,
   DESKTOPS_SELECTOR_CLASS,
-  TOOLBAR_CONTAINER_CLASS,
+  RIGHT_TOOLBAR_CONTAINER_CLASS,
+  LEFT_TOOLBAR_CONTAINER_CLASS,
   ZIRCON_DESKTOP_MANAGER_TYPE,
 } from './zircon-types';
 import { ToolbarElement as ToolbarElementDescriptor } from './zircon-desktop-manager-toolbar';
+import { ZirconObjectManagerEvents } from './zircon-object-manager';
 
 export interface ZirconDesktopManagerState extends ZirconObjectState {
   type: typeof ZIRCON_DESKTOP_MANAGER_TYPE;
@@ -45,10 +46,10 @@ export interface ZirconDesktopManagerState extends ZirconObjectState {
 export type ZirconDesktopManagerEvents = {
   // DESKTOP_MANAGER_STATE_REQUEST: { desktopManagerId: string };
   // DESKTOP_MANAGER_STATE: { state: ZirconDesktopManagerState };
-  DESKTOP_MANAGER_DESKTOP_IDS_CHANGED: {
-    desktopManagerId: string;
-    desktopIds: string[];
-  };
+  // DESKTOP_MANAGER_DESKTOP_IDS_CHANGED: {
+  //   desktopManagerId: string;
+  //   desktopIds: string[];
+  // };
 };
 
 // TODO: faire un evenement pour l'ajout et la suppression de desktop
@@ -64,8 +65,8 @@ export type ZirconDesktopManagerEventRegistry = MergeZirconRegistries<
           | 'DESKTOP_ACTIVATE_REQUEST'
         >,
         // PickEvents<ZirconDesktopManagerEvents, 'DESKTOP_MANAGER_STATE'>,
-        PickEvents<ZirconObjectEvents, 'OBJECT_NAME_CHANGED'>,
-        PickEvents<ZirconApplicationEvents, 'OBJECT_STATE_REGISTERED'>,
+        PickEvents<ZirconObjectEvents, 'ZIRCON_OBJECT_NAME_CHANGED'>,
+        PickEvents<ZirconObjectManagerEvents, 'OBJECT_STATE_REGISTERED'>,
       ]
     >;
     outgoing: MergePickEvents<
@@ -73,12 +74,6 @@ export type ZirconDesktopManagerEventRegistry = MergeZirconRegistries<
         PickEvents<
           ZirconDesktopEvents,
           'DESKTOP_ACTIVATE_REQUEST' | 'DESKTOP_DEACTIVATE_REQUEST'
-        >,
-        PickEvents<
-          ZirconDesktopManagerEvents,
-          // | 'DESKTOP_MANAGER_STATE_REQUEST'
-          // | 'DESKTOP_MANAGER_STATE_REQUEST'
-          'DESKTOP_MANAGER_DESKTOP_IDS_CHANGED'
         >,
       ]
     >;
@@ -102,7 +97,8 @@ export class ZirconDesktopManager<
   // private __parent: HTMLElement = null;
   private __mainDiv: HTMLDivElement = null;
   private __headerDiv: HTMLDivElement = null;
-  private __toolbarContainer: HTMLDivElement = null;
+  private __rightToolbarContainer: HTMLDivElement = null;
+  private __leftToolbarContainer: HTMLDivElement = null;
   private __desktopContainer: HTMLDivElement = null;
   private __desktopsSelectorContainer: HTMLDivElement = null;
   private __desktopNameContainer: HTMLDivElement = null;
@@ -141,8 +137,8 @@ export class ZirconDesktopManager<
     this.addListener('DESKTOP_DEACTIVATED', (arg) =>
       this.onDESKTOP_DEACTIVATE_REQUEST(arg.desktopId),
     );
-    this.addListener('OBJECT_NAME_CHANGED', (arg) =>
-      this.onOBJECT_NAME_CHANGED(arg.id, arg.name),
+    this.addListener('ZIRCON_OBJECT_NAME_CHANGED', (arg) =>
+      this.onZIRCON_OBJECT_NAME_CHANGED(arg.id, arg.name),
     );
 
     this.addListener('OBJECT_STATE_REGISTERED', (arg) =>
@@ -183,7 +179,7 @@ export class ZirconDesktopManager<
    * @param id The ID of the object whose name changed
    * @param name The new name of the object
    */
-  private onOBJECT_NAME_CHANGED(id: string, name: string): void {
+  private onZIRCON_OBJECT_NAME_CHANGED(id: string, name: string): void {
     const ui: ZirconDesktopManagerUI = this.__displayedDesktops[id];
     if (ui) {
       ui.desktopSelectorElement.innerHTML = `<span>${name}</span>`; // TODO: this should be in a method from a UI element
@@ -245,10 +241,11 @@ export class ZirconDesktopManager<
         this.undisplayDesktop(desktopId);
       });
     }
-    this.emit('DESKTOP_MANAGER_DESKTOP_IDS_CHANGED', {
-      desktopManagerId: this.getId(),
-      desktopIds: desktopIds,
-    });
+    this.stateModified();
+    // this.emit('DESKTOP_MANAGER_DESKTOP_IDS_CHANGED', {
+    //   desktopManagerId: this.getId(),
+    //   desktopIds: desktopIds,
+    // });
   }
 
   /**
@@ -430,19 +427,36 @@ export class ZirconDesktopManager<
     return this.__desktopContainer;
   }
 
-  private getToolbarContainer(): HTMLDivElement {
-    if (this.__toolbarContainer) {
-      return this.__toolbarContainer;
+  private getRightToolbarContainer(): HTMLDivElement {
+    if (this.__rightToolbarContainer) {
+      return this.__rightToolbarContainer;
     }
-    this.__toolbarContainer = document.createElement('div');
-    this.__toolbarContainer.classList.add(TOOLBAR_CONTAINER_CLASS);
-    this.__toolbarContainer.id = `toolbar-container-${this.getId()}`;
-    this.__toolbarContainer.innerHTML =
+    this.__rightToolbarContainer = document.createElement('div');
+    this.__rightToolbarContainer.classList.add(RIGHT_TOOLBAR_CONTAINER_CLASS);
+    this.__rightToolbarContainer.id = `right-toolbar-container-${this.getId()}`;
+    this.__rightToolbarContainer.innerHTML =
       '<div>A</div><div>B</div><div>C</div><div>D</div>';
     Object.keys(this.__toolbarElements).forEach((toolbarElementId: string) => {
       this.displayToolbarElement(toolbarElementId);
     });
-    return this.__toolbarContainer;
+    return this.__rightToolbarContainer;
+  }
+
+  private getLeftToolbarContainer(): HTMLDivElement {
+    if (this.__leftToolbarContainer) {
+      return this.__leftToolbarContainer;
+    }
+    this.__leftToolbarContainer = document.createElement('div');
+    this.__leftToolbarContainer.classList.add(LEFT_TOOLBAR_CONTAINER_CLASS);
+    this.__leftToolbarContainer.id = `right-toolbar-container-${this.getId()}`;
+    this.getHeaderDiv().insertBefore(
+      this.__leftToolbarContainer,
+      this.__headerDiv.firstChild,
+    );
+    return this.__leftToolbarContainer;
+  }
+  public addHeaderLeftElement(element: HTMLElement): void {
+    this.getLeftToolbarContainer().appendChild(element);
   }
 
   /**
@@ -476,7 +490,7 @@ export class ZirconDesktopManager<
       this.getId(),
     );
     this.__headerDiv.appendChild(this.getDesktopsSelectorsContainer());
-    this.__headerDiv.appendChild(this.getToolbarContainer());
+    this.__headerDiv.appendChild(this.getRightToolbarContainer());
     return this.__headerDiv;
   }
 
@@ -595,12 +609,12 @@ export class ZirconDesktopManager<
     if (!toolbarElement) {
       return;
     }
-    if (!this.__toolbarContainer) {
+    if (!this.__rightToolbarContainer) {
       return;
     }
     const toolDiv = document.createElement('div');
     toolDiv.id = id;
     toolDiv.appendChild(toolbarElement.content);
-    this.__toolbarContainer.append(toolDiv);
+    this.__rightToolbarContainer.append(toolDiv);
   }
 }

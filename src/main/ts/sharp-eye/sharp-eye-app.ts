@@ -38,6 +38,7 @@ import { createDesktop4 } from './desktops/sharp-eyed-desktop4';
 import { createDesktop5 } from './desktops/sharp-eyed-desktop5';
 import { createDesktop6 } from './desktops/sharp-eyed-desktop6';
 import { createDesktop7 } from './desktops/sharp-eyed-desktop7';
+import { ApplicationMenuPlugin } from '../zircon-plugins/zircon-application-menu/application-menu-plugin';
 
 export const SHARP_EYE_ENGINE_TYPE = ZIRCON_ENGINE_TYPE;
 export const SHARP_EYE_VIZ_TYPE = ZIRCON_VISUALIZER_TYPE;
@@ -93,6 +94,7 @@ export class SharpEyedApp extends ZirconApplication {
    */
   private async registerPlugins(): Promise<void> {
     this.getPluginManager().registerPlugin(new UserConnectUIZirconPlugin());
+    this.getPluginManager().registerPlugin(new ApplicationMenuPlugin(this));
   }
 
   /**

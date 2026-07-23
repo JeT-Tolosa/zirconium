@@ -5,21 +5,49 @@ import {
   ZirconObjectFactory,
 } from './zircon-object-factory';
 import { ZirconApplication } from './zircon-app';
-import { ZirconAppObject } from './zircon-app-object';
+import {
+  ZirconAppObject,
+  ZirconAppObjectEventRegistry,
+} from './zircon-app-object';
 import {
   ZIRCON_OBJECT_MANAGER_TYPE,
   ZIRCON_OBJECT_TYPE,
+  ZIRCON_OBJECT_HIERARCHY,
   ZirconType,
 } from './zircon-types';
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
+import {
+  MergePickEvents,
+  MergeZirconRegistries,
+  PickEvents,
+} from '../zircon-event';
 
-// TODO: manage this event
-// REGISTER_DATA_PROVIDER_FACTORY_REQUEST: {
-//   dataProviderFactory: ZirconDataProviderFactory;
-// };
-//           | 'REGISTER_DATA_PROVIDER_FACTORY_REQUEST'
+export type ZirconObjectManagerEvents = {
+  ZIRCON_OBJECT_STATE_REQUEST: { id: string };
+  OBJECT_STATE_REGISTERED: { state: ZirconObjectState };
+  ZIRCON_OBJECT_STATE: { state: ZirconObjectState };
+};
 
-export class ZirconObjectManager extends ZirconAppObject {
+export type ZirconObjectManagerEventRegistry = MergeZirconRegistries<
+  {
+    incoming: MergePickEvents<
+      [PickEvents<ZirconObjectManagerEvents, 'ZIRCON_OBJECT_STATE_REQUEST'>]
+    >;
+    outgoing: MergePickEvents<
+      [
+        PickEvents<
+          ZirconObjectManagerEvents,
+          'ZIRCON_OBJECT_STATE' | 'OBJECT_STATE_REGISTERED'
+        >,
+      ]
+    >;
+  },
+  ZirconAppObjectEventRegistry
+>;
+
+export class ZirconObjectManager<
+  R extends ZirconObjectManagerEventRegistry = ZirconObjectManagerEventRegistry,
+> extends ZirconAppObject<R> {
   private __registeredStates: { [id: string]: ZirconObjectState } = {}; // TODO: UI Object
   private __objectInstances: { [id: string]: ZirconObject } = {}; // TODO: UI Object
   private __objectFactories: { [id: string]: ZirconObjectFactory } = {};
@@ -27,6 +55,21 @@ export class ZirconObjectManager extends ZirconAppObject {
 
   constructor(app: ZirconApplication) {
     super(app);
+    // initialize object hierarchy with default ZIRCON values
+    Object.keys(ZIRCON_OBJECT_HIERARCHY).forEach((key) => {
+      this.__objectHierarchy[key] = ZIRCON_OBJECT_HIERARCHY[key]
+        .parent as string;
+    });
+  }
+
+  protected override listenToEvents(): void {
+    this.addListener('ZIRCON_OBJECT_STATE_REQUEST', (arg) => {
+      if (arg.id) {
+        this.emit('ZIRCON_OBJECT_STATE', {
+          state: this.__registeredStates[arg.id],
+        });
+      }
+    });
   }
 
   public override getType(): string {
@@ -82,7 +125,27 @@ export class ZirconObjectManager extends ZirconAppObject {
 
     // store object hierarchy
     this.__objectFactories[factory.getName()] = factory;
+    if (!factory.getAncestorType()) {
+      throw new Error(
+        `Factory ${factory.getName()} has no ancestor type defined`,
+      );
+    }
+    if (
+      this.__objectHierarchy[factory.getObjectType()] &&
+      this.__objectHierarchy[factory.getObjectType()] !==
+        factory.getAncestorType()
+    ) {
+      throw new Error(
+        `Factory ${factory.getName()} has an ancestor type ${factory.getAncestorType()} which is different from the one already registered for this object type ${this.__objectHierarchy[factory.getObjectType()]}`,
+      );
+    }
     this.__objectHierarchy[factory.getObjectType()] = factory.getAncestorType();
+    console.log(
+      'REGISTER FACTORY',
+      factory.getName(),
+      factory.getObjectType(),
+      factory.getAncestorType(),
+    );
     return true;
   }
 
@@ -265,8 +328,8 @@ export class ZirconObjectManager extends ZirconAppObject {
           `Object with id ${objectId} is not the expected class: ${instance.getType()} which is not ofType ${type}`,
         );
       }
-      this.addInstance(instance);
     }
+    this.addInstance(instance);
     return instance;
   }
 
@@ -342,5 +405,15 @@ export class ZirconObjectManager extends ZirconAppObject {
       current = this.__objectHierarchy[current];
     }
     return false;
+  }
+
+  public getTypeHierarchy(type: string): string[] {
+    const hierarchy: string[] = [];
+    let current: string | null = type;
+    while (current) {
+      hierarchy.push(current);
+      current = this.__objectHierarchy[current];
+    }
+    return hierarchy;
   }
 }

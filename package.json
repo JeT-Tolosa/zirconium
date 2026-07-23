@@ -38,7 +38,6 @@
     "vite": "^8.0.16"
   },
   "dependencies": {
-    "@ionic/core": "^8.8.10",
     "@openglobus/og": "^0.28.6",
     "@types/eslint": "^9.6.1",
     "@types/jquery": "^4.0.1",
@@ -47,6 +46,8 @@
     "@types/tabulator-tables": "^6.3.4",
     "@types/three": "^0.184.1",
     "@types/uuid": "^11.0.0",
+    "@ui5/webcomponents": "^2.24.0",
+    "@ui5/webcomponents-base": "^2.24.0",
     "cesium": "^1.142.0",
     "chart.js": "^4.5.1",
     "datatables.net": "^2.3.7",

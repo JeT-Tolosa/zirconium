@@ -148,6 +148,7 @@ export class ZirconDataProvider<
 
   private setMinEventEmissionThresholdInterval(intervalMS: number) {
     this._minEventEmissionThresholdInterval = intervalMS;
+    this.stateModified();
   }
 
   private getMinEventEmissionThresholdInterval(): number {
@@ -164,6 +165,7 @@ export class ZirconDataProvider<
       );
     }
     this._outputDataType = dataType;
+    this.stateModified();
   }
 
   public getOutputDataType(): string {
@@ -180,9 +182,11 @@ export class ZirconDataProvider<
     if (!active) {
       await this.stop();
       this._active = false;
+      this.stateModified();
     } else {
       await this.start();
       this._active = true;
+      this.stateModified();
     }
   }
 

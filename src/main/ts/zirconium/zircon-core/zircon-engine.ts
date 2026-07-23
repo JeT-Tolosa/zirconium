@@ -51,7 +51,7 @@ export interface ZirconEngineState extends ZirconObjectState {
 /**
  * Base class for all Business Data objects
  */
-export abstract class ZirconEngine<
+export class ZirconEngine<
   R extends ZirconEngineEventRegistry = ZirconEngineEventRegistry,
 > extends ZirconObject<R> {
   private _started: boolean = false;
@@ -61,6 +61,10 @@ export abstract class ZirconEngine<
    */
   constructor(state?: ZirconEngineState) {
     super(state);
+  }
+
+  public override getType(): string {
+    return ZIRCON_ENGINE_TYPE;
   }
 
   /**
@@ -122,7 +126,7 @@ export abstract class ZirconEngine<
     this._started = false;
   }
 
-  protected abstract onStart(): Promise<void>;
+  protected async onStart(): Promise<void> {}
 
-  protected abstract onStop(): Promise<void>;
+  protected async onStop(): Promise<void> {}
 }

@@ -53,12 +53,12 @@ export class VizLoader<
   T,
   R extends VizLoaderEventRegistry<T> = VizLoaderEventRegistry<T>,
 > extends ZirconViz<R> {
-  private _div: HTMLDivElement = null;
-  private _fetchButton: IonButton = null;
-  private _dataSelector: HTMLSelectElement = null;
-  private _statusDiv: HTMLDivElement = null;
+  private __div: HTMLDivElement = null;
+  private __fetchButton: IonButton = null;
+  private __dataSelector: HTMLSelectElement = null;
+  private __statusDiv: HTMLDivElement = null;
 
-  private _loadingStartTime = 0;
+  private __loadingStartTime = 0;
 
   constructor(
     private readonly _itemType: string,
@@ -87,12 +87,14 @@ export class VizLoader<
   // ---------------------------
 
   private getStatusDiv(): HTMLDivElement {
-    if (this._statusDiv) {return this._statusDiv;}
+    if (this.__statusDiv) {
+      return this.__statusDiv;
+    }
 
-    this._statusDiv = document.createElement('div');
-    this._statusDiv.classList.add('loader-status');
+    this.__statusDiv = document.createElement('div');
+    this.__statusDiv.classList.add('loader-status');
 
-    return this._statusDiv;
+    return this.__statusDiv;
   }
 
   private setStatusIdle(message: string): void {
@@ -120,39 +122,45 @@ export class VizLoader<
   // ---------------------------
 
   protected getDataSelector(): HTMLSelectElement {
-    if (this._dataSelector) {return this._dataSelector;}
+    if (this.__dataSelector) {
+      return this.__dataSelector;
+    }
 
-    this._dataSelector = document.createElement('select');
+    this.__dataSelector = document.createElement('select');
 
     Object.entries(this._loaderDescriptors).forEach(
       ([descriptorId, descriptor]) => {
         const option = document.createElement('option');
         option.value = descriptorId;
         option.innerHTML = descriptor.name;
-        this._dataSelector.appendChild(option);
+        this.__dataSelector.appendChild(option);
       },
     );
 
     // default selection
-    if (this._dataSelector.options.length > 0) {
-      this._dataSelector.selectedIndex = 0;
+    if (this.__dataSelector.options.length > 0) {
+      this.__dataSelector.selectedIndex = 0;
     }
 
-    this._dataSelector.addEventListener('change', () => {
+    this.__dataSelector.addEventListener('change', () => {
       this.updateHintMessage();
     });
 
-    return this._dataSelector;
+    return this.__dataSelector;
   }
 
   private updateHintMessage(): void {
     const select = this.getDataSelector();
     const descriptorId = select.options[select.selectedIndex]?.value;
 
-    if (!descriptorId) {return;}
+    if (!descriptorId) {
+      return;
+    }
 
     const descriptor = this._loaderDescriptors[descriptorId];
-    if (!descriptor) {return;}
+    if (!descriptor) {
+      return;
+    }
 
     this.setStatusIdle(`Click to load "${descriptor.name}"`);
   }
@@ -162,13 +170,15 @@ export class VizLoader<
   // ---------------------------
 
   protected getFetchButton(): HTMLElement {
-    if (this._fetchButton) {return this._fetchButton;}
+    if (this.__fetchButton) {
+      return this.__fetchButton;
+    }
 
-    this._fetchButton = document.createElement('ion-button');
-    this._fetchButton.classList.add('loader-button');
-    this._fetchButton.innerText = 'Load Data';
+    this.__fetchButton = document.createElement('ion-button');
+    this.__fetchButton.classList.add('loader-button');
+    this.__fetchButton.innerText = 'Load Data';
 
-    this._fetchButton.addEventListener('click', async () => {
+    this.__fetchButton.addEventListener('click', async () => {
       const select = this.getDataSelector();
       const descriptorId = select.options[select.selectedIndex]?.value;
 
@@ -182,14 +192,14 @@ export class VizLoader<
         throw new Error(`Unknown descriptor: ${descriptorId}`);
       }
 
-      this._loadingStartTime = performance.now();
+      this.__loadingStartTime = performance.now();
       this.setStatusLoading(`Loading "${descriptor.name}"...`);
 
       try {
         const items = await descriptor.loader.getData();
 
         const duration = this.formatDuration(
-          performance.now() - this._loadingStartTime,
+          performance.now() - this.__loadingStartTime,
         );
 
         this.setStatusSuccess(
@@ -205,7 +215,7 @@ export class VizLoader<
         });
       } catch (error) {
         const duration = this.formatDuration(
-          performance.now() - this._loadingStartTime,
+          performance.now() - this.__loadingStartTime,
         );
 
         this.setStatusError(
@@ -220,7 +230,7 @@ export class VizLoader<
       }
     });
 
-    return this._fetchButton;
+    return this.__fetchButton;
   }
 
   // ---------------------------
@@ -228,11 +238,15 @@ export class VizLoader<
   // ---------------------------
 
   private formatDuration(ms: number): string {
-    if (ms < 1000) {return `${Math.round(ms)}ms`;}
+    if (ms < 1000) {
+      return `${Math.round(ms)}ms`;
+    }
 
     const sec = ms / 1000;
 
-    if (sec < 60) {return `${sec.toFixed(2)}s`;}
+    if (sec < 60) {
+      return `${sec.toFixed(2)}s`;
+    }
 
     const min = Math.floor(sec / 60);
     const remainingSec = Math.round(sec % 60);
@@ -245,11 +259,13 @@ export class VizLoader<
   // ---------------------------
 
   public getContainer(): HTMLDivElement {
-    if (this._div) {return this._div;}
+    if (this.__div) {
+      return this.__div;
+    }
 
-    this._div = document.createElement('div');
-    this._div.id = uuid();
-    this._div.classList.add('loader-container');
+    this.__div = document.createElement('div');
+    this.__div.id = uuid();
+    this.__div.classList.add('loader-container');
 
     const selectorDiv = document.createElement('div');
     selectorDiv.appendChild(this.getDataSelector());
@@ -257,13 +273,13 @@ export class VizLoader<
     const buttonDiv = document.createElement('div');
     buttonDiv.appendChild(this.getFetchButton());
 
-    this._div.appendChild(selectorDiv);
-    this._div.appendChild(buttonDiv);
-    this._div.appendChild(this.getStatusDiv());
+    this.__div.appendChild(selectorDiv);
+    this.__div.appendChild(buttonDiv);
+    this.__div.appendChild(this.getStatusDiv());
 
     this.updateHintMessage();
 
-    return this._div;
+    return this.__div;
   }
 
   public override updateResize(): boolean {

@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&display=swap');
 
+:root {
+  --sapFontFamily: 'Orbitron', sans-serif;
+  --sapFontSize: 0.5em;
+}
 * {
   box-sizing: border-box;
 }
@@ -57,7 +61,8 @@ body {
 }
 
 .zircon-ui .desktops-selector,
-.zircon-ui .toolbar-container {
+.zircon-ui .right-toolbar-container,
+.zircon-ui .left-toolbar-container {
   display: flex;
   gap: 8px;
   padding: 10px;
@@ -87,7 +92,8 @@ body {
   transition: all 0.2s ease;
 }
 
-.zircon-ui .toolbar-container > div {
+.zircon-ui .left-toolbar-container > div,
+.zircon-ui .right-toolbar-container > div {
   padding: 10px;
   text-align: center;
   font-size: 13px;
@@ -199,9 +205,12 @@ body {
     3px 3px 10px 3px black;
 }
 
-.zircon-ui .jsPanel-content {
+.zircon-ui .jsPanel-content,
+.zircon-ui .jsPanel-content > div {
   color: white;
   overflow: auto;
+  width: 100%;
+  height: 100%;
 }
 
 .zircon-ui .jsPanel,
@@ -240,30 +249,6 @@ body {
   box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.zircon-ui .jsPanel ion-segment-button {
-  position: relative;
-  padding: 1px 3px;
-  background: linear-gradient(90deg, transparent, #1a1a1a, transparent);
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.2s ease;
-  min-height: 20px;
-}
-
-.zircon-ui .jsPanel ion-segment-button:hover {
-  background: linear-gradient(90deg, transparent, #333, transparent);
-  color: white;
-  transform: scale(1.2);
-}
-
-.zircon-ui .jsPanel ion-segment-button.segment-button-checked {
-  background: linear-gradient(90deg, transparent, #233d93, transparent);
-}
-
 .zircon-ui .zircon-window-view {
   flex: 1;
   position: relative;
@@ -280,78 +265,4 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-
-/***********************************************
- *        ZIRCON VISUALIZER WINDOW             *
- ***********************************************/
-
-.zircon-viz .jsPanel {
-  border: 1px solid #2a3967;
-  box-shadow: 0 0 8px 4px rgb(49, 91, 56);
-}
-
-.zircon-viz .jsPanel-headerbar {
-  background: #32488b;
-}
-
-.zircon-viz .jsPanel-content {
-  box-shadow: inset 0 8px 32px rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0);
-  background: linear-gradient(135deg, #13131c 0%, #0d121d 100%);
-  backdrop-filter: blur(10px);
-  overflow: auto;
-  font-family: 'Orbitron', sans-serif;
-  color: inherit;
-}
-
-.zircon-viz .jsPanel {
-  border: 1px solid #2a3967;
-}
-
-.zircon-viz .jsPanel,
-.zircon-viz .jsPanel-hdr {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-
-.zircon-viz .jsPanel-hdr::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 32px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #ffffffee, transparent);
-  opacity: 0.7;
-}
-
-.zircon-viz .jsPanel-controlbar button {
-  scale: 0.7;
-  width: 20px;
-}
-
-.zircon-viz .jsPanel-headerlogo img {
-  scale: 0.9;
-  width: 25px;
-}
-
-/***********************************************
- *        ZIRCON PARAMETER WINDOW              *
- ***********************************************/
-
-.zircon-param .jsPanel-headerbar {
-  background: #328b3e;
-}
-.zircon-param .jsPanel-content {
-  background: linear-gradient(135deg, #21562e 0%, #273b2b 100%);
-}
-
-.zircon-param .jsPanel-hdr {
-  background-color: green;
-  background: green;
-}
-
-.zircon-param .jsPanel-content .jsoneditor {
-  color: black;
 }

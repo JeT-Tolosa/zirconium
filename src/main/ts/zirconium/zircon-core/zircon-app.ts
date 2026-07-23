@@ -1,4 +1,9 @@
+import { setTheme } from '@ui5/webcomponents-base/dist/config/Theme.js';
+setTheme('sap_horizon');
+
+// zircon-ui must be after ui5 theme setTheme
 import '../zircon-ui.css';
+import '../zircon-ui5.css';
 import EventEmitter2 from 'eventemitter2';
 import {
   ZirconDesktopManager,
@@ -17,10 +22,7 @@ import {
 import { ZirconContextMenu } from '../zircon-menu/zircon-context-menu';
 import pino from 'pino';
 import { ZirconObject, ZirconObjectState } from './zircon-object';
-import {
-  ZirconParamWindowFactory,
-  ZirconVizWindowFactory,
-} from '../zircon-ui/zircon-window-factory';
+import { ZirconWindowFactory } from '../zircon-ui/zircon-window-factory';
 import { ZirconEngine, ZirconEngineEvents } from './zircon-engine';
 import { ZirconVizWindowEvents } from '../zircon-ui/zircon-viz-window';
 import { ZirconParamWindowEvents } from '../zircon-params/zircon-param-window';
@@ -41,6 +43,11 @@ import { ZirconDataAdapterFactory } from '../zircon-data/zircon-data-adapter-fac
 import { ZirconDataProviderFactory } from '../zircon-data/zircon-data-provider-factory';
 import { ZirconDataProvider } from '../zircon-data/zircon-data-provider';
 import { ZirconContextMenuFactoryApplication } from '../zircon-menu/zircon-app-context-menu';
+import { ZirconStateEditorManager } from '../zircon-params/zircon-state-editor-manager';
+import { ZirconEngineFactory } from './zircon-engine-factory';
+import { ZirconVizWindowFactory } from '../zircon-ui/zircon-viz-window-factory';
+import { ZirconStateEditorFactoryPre } from '../zircon-params/zircon-state-editor-factory';
+import { ZirconParamWindowFactory } from '../zircon-params/zircon-param-window-factory';
 
 /**
  * Composition of this application UI
@@ -65,8 +72,10 @@ export type ZirconApplicationEvents = {
   APPLICATION_START_REQUEST: { applicationId: string };
   APPLICATION_STARTED: { applicationId: string };
   SET_OBJECT_STATE_REQUEST: { objectId: string; state: ZirconObjectState };
-  OBJECT_STATE_REGISTERED: { state: ZirconObjectState };
   UNCAUGHT_EXCEPTION: { error: string };
+  APPLICATION_SAVE_WORKSPACE_REQUEST: { filePath: string };
+  APPLICATION_LOAD_WORKSPACE_REQUEST: { filePath: string };
+  APPLICATION_QUIT_REQUEST: { filePath: string };
 };
 
 export type ZirconApplicationEventRegistry = MergeZirconRegistries<
@@ -75,7 +84,11 @@ export type ZirconApplicationEventRegistry = MergeZirconRegistries<
       [
         PickEvents<
           ZirconApplicationEvents,
-          'APPLICATION_START_REQUEST' | 'SET_OBJECT_STATE_REQUEST'
+          | 'APPLICATION_START_REQUEST'
+          | 'SET_OBJECT_STATE_REQUEST'
+          | 'APPLICATION_SAVE_WORKSPACE_REQUEST'
+          | 'APPLICATION_LOAD_WORKSPACE_REQUEST'
+          | 'APPLICATION_QUIT_REQUEST'
         >,
         PickEvents<
           ZirconWindowEvents,
@@ -128,6 +141,7 @@ export class ZirconApplication<
   private __objectManager: ZirconObjectManager = null;
   private __pluginManager: ZirconPluginManager = null;
   private __dataProviderManager: ZirconDataProviderManager = null;
+  private __stateEditorManager: ZirconStateEditorManager = null;
 
   /**
    * constructor
@@ -152,10 +166,10 @@ export class ZirconApplication<
     // create event dispatcher
     this._eventEmitter = new EventEmitter2();
     this._eventEmitter.setMaxListeners(1000);
-    // create object manager
-    this.__objectManager = new ZirconObjectManager(this);
-    // create data provider manager
-    this.__dataProviderManager = new ZirconDataProviderManager(this);
+    // // create object manager
+    // this.__objectManager = new ZirconObjectManager(this);
+    // // create data provider manager
+    // this.__dataProviderManager = new ZirconDataProviderManager(this);
     // register default factories
 
     this.registerDefaultFactories().then(() => {
@@ -174,7 +188,44 @@ export class ZirconApplication<
     this.addListener('UNCAUGHT_EXCEPTION', (arg) => {
       this.onUNCAUGHT_EXCEPTION(arg.error);
     });
+    this.addListener('APPLICATION_SAVE_WORKSPACE_REQUEST', (arg) => {
+      this.onAPPLICATION_SAVE_WORKSPACE_REQUEST(arg.filePath);
+    });
+    this.addListener('APPLICATION_LOAD_WORKSPACE_REQUEST', (arg) => {
+      this.onAPPLICATION_LOAD_WORKSPACE_REQUEST(arg.filePath);
+    });
+    this.addListener('APPLICATION_QUIT_REQUEST', () => {
+      this.onAPPLICATION_QUIT_REQUEST();
+    });
   }
+  private async onAPPLICATION_SAVE_WORKSPACE_REQUEST(
+    filePath: string,
+  ): Promise<void> {
+    const applicationState = this.getCurrentState();
+    const success = await window.electronAPI.saveJson(
+      filePath,
+      applicationState,
+    );
+    if (success) {
+      console.log('Préférences sauvegardées !');
+    }
+  }
+
+  private async onAPPLICATION_LOAD_WORKSPACE_REQUEST(
+    filePath: string,
+  ): Promise<void> {
+    try {
+      const applicationState = await window.electronAPI.readJson(filePath);
+      console.log(applicationState);
+    } catch (err) {
+      console.warn(
+        'Aucun fichier de paramètres trouvé, chargement des valeurs par défaut.',
+        err,
+      );
+    }
+  }
+
+  private onAPPLICATION_QUIT_REQUEST(): void {}
 
   private onAPPLICATION_START_REQUEST(applicationId: string): void {
     if (this.getId() === applicationId) {
@@ -236,6 +287,17 @@ export class ZirconApplication<
     return this.__dataProviderManager;
   }
 
+  public getStateEditorManager(): ZirconStateEditorManager {
+    if (!this.__stateEditorManager) {
+      this.__stateEditorManager = new ZirconStateEditorManager(this);
+      this.__stateEditorManager.registerStateEditorFactory(
+        ZIRCON_OBJECT_TYPE,
+        new ZirconStateEditorFactoryPre(),
+      );
+    }
+    return this.__stateEditorManager;
+  }
+
   public async getInstance(
     objId: string,
     type: string = ZIRCON_OBJECT_TYPE,
@@ -264,17 +326,12 @@ export class ZirconApplication<
 
   private async registerDefaultFactories(): Promise<void> {
     // await this.registerObjectFactory(new ZirconAppFactory(this));
-    // await this.registerObjectFactory(new ZirconWindowFactory(this));
     await this.registerObjectFactory(new ZirconDesktopFactory(this));
     await this.registerObjectFactory(new ZirconDesktopManagerFactory(this));
+    await this.registerObjectFactory(new ZirconWindowFactory(this));
     await this.registerObjectFactory(new ZirconVizWindowFactory(this));
     await this.registerObjectFactory(new ZirconParamWindowFactory(this));
-    // await this.registerObjectFactory(new ZirconEngineFactory(this));
-
-    // may be we should not add param window as they are not stored windows...
-    // this.registerObjectFactory(
-    //   new ZirconParamWindowFactory(this),
-    // );
+    await this.registerObjectFactory(new ZirconEngineFactory());
   }
 
   public async registerDataAdapterFactory(
@@ -474,6 +531,7 @@ export class ZirconApplication<
         desktopId: this.getDesktopManager().getDesktopIds()[0],
       });
     }
+    // set UI5 web components theme to sap_horizon_dark
     this.emit('APPLICATION_STARTED', { applicationId: this.getId() });
   }
 

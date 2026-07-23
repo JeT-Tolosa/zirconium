@@ -1,0 +1,29 @@
+.zircon-ui {
+  --sapFontFamily: 'Orbitron', sans-serif;
+  --sapFontSize: 10px;
+  --sapFontSmallSize: 8px;
+  --sapFontLargeSize: 12px;
+  --sapElement_Height: default;
+  --sapBackgroundColor: yellow;
+  --sapButton_Hover_Background: red;
+  --sapBaseColor: green;
+  --sapTextColor: blue;
+  --sapTitleColor: violet;
+  --sapLabelColor: darkGrey;
+  --sapContent_ForegroundColor: black;
+  --sapContent_BackgroundColor: darkRed;
+}
+
+/**
+.zircon-ui ui5-select {
+  height: 1.5em;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8em;
+}
+
+.zircon-ui .ui5-button {
+  height: 1.5em;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8em;
+}
+*/

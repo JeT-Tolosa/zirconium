@@ -70,6 +70,7 @@ export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory 
           {
             label: 'parameters',
             action: () => {
+              // TODO: may be we should fire an event instead of direct call
               window.displayParameterWindow();
             },
           },

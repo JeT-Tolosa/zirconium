@@ -21,7 +21,23 @@ import {
 } from '../../zirconium/zircon-event';
 // import { ZirconDataProviderManagerEvents } from '../../zirconium/zircon-data/zircon-data-provider-manager';
 import { ZirconDataProviderManagerEvents } from '../../zirconium/zircon-data/zircon-data-provider-manager';
-
+import '@ui5/webcomponents/dist/Button.js';
+import '@ui5/webcomponents/dist/Select.js';
+import '@ui5/webcomponents/dist/Option.js';
+import '@ui5/webcomponents/dist/Text.js';
+import '@ui5/webcomponents-icons/dist/refresh.js';
+import Button from '@ui5/webcomponents/dist/Button.js';
+import Select from '@ui5/webcomponents/dist/Select.js';
+import Option from '@ui5/webcomponents/dist/Option.js';
+import Text from '@ui5/webcomponents/dist/Text.js';
+declare global {
+  interface HTMLElementTagNameMap {
+    'ui5-button': Button;
+    'ui5-select': Select;
+    'ui5-option': Option;
+    'ui5-text': Text;
+  }
+}
 export interface VizDataProviderExplorerState {
   type: typeof VizDataProviderExplorer.DATA_EXPLORER_VISUALIZER_TYPE;
   id?: string;
@@ -60,31 +76,42 @@ export class VizDataProviderExplorer<
   public static readonly DATA_EXPLORER_VISUALIZER_TYPE =
     'data-provider-explorer-visualizer-type';
 
-  private _jsonEditorContainer: HTMLDivElement = null;
-  private _jsonEditor: JSONEditor = null;
-  private _div: HTMLDivElement = null;
-  private _dataProviderSelect: HTMLSelectElement = null;
-  private _refreshButton: HTMLIonButtonElement = null;
-  private _output: HTMLParagraphElement = null;
-  private _app: ZirconApplication = null;
+  private __jsonEditorContainer: HTMLDivElement = null;
+  private __jsonEditor: JSONEditor = null;
+
+  private __div: HTMLDivElement = null;
+
+  private __dataProviderSelect: HTMLElementTagNameMap['ui5-select'] = null;
+
+  private __refreshButton: HTMLElementTagNameMap['ui5-button'] = null;
+
+  private __output: HTMLElementTagNameMap['ui5-text'] = null;
+
+  private __app: ZirconApplication = null;
+
   private _currentSelectedDataProviderId: string = null;
 
   constructor(app: ZirconApplication, state?: VizDataProviderExplorerState) {
     super(state);
-    this._app = app;
+    this.__app = app;
   }
+
   protected override listenToEvents(): void {
     super.listenToEvents();
-    this.addListener('DATA_PROVIDER_MANAGER_DESCRIPTORS', (_arg) => {
+
+    this.addListener('DATA_PROVIDER_MANAGER_DESCRIPTORS', () => {
       this.refreshDataProviderList();
     });
-    this.addListener('DATA_PROVIDER_MANAGER_PROVIDER_REGISTERED', (_arg) => {
+
+    this.addListener('DATA_PROVIDER_MANAGER_PROVIDER_REGISTERED', () => {
       this.refreshDataProviderList();
     });
+
     this.addListener('DATA_PROVIDER_FULL_CONTENT', (arg) => {
       this.onDATA_PROVIDER_FULL_CONTENT(arg.dataProviderDescriptor);
     });
   }
+
   public override getType(): string {
     return VizDataProviderExplorer.DATA_EXPLORER_VISUALIZER_TYPE;
   }
@@ -98,15 +125,17 @@ export class VizDataProviderExplorer<
     ) {
       return;
     }
+
     this.displaySelectedProvider();
   }
 
   private getApplication(): ZirconApplication {
-    return this._app;
+    return this.__app;
   }
 
   public updateDataProviderList(): boolean {
     this.refreshDataProviderList();
+
     return true;
   }
 
@@ -117,35 +146,45 @@ export class VizDataProviderExplorer<
   }
 
   public close(): void {
-    this._jsonEditor?.destroy();
-    this._jsonEditor = null;
+    this.__jsonEditor?.destroy();
+
+    this.__jsonEditor = null;
   }
 
   private displayMessage(message: string, cssClass = 'info') {
-    this.getOutputElement().className = 'provider-output';
-    this.getOutputElement().classList.add(cssClass);
-    this.getOutputElement().innerText = message;
+    const output = this.getOutputElement();
+
+    output.className = 'provider-output';
+
+    output.classList.add(cssClass);
+
+    output.textContent = message;
   }
 
   private getJsonEditorContainer(): HTMLElement {
-    if (this._jsonEditorContainer) {
-      return this._jsonEditorContainer;
+    if (this.__jsonEditorContainer) {
+      return this.__jsonEditorContainer;
     }
-    this._jsonEditorContainer = document.createElement('div');
-    this._jsonEditorContainer.classList.add('provider-json-view');
-    this._jsonEditor = new JSONEditor(this._jsonEditorContainer, {
+
+    this.__jsonEditorContainer = document.createElement('div');
+
+    this.__jsonEditorContainer.classList.add('provider-json-view');
+
+    this.__jsonEditor = new JSONEditor(this.__jsonEditorContainer, {
       mode: 'tree',
       mainMenuBar: false,
       navigationBar: true,
       statusBar: true,
     });
 
-    return this._jsonEditorContainer;
+    return this.__jsonEditorContainer;
   }
 
   private async refreshDataProviderList(): Promise<void> {
     const select = this.getProviderSelector();
+
     const previousSelection = select.value;
+
     select.innerHTML = '';
 
     const manager = this.getApplication().getDataProviderManager();
@@ -154,64 +193,67 @@ export class VizDataProviderExplorer<
       manager.getDataProviderDescriptors();
 
     dataProviderDescriptors.forEach((dataProviderDescriptor) => {
-      const option = document.createElement('option');
+      const option = document.createElement(
+        'ui5-option',
+      ) as HTMLElementTagNameMap['ui5-option'];
+
       option.value = dataProviderDescriptor.id;
-      option.text = dataProviderDescriptor.name;
+
+      option.textContent = dataProviderDescriptor.name;
+
       select.appendChild(option);
     });
+
     if (
       previousSelection &&
       dataProviderDescriptors.some((d) => d.id === previousSelection)
     ) {
       select.value = previousSelection;
+    } else if (dataProviderDescriptors.length > 0) {
+      select.value = dataProviderDescriptors[0].id;
     }
+
     if (dataProviderDescriptors.length > 0) {
-      select.selectedIndex = Math.max(select.selectedIndex, 0);
       await this.displaySelectedProvider();
     }
   }
 
   private getSelectedProviderId(): string {
-    return this._dataProviderSelect?.value;
+    return this.__dataProviderSelect?.value ?? null;
   }
 
   private async displaySelectedProvider(): Promise<void> {
     try {
       const providerId = this.getSelectedProviderId();
+
       if (!providerId) {
         return;
       }
 
-      const obj: ZirconDataProvider = this.getApplication()
+      const provider: ZirconDataProvider = this.getApplication()
         .getDataProviderManager()
         .getDataProvider(providerId);
-      // const obj = this.getApplication()
-      //   .getObjectManager()
-      //   .getExistingInstance(providerId);
-      if (!obj) {
-        return;
-      }
-
-      const provider: ZirconDataProvider = obj;
 
       if (!provider) {
-        this._currentSelectedDataProviderId = null;
-        this._jsonEditor?.set({});
-        this.displayMessage('Provider not found', 'warning');
         return;
       }
 
       const data = await provider.getData();
+
       if (!data) {
         this.emit('DATA_PROVIDER_FULL_CONTENT_REQUEST', {
           dataProviderId: providerId,
         });
+
         this.displayMessage('No data stored, waiting for content');
+
         return;
       }
-      this._jsonEditor?.set(data);
-      const count =
-        data && typeof data === 'object' ? Object.keys(data).length : 0;
+
+      this.__jsonEditor?.set(data);
+
+      const count = typeof data === 'object' ? Object.keys(data).length : 0;
+
       this.displayMessage(
         `Provider "${providerId}" loaded (${count} properties)`,
         'success',
@@ -221,58 +263,305 @@ export class VizDataProviderExplorer<
     }
   }
 
-  private getRefreshButton(): HTMLIonButtonElement {
-    if (this._refreshButton) {
-      return this._refreshButton;
+  private getRefreshButton(): HTMLElementTagNameMap['ui5-button'] {
+    if (this.__refreshButton) {
+      return this.__refreshButton;
     }
-    this._refreshButton = document.createElement('ion-button');
-    this._refreshButton.classList.add('provider-refresh-button');
-    this._refreshButton.innerText = 'Refresh';
-    this._refreshButton.addEventListener('click', () => {
+
+    this.__refreshButton = document.createElement('ui5-button');
+
+    this.__refreshButton.classList.add('provider-refresh-button');
+
+    this.__refreshButton.textContent = 'Refresh';
+
+    this.__refreshButton.setAttribute('icon', 'refresh');
+
+    this.__refreshButton.addEventListener('click', () => {
       this.refreshDataProviderList();
+
       this.displaySelectedProvider();
     });
-    return this._refreshButton;
+
+    return this.__refreshButton;
   }
 
-  private getProviderSelector(): HTMLSelectElement {
-    if (this._dataProviderSelect) {
-      return this._dataProviderSelect;
+  private getProviderSelector(): HTMLElementTagNameMap['ui5-select'] {
+    if (this.__dataProviderSelect) {
+      return this.__dataProviderSelect;
     }
-    this._dataProviderSelect = document.createElement('select');
-    this._dataProviderSelect.classList.add('provider-selector');
-    this._dataProviderSelect.addEventListener('change', () =>
+
+    this.__dataProviderSelect = document.createElement('ui5-select');
+
+    this.__dataProviderSelect.classList.add('provider-selector');
+
+    this.__dataProviderSelect.addEventListener('change', () =>
       this.displaySelectedProvider(),
     );
 
-    return this._dataProviderSelect;
+    return this.__dataProviderSelect;
   }
 
-  private getOutputElement(): HTMLParagraphElement {
-    if (this._output) {
-      return this._output;
+  private getOutputElement(): HTMLElementTagNameMap['ui5-text'] {
+    if (this.__output) {
+      return this.__output;
     }
-    this._output = document.createElement('p');
-    this._output.classList.add('provider-output');
-    return this._output;
+
+    this.__output = document.createElement('ui5-text');
+
+    this.__output.classList.add('provider-output');
+
+    return this.__output;
   }
 
   public getContainer(): HTMLDivElement {
-    if (this._div) {
-      return this._div;
+    if (this.__div) {
+      return this.__div;
     }
 
-    this._div = document.createElement('div');
-    this._div.id = uuid();
-    this._div.classList.add('provider-container');
-    const toolbar = document.createElement('div');
-    toolbar.classList.add('provider-toolbar');
-    toolbar.appendChild(this.getProviderSelector());
-    toolbar.appendChild(this.getRefreshButton());
-    this._div.appendChild(toolbar);
-    this._div.appendChild(this.getJsonEditorContainer());
-    this._div.appendChild(this.getOutputElement());
+    this.__div = document.createElement('div');
 
-    return this._div;
+    this.__div.id = uuid();
+
+    this.__div.classList.add('provider-container');
+
+    const toolbar = document.createElement('div');
+
+    toolbar.classList.add('provider-toolbar');
+
+    toolbar.appendChild(this.getProviderSelector());
+
+    toolbar.appendChild(this.getRefreshButton());
+
+    this.__div.appendChild(toolbar);
+
+    this.__div.appendChild(this.getJsonEditorContainer());
+
+    this.__div.appendChild(this.getOutputElement());
+
+    return this.__div;
   }
 }
+
+// export class VizDataProviderExplorer<
+//   R extends VizDataProviderExplorerEventRegistry =
+//     VizDataProviderExplorerEventRegistry,
+// > extends ZirconViz<R> {
+//   public static readonly DATA_EXPLORER_VISUALIZER_TYPE =
+//     'data-provider-explorer-visualizer-type';
+
+//   private __jsonEditorContainer: HTMLDivElement = null;
+//   private __jsonEditor: JSONEditor = null;
+//   private __div: HTMLDivElement = null;
+//   private __dataProviderSelect: HTMLSelectElement = null;
+//   private __refreshButton: HTMLIonButtonElement = null;
+//   private __output: HTMLParagraphElement = null;
+//   private __app: ZirconApplication = null;
+//   private _currentSelectedDataProviderId: string = null;
+
+//   constructor(app: ZirconApplication, state?: VizDataProviderExplorerState) {
+//     super(state);
+//     this.__app = app;
+//   }
+//   protected override listenToEvents(): void {
+//     super.listenToEvents();
+//     this.addListener('DATA_PROVIDER_MANAGER_DESCRIPTORS', (_arg) => {
+//       this.refreshDataProviderList();
+//     });
+//     this.addListener('DATA_PROVIDER_MANAGER_PROVIDER_REGISTERED', (_arg) => {
+//       this.refreshDataProviderList();
+//     });
+//     this.addListener('DATA_PROVIDER_FULL_CONTENT', (arg) => {
+//       this.onDATA_PROVIDER_FULL_CONTENT(arg.dataProviderDescriptor);
+//     });
+//   }
+//   public override getType(): string {
+//     return VizDataProviderExplorer.DATA_EXPLORER_VISUALIZER_TYPE;
+//   }
+
+//   private onDATA_PROVIDER_FULL_CONTENT(
+//     dataProviderDescriptor: ZirconDataProviderDescriptor,
+//   ) {
+//     if (
+//       !dataProviderDescriptor ||
+//       dataProviderDescriptor.id !== this.getSelectedProviderId()
+//     ) {
+//       return;
+//     }
+//     this.displaySelectedProvider();
+//   }
+
+//   private getApplication(): ZirconApplication {
+//     return this.__app;
+//   }
+
+//   public updateDataProviderList(): boolean {
+//     this.refreshDataProviderList();
+//     return true;
+//   }
+
+//   public update(): void {}
+
+//   public start(): void {
+//     this.refreshDataProviderList();
+//   }
+
+//   public close(): void {
+//     this.__jsonEditor?.destroy();
+//     this.__jsonEditor = null;
+//   }
+
+//   private displayMessage(message: string, cssClass = 'info') {
+//     this.getOutputElement().className = 'provider-output';
+//     this.getOutputElement().classList.add(cssClass);
+//     this.getOutputElement().innerText = message;
+//   }
+
+//   private getJsonEditorContainer(): HTMLElement {
+//     if (this.__jsonEditorContainer) {
+//       return this.__jsonEditorContainer;
+//     }
+//     this.__jsonEditorContainer = document.createElement('div');
+//     this.__jsonEditorContainer.classList.add('provider-json-view');
+//     this.__jsonEditor = new JSONEditor(this.__jsonEditorContainer, {
+//       mode: 'tree',
+//       mainMenuBar: false,
+//       navigationBar: true,
+//       statusBar: true,
+//     });
+
+//     return this.__jsonEditorContainer;
+//   }
+
+//   private async refreshDataProviderList(): Promise<void> {
+//     const select = this.getProviderSelector();
+//     const previousSelection = select.value;
+//     select.innerHTML = '';
+
+//     const manager = this.getApplication().getDataProviderManager();
+
+//     const dataProviderDescriptors: ZirconDataProviderDescriptor[] =
+//       manager.getDataProviderDescriptors();
+
+//     dataProviderDescriptors.forEach((dataProviderDescriptor) => {
+//       const option = document.createElement('option');
+//       option.value = dataProviderDescriptor.id;
+//       option.text = dataProviderDescriptor.name;
+//       select.appendChild(option);
+//     });
+//     if (
+//       previousSelection &&
+//       dataProviderDescriptors.some((d) => d.id === previousSelection)
+//     ) {
+//       select.value = previousSelection;
+//     }
+//     if (dataProviderDescriptors.length > 0) {
+//       select.selectedIndex = Math.max(select.selectedIndex, 0);
+//       await this.displaySelectedProvider();
+//     }
+//   }
+
+//   private getSelectedProviderId(): string {
+//     return this.__dataProviderSelect?.value;
+//   }
+
+//   private async displaySelectedProvider(): Promise<void> {
+//     try {
+//       const providerId = this.getSelectedProviderId();
+//       if (!providerId) {
+//         return;
+//       }
+
+//       const obj: ZirconDataProvider = this.getApplication()
+//         .getDataProviderManager()
+//         .getDataProvider(providerId);
+//       // const obj = this.getApplication()
+//       //   .getObjectManager()
+//       //   .getExistingInstance(providerId);
+//       if (!obj) {
+//         return;
+//       }
+
+//       const provider: ZirconDataProvider = obj;
+
+//       if (!provider) {
+//         this._currentSelectedDataProviderId = null;
+//         this.__jsonEditor?.set({});
+//         this.displayMessage('Provider not found', 'warning');
+//         return;
+//       }
+
+//       const data = await provider.getData();
+//       if (!data) {
+//         this.emit('DATA_PROVIDER_FULL_CONTENT_REQUEST', {
+//           dataProviderId: providerId,
+//         });
+//         this.displayMessage('No data stored, waiting for content');
+//         return;
+//       }
+//       this.__jsonEditor?.set(data);
+//       const count =
+//         data && typeof data === 'object' ? Object.keys(data).length : 0;
+//       this.displayMessage(
+//         `Provider "${providerId}" loaded (${count} properties)`,
+//         'success',
+//       );
+//     } catch (error) {
+//       this.displayMessage(`Failed to display provider: ${error}`, 'error');
+//     }
+//   }
+
+//   private getRefreshButton(): HTMLIonButtonElement {
+//     if (this.__refreshButton) {
+//       return this.__refreshButton;
+//     }
+//     this.__refreshButton = document.createElement('ion-button');
+//     this.__refreshButton.classList.add('provider-refresh-button');
+//     this.__refreshButton.innerText = 'Refresh';
+//     this.__refreshButton.addEventListener('click', () => {
+//       this.refreshDataProviderList();
+//       this.displaySelectedProvider();
+//     });
+//     return this.__refreshButton;
+//   }
+
+//   private getProviderSelector(): HTMLSelectElement {
+//     if (this.__dataProviderSelect) {
+//       return this.__dataProviderSelect;
+//     }
+//     this.__dataProviderSelect = document.createElement('select');
+//     this.__dataProviderSelect.classList.add('provider-selector');
+//     this.__dataProviderSelect.addEventListener('change', () =>
+//       this.displaySelectedProvider(),
+//     );
+
+//     return this.__dataProviderSelect;
+//   }
+
+//   private getOutputElement(): HTMLParagraphElement {
+//     if (this.__output) {
+//       return this.__output;
+//     }
+//     this.__output = document.createElement('p');
+//     this.__output.classList.add('provider-output');
+//     return this.__output;
+//   }
+
+//   public getContainer(): HTMLDivElement {
+//     if (this.__div) {
+//       return this.__div;
+//     }
+
+//     this.__div = document.createElement('div');
+//     this.__div.id = uuid();
+//     this.__div.classList.add('provider-container');
+//     const toolbar = document.createElement('div');
+//     toolbar.classList.add('provider-toolbar');
+//     toolbar.appendChild(this.getProviderSelector());
+//     toolbar.appendChild(this.getRefreshButton());
+//     this.__div.appendChild(toolbar);
+//     this.__div.appendChild(this.getJsonEditorContainer());
+//     this.__div.appendChild(this.getOutputElement());
+
+//     return this.__div;
+//   }
+// }

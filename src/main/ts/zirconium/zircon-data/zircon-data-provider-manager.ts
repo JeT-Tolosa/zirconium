@@ -1,12 +1,10 @@
-import {
-  ZirconApplication,
-  ZirconApplicationEvents,
-} from '../zircon-core/zircon-app';
+import { ZirconApplication } from '../zircon-core/zircon-app';
 import {
   ZirconAppObject,
   ZirconAppObjectEventRegistry,
 } from '../zircon-core/zircon-app-object';
 import { ZirconObject, ZirconObjectState } from '../zircon-core/zircon-object';
+import { ZirconObjectManagerEvents } from '../zircon-core/zircon-object-manager';
 import { ZIRCON_DATA_PROVIDER_TYPE } from '../zircon-core/zircon-types';
 import {
   MergePickEvents,
@@ -73,7 +71,7 @@ export type ZirconDataProviderManagerRegistry = MergeZirconRegistries<
           | 'REGISTER_DATA_PROVIDER_REQUEST'
           | 'UNREGISTER_DATA_PROVIDER_REQUEST'
         >,
-        PickEvents<ZirconApplicationEvents, 'OBJECT_STATE_REGISTERED'>,
+        PickEvents<ZirconObjectManagerEvents, 'OBJECT_STATE_REGISTERED'>,
       ]
     >;
 

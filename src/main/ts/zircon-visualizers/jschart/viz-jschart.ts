@@ -11,12 +11,14 @@ import {
   PickEvents,
 } from '../../zirconium/zircon-event';
 import {
-  ZirconDataProvider,
   ZirconDataProviderDescriptor,
   ZirconDataProviderEvents,
 } from '../../zirconium/zircon-data/zircon-data-provider';
 import { VIZ_JSCHART_REGISTRY } from './viz-jschart-types';
 import './viz-jschart.css';
+
+// TODO: Pour améliorer les performances, il faudrait récupérer une instance du data provider pour éviter
+// d'avoir à passer par le zircon data provider manager pour chaque requête de contenu
 
 export interface VizJSChartState<
   TType extends ChartType,
@@ -85,7 +87,7 @@ export abstract class VizJSChart<
     DEFAULT_OPTIONS as ChartOptions<TType>;
 
   private __chart: Chart<TType> = null;
-  private __dataProvider: ZirconDataProvider<ChartData<TType>> = null;
+  // private __dataProvider: ZirconDataProvider<ChartData<TType>> = null;
   private __data: ChartData<TType> = null;
   private __dataVersion: number = null; // data content version stored in _data for _dataProviderId
   private __mainDiv: HTMLDivElement = null;
@@ -176,7 +178,7 @@ export abstract class VizJSChart<
     if (typeof id === typeof undefined) {
       return;
     }
-    this.__dataProvider = null;
+    // this.__dataProvider = null;
     this.__dataVersion = null;
     this._dataProviderId = id;
     this.requestDataProviderContent();
@@ -226,37 +228,42 @@ export abstract class VizJSChart<
       });
     }
   }
-  /**
-   * get input data
-   */
-  public getDataProvider(): ZirconDataProvider<ChartData<TType>> {
-    return this.__dataProvider;
+
+  public override getEditedIds(): string[] {
+    return [this._dataProviderId];
   }
+
+  // /**
+  //  * get input data
+  //  */
+  // public getDataProvider(): ZirconDataProvider<ChartData<TType>> {
+  //   return this.__dataProvider;
+  // }
 
   private refreshChart = async () => this.updateData();
 
-  /**
-   * set input data
-   * @param dataProvider
-   */
-  public setDataProvider(
-    dataProvider: ZirconDataProvider<ChartData<TType>>,
-  ): void {
-    if (this.__dataProvider === dataProvider) {
-      return;
-    }
-    if (this.__dataProvider) {
-      this.__dataProvider.removeListener(
-        'SERIES_DATA_CHANGED',
-        this.refreshChart,
-      );
-    }
-    this.__dataProvider = dataProvider;
-    if (this.__dataProvider) {
-      this.__dataProvider.addListener('SERIES_DATA_CHANGED', this.refreshChart);
-    }
-    //this.emit('VIZ_INPUT_SERIES_CHANGED', { id: this.series.getId() });
-  }
+  // /**
+  //  * set input data
+  //  * @param dataProvider
+  //  */
+  // public setDataProvider(
+  //   dataProvider: ZirconDataProvider<ChartData<TType>>,
+  // ): void {
+  //   if (this.__dataProvider === dataProvider) {
+  //     return;
+  //   }
+  //   if (this.__dataProvider) {
+  //     this.__dataProvider.removeListener(
+  //       'SERIES_DATA_CHANGED',
+  //       this.refreshChart,
+  //     );
+  //   }
+  //   this.__dataProvider = dataProvider;
+  //   if (this.__dataProvider) {
+  //     this.__dataProvider.addListener('SERIES_DATA_CHANGED', this.refreshChart);
+  //   }
+  //   //this.emit('VIZ_INPUT_SERIES_CHANGED', { id: this.series.getId() });
+  // }
 
   protected getChart(): Chart<TType> {
     return this.__chart;

@@ -18,7 +18,14 @@ import {
 } from '../zircon-event';
 import { ZirconDesktop } from './zircon-desktop';
 import { ZirconHelper } from '../zircon-helper';
-import { ZIRCON_WINDOW_TYPE } from '../zircon-core/zircon-types';
+import {
+  ZIRCON_PARAMETER_WINDOW_TYPE,
+  ZIRCON_WINDOW_TYPE,
+} from '../zircon-core/zircon-types';
+import {
+  ZirconParamWindow,
+  ZirconParamWindowState,
+} from '../zircon-params/zircon-param-window';
 
 export type ZirconWindowEvents = {
   WINDOW_SET_PARENT_DESKTOP_DONE: {
@@ -45,9 +52,9 @@ export type ZirconWindowEvents = {
   WINDOW_MINIMIZED: { windowId: string };
   WINDOW_MAXIMIZED: { windowId: string };
   WINDOW_CLOSED: { windowId: string };
-  WINDOW_TITLE_CHANGED: { windowId: string; title: string };
-  WINDOW_POSITION_CHANGED: { windowId: string; x: number; y: number };
-  WINDOW_DIMENSION_CHANGED: { windowId: string; width: number; height: number };
+  // WINDOW_TITLE_CHANGED: { windowId: string; title: string };
+  // WINDOW_POSITION_CHANGED: { windowId: string; x: number; y: number };
+  // WINDOW_DIMENSION_CHANGED: { windowId: string; width: number; height: number };
 };
 
 export type ZirconWindowEventRegistry = MergeZirconRegistries<
@@ -76,9 +83,9 @@ export type ZirconWindowEventRegistry = MergeZirconRegistries<
           | 'WINDOW_MINIMIZED'
           | 'WINDOW_MAXIMIZED'
           | 'WINDOW_CLOSED'
-          | 'WINDOW_TITLE_CHANGED'
-          | 'WINDOW_DIMENSION_CHANGED'
-          | 'WINDOW_POSITION_CHANGED'
+          // | 'WINDOW_TITLE_CHANGED'
+          // | 'WINDOW_DIMENSION_CHANGED'
+          // | 'WINDOW_POSITION_CHANGED'
         >,
       ]
     >;
@@ -101,15 +108,16 @@ export interface ZirconWindowState extends ZirconAppObjectState {
 export class ZirconWindow<
   R extends ZirconWindowEventRegistry = ZirconWindowEventRegistry,
 > extends ZirconAppObject<R> {
-  private __parentDesktop: ZirconDesktop = null;
-  private __panel: IJSPanelInstance = null;
   private _title: string = 'untitled';
   private _left: number = 0;
   private _top: number = 0;
   private _width: number = 500;
   private _height: number = 500;
+  private __parentDesktop: ZirconDesktop = null;
+  private __panel: IJSPanelInstance = null;
   private __dragSource: HTMLElement = null; // parent element when drag is initialized
   private __dragPosition: { x: number; y: number } = null; // window position when drag is initialized
+  private __paramWindow: ZirconParamWindow = null;
 
   constructor(app: ZirconApplication, state?: ZirconWindowState) {
     super(app, state);
@@ -223,9 +231,10 @@ export class ZirconWindow<
       boxShadow: 3,
       resizeit: {
         stop: (_position: IJSPanelInstance) => {
-          this.emit('WINDOW_RESIZED', {
-            windowId: this.getId(),
-          });
+          this.stateModified();
+          // this.emit('WINDOW_RESIZED', {
+          //   windowId: this.getId(),
+          // });
         },
       },
       dragit: {
@@ -326,24 +335,51 @@ export class ZirconWindow<
 
       callback: async (panel: IJSPanelInstance) => {
         this.__panel = panel;
+        this.__panel.setAttribute(
+          ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
+          this.getId(),
+        );
         await this.onPanelCreated(panel);
         this.emit('WINDOW_DISPLAYED', { windowId: this.getId() });
       },
       theme: 'primary',
     });
 
-    this.__panel.setAttribute(
-      ZirconObject.ZIRCON_OBJECT_ATTRIBUTE_ID,
-      this.getId(),
-    );
     return this.__panel;
   }
 
-  protected async onPanelCreated(_panel: IJSPanelInstance): Promise<void> {
-    return;
+  public async displayParameterWindow(): Promise<ZirconParamWindow> {
+    const paramWindowState: ZirconParamWindowState = {
+      type: ZIRCON_PARAMETER_WINDOW_TYPE,
+      id: `${this.getId()}-parameters`,
+      name: `${this.getName()} param`,
+      title: `${this.getName()} Parameters`,
+      left: this.getLeft() + this.getWidth(),
+      top: this.getTop(),
+      width: this.getWidth(),
+      height: this.getHeight(),
+      sourceId: this.getId(),
+    };
+    if (!this.__paramWindow) {
+      this.__paramWindow = (await this.getApplication()
+        .getObjectManager()
+        .createInstance(paramWindowState)) as ZirconParamWindow;
+      ZirconHelper.addParamWindowToDesktop(
+        this.getApplication(),
+        this.__paramWindow,
+        this.getParentDesktop()?.getId(),
+      );
+    }
+    return this.__paramWindow;
   }
 
-  public getWindowContent(): HTMLDivElement {
+  protected async onPanelCreated(panel: IJSPanelInstance): Promise<void> {
+    panel?.headerlogo?.addEventListener('click', () => {
+      this.displayParameterWindow();
+    });
+  }
+
+  protected getWindowContent(): HTMLDivElement {
     if (this.__panel) {
       return this.__panel.content;
     }
@@ -352,7 +388,8 @@ export class ZirconWindow<
   }
 
   public isDisplayed(): boolean {
-    return this.__panel?.content !== null;
+    // eslint-disable-next-line eqeqeq
+    return this.__panel?.content != null;
   }
 
   public getLeft(): number {
@@ -391,11 +428,12 @@ export class ZirconWindow<
       });
     }
 
-    this.emit('WINDOW_POSITION_CHANGED', {
-      windowId: this.getId(),
-      x: this._left,
-      y: this._top,
-    });
+    // this.emit('WINDOW_POSITION_CHANGED', {
+    //   windowId: this.getId(),
+    //   x: this._left,
+    //   y: this._top,
+    // });
+    this.stateModified();
     return true;
   }
 
@@ -415,11 +453,13 @@ export class ZirconWindow<
     if (this.__panel) {
       this.__panel.resize({ width: width, height: height });
     }
-    this.emit('WINDOW_DIMENSION_CHANGED', {
-      windowId: this.getId(),
-      width: this._width,
-      height: this._height,
-    });
+    // this.emit('WINDOW_DIMENSION_CHANGED', {
+    //   windowId: this.getId(),
+    //   width: this._width,
+    //   height: this._height,
+    // });
+    this.stateModified();
+
     return true;
   }
 
@@ -438,17 +478,15 @@ export class ZirconWindow<
       return false;
     }
     this._title = title;
+    this.stateModified();
     if (this.__panel) {
       this.__panel.title = this._title;
     }
-    this.emit('WINDOW_TITLE_CHANGED', {
-      windowId: this.getId(),
-      title: this._title,
-    });
+    // this.emit('WINDOW_TITLE_CHANGED', {
+    //   windowId: this.getId(),
+    //   title: this._title,
+    // });
+    this.stateModified();
     return true;
-  }
-
-  public displayParameters(_container: HTMLElement) {
-    return;
   }
 }

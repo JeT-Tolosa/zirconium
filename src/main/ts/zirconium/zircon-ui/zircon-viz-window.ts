@@ -1,5 +1,6 @@
 import 'jspanel4/dist/jspanel.min.css';
 import 'jsoneditor/dist/jsoneditor.css';
+import './zircon-viz-window.css';
 import { ZirconApplication } from '../zircon-core/zircon-app';
 import {
   MergePickEvents,
@@ -8,20 +9,13 @@ import {
 } from '../zircon-event';
 import { ZirconViz, ZirconVizEvents } from './zircon-visualizer';
 import {
-  ZirconParamWindow,
-  ZirconParamWindowState,
-} from '../zircon-params/zircon-param-window';
-import {
   ZirconWindow,
   ZirconWindowEventRegistry,
   ZirconWindowState,
 } from './zircon-window';
 import { IJSPanelInstance } from 'jspanel4';
-import JSONEditor, { JSONEditorOptions } from 'jsoneditor';
-import {
-  ZIRCON_PARAMETER_WINDOW_TYPE,
-  ZIRCON_VISUALIZER_WINDOW_TYPE,
-} from '../zircon-core/zircon-types';
+// import JSONEditor, { JSONEditorOptions } from 'jsoneditor';
+import { ZIRCON_VISUALIZER_WINDOW_TYPE } from '../zircon-core/zircon-types';
 import { ZirconObject } from '../zircon-core/zircon-object';
 // ionic elements
 import { defineCustomElements } from '@ionic/core/loader';
@@ -83,7 +77,7 @@ export class ZirconVizWindow<
   private __visualizerDocks: { [vizId: string]: VizDock } = {};
   private _vizIds: string[] = [];
   private _activeVizId: string = null;
-  private __tabContainer: HTMLDivElement = null;
+  private __mainContainer: HTMLDivElement = null;
   private __viewContainer: HTMLDivElement = null;
   private __segment: HTMLIonSegmentElement = null; // tabs container
 
@@ -135,6 +129,7 @@ export class ZirconVizWindow<
     }
     this._activeVizId = vizId;
     this.displayActiveViz();
+    this.stateModified();
   }
 
   private async setVisualizerIds(vizIds: string[]): Promise<boolean> {
@@ -163,7 +158,8 @@ export class ZirconVizWindow<
     // }
     this._vizIds = vizIds.slice();
     // TODO: we may reconstruct only modified docks...
-    this.reconstructUI();
+    this.stateModified();
+    await this.reconstructUI();
     return true;
   }
 
@@ -183,28 +179,14 @@ export class ZirconVizWindow<
     };
   }
 
-  public displayParameterWindow(): boolean {
-    const paramWindowState: ZirconParamWindowState = {
-      type: ZIRCON_PARAMETER_WINDOW_TYPE,
-      name: `${this.getName()}-param`,
-      title: `${this.getName()} Parameters`,
-      left: this.getLeft() + 20,
-      top: this.getTop() + 20,
-      width: this.getWidth(),
-      height: this.getHeight(),
-    };
-    const paramWindow = new ZirconParamWindow(
-      this.getApplication(),
-      paramWindowState,
-    );
-    paramWindow.setWindow(this);
-    this.getParentDesktop().displayParamWindow(paramWindow);
-    return false;
+  public override getEditedIds(): string[] {
+    return this.getVisualizerIds();
   }
 
   protected override async onPanelCreated(
     panel: IJSPanelInstance,
   ): Promise<void> {
+    super.onPanelCreated(panel);
     if (!panel) {
       throw new Error(
         `panel should not be null in Visualizer window Creation ID: ${this.getId()}`,
@@ -212,9 +194,8 @@ export class ZirconVizWindow<
     }
     panel.classList.add(ZIRCON_VISUALIZER_WINDOW_CLASS);
 
-    panel?.headerlogo?.addEventListener('click', () => {
-      this.displayParameterWindow();
-    });
+    this.getWindowContent().appendChild(this.getMainContainer());
+    this.reconstructUI();
   }
 
   public addVisualizer(vizId: string) {
@@ -324,9 +305,9 @@ export class ZirconVizWindow<
   //   delete this.__visualizerDocks[vizId];
   // }
 
-  public override getWindowContent(): HTMLDivElement {
-    return this.getViewContainer();
-  }
+  // public override getWindowContent(): HTMLDivElement {
+  //   return this.getViewContainer();
+  // }
 
   private generateViewElement(viz: ZirconViz): HTMLDivElement {
     if (!viz) {
@@ -401,23 +382,27 @@ export class ZirconVizWindow<
     return this.__viewContainer;
   }
 
-  private getTabContainer(): HTMLElement {
-    if (this.__tabContainer) {
-      return this.__tabContainer;
+  private getMainContainer(): HTMLElement {
+    if (this.__mainContainer) {
+      return this.__mainContainer;
     }
-    this.__tabContainer = document.createElement('div');
-    this.__tabContainer.classList.add('zircon-window-tabs');
+    this.__mainContainer = document.createElement('div');
+    this.__mainContainer.classList.add('zircon-window-tabs');
     // this.__tabContainer.style.display = 'flex';
     // this.__tabContainer.style.flexDirection = 'column';
     // this.__tabContainer.style.height = '100%';
-    this.__tabContainer.appendChild(this.getHeaderContainer());
-    this.__tabContainer.appendChild(this.getViewContainer());
-    return this.__tabContainer;
+    this.__mainContainer.appendChild(this.getHeaderContainer());
+    this.__mainContainer.appendChild(this.getViewContainer());
+    return this.__mainContainer;
   }
 
   private async reconstructUI(): Promise<void> {
+    if (!this.isDisplayed()) {
+      return;
+    }
+
     super.getWindowContent().innerHTML = '';
-    super.getWindowContent().appendChild(this.getTabContainer());
+    super.getWindowContent().appendChild(this.getMainContainer());
     this._vizIds.forEach((vizId) => {
       this.addVizualizerDock(vizId);
     });
@@ -449,37 +434,32 @@ export class ZirconVizWindow<
     //   });
   }
 
-  public override displayParameters(container: HTMLElement) {
-    if (!container) {
-      throw new Error(
-        `displaying parameters should not be called with an invalid container in window Id ${this.getId()}`,
-      );
-    }
-    super.displayParameters(container);
-    let h2: HTMLHeadingElement = document.createElement('h2');
-    h2.innerText = `Window ${this.getId()}`;
-    container.appendChild(h2);
+  // public override getParameterComponents(): ZirconParameterComponent[] {
+  //   super.getParameterComponent();
+  //   let h2: HTMLHeadingElement = document.createElement('h2');
+  //   h2.innerText = `Window ${this.getId()}`;
+  //   container.appendChild(h2);
 
-    const options: JSONEditorOptions = {
-      mode: 'form',
-      modes: ['tree', 'view', 'form', 'code', 'text', 'preview'],
-      onChange: () => {
-        this.setState(editor.get());
-      },
-    };
-    const editor = new JSONEditor(container, options);
-    editor.set(this.generateCurrentState());
+  //   const options: JSONEditorOptions = {
+  //     mode: 'form',
+  //     modes: ['tree', 'view', 'form', 'code', 'text', 'preview'],
+  //     onChange: () => {
+  //       this.setState(editor.get());
+  //     },
+  //   };
+  //   const editor = new JSONEditor(container, options);
+  //   editor.set(this.generateCurrentState());
 
-    h2 = document.createElement('h2');
-    h2.innerText = `Display multiple visualizers...`;
-    // h2.innerText = this.__viz
-    //   ? `Visualizer ${this.__viz.getId()} [${this.__viz.getType()}]`
-    //   : `No Visualizer Id ${this._vizIds}`;
+  //   h2 = document.createElement('h2');
+  //   h2.innerText = `Display multiple visualizers...`;
+  //   // h2.innerText = this.__viz
+  //   //   ? `Visualizer ${this.__viz.getId()} [${this.__viz.getType()}]`
+  //   //   : `No Visualizer Id ${this._vizIds}`;
 
-    // container.appendChild(h2);
-    // if (this.__viz) {
-    //   const editor = new JSONEditor(container, options);
-    //   editor.set(this.__viz.generateCurrentState());
-    // }
-  }
+  //   // container.appendChild(h2);
+  //   // if (this.__viz) {
+  //   //   const editor = new JSONEditor(container, options);
+  //   //   editor.set(this.__viz.generateCurrentState());
+  //   // }
+  // }
 }
