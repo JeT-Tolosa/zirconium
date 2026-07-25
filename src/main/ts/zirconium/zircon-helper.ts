@@ -3,10 +3,8 @@ import {
   ZIRCON_DESKTOP_TYPE,
   ZIRCON_WINDOW_TYPE,
 } from './zircon-core/zircon-types';
-import {
-  ZirconParamWindow,
-  ZirconParamWindowState,
-} from './zircon-params/zircon-param-window';
+import { ZirconParamWindowState } from './zircon-params/zircon-param-window';
+
 import { ZirconDesktop } from './zircon-ui/zircon-desktop';
 import { ZirconWindow } from './zircon-ui/zircon-window';
 
@@ -54,8 +52,8 @@ export class ZirconHelper {
     }
     const targetDesktopState = targetDesktop.generateCurrentState();
     targetDesktopState.windowIds.push(windowId);
-    application.emit('SET_OBJECT_STATE_REQUEST', {
-      objectId: targetDesktopId,
+    application.emit('ZIRCON_OBJECT_SET_STATE_REQUEST', {
+      id: targetDesktopId,
       state: targetDesktopState,
     });
     if (sourceDesktop) {
@@ -64,47 +62,42 @@ export class ZirconHelper {
       sourceDesktopState.windowIds = sourceDesktopState.windowIds.filter(
         (id) => id !== windowId,
       );
-      application.emit('SET_OBJECT_STATE_REQUEST', {
-        objectId: sourceDesktop.getId(),
+      application.emit('ZIRCON_OBJECT_SET_STATE_REQUEST', {
+        id: sourceDesktop.getId(),
         state: sourceDesktopState,
       });
     }
   }
 
-  public static addParamWindowToDesktop(
+  private static async sleep(ms: number) {
+    new Promise((r) => setTimeout(r, ms));
+  }
+
+  public static async addParamWindowToDesktop(
     application: ZirconApplication,
-    paramWindow: ZirconParamWindow,
+    paramWindowState: ZirconParamWindowState,
     desktopId: string,
-  ): void {
+  ) {
     if (!application) {
       throw new Error('Application instance is required.');
     }
-    if (!paramWindow || !paramWindow.getId()) {
-      throw new Error('Param Window state with a valid ID is required.');
+    if (!paramWindowState) {
+      throw new Error('Param Window state is required.');
+    }
+    if (!paramWindowState.id) {
+      throw new Error('Param Window state ID is required.');
     }
     if (!desktopId) {
       throw new Error('Desktop ID is required.');
     }
-    // retrieve desktop instance
-    const desktop = application
-      .getObjectManager()
-      .getExistingInstance(desktopId, ZIRCON_DESKTOP_TYPE) as ZirconDesktop;
-    if (!desktop) {
-      throw new Error(`Cannot find desktop with id ${desktopId}`);
-    }
-    const windowState: ZirconParamWindowState =
-      paramWindow.generateCurrentState();
-    const desktopState = desktop.generateCurrentState();
-    // register the window state
-    application.emit('SET_OBJECT_STATE_REQUEST', {
-      objectId: windowState.id,
-      state: windowState,
+    // register
+    application.emit('STORE_STATE_SNAPSHOT_REQUEST', {
+      state: paramWindowState,
     });
-    // update the desktop state to include the new window ID
-    desktopState.windowIds.push(windowState.id);
-    application.emit('SET_OBJECT_STATE_REQUEST', {
-      objectId: desktop.getId(),
-      state: desktopState,
+    await this.sleep(1000);
+    application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
+      desktopId: desktopId,
+      windowId: paramWindowState.id,
     });
   }
 }

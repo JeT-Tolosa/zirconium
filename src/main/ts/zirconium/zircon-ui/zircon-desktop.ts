@@ -9,7 +9,7 @@ import {
   ZirconAppObjectEventRegistry,
 } from '../zircon-core/zircon-app-object';
 import { MergeZirconRegistries, PickEvents } from '../zircon-event';
-import { ZirconObject } from '../zircon-core/zircon-object';
+import { ZirconObject, ZirconObjectState } from '../zircon-core/zircon-object';
 import { ArrayComparisonResult, Zircon } from '../zircon';
 import {
   ACTIVE_DESKTOP_CLASS,
@@ -33,6 +33,16 @@ export type ZirconDesktopEvents = {
     error: string;
   };
   DESKTOP_WINDOW_IDS_CHANGED: { desktopId: string; windowIds: string[] };
+  DESKTOP_ADD_WINDOW_REQUEST: {
+    desktopId: string;
+    windowId: string;
+  };
+  DESKTOP_WINDOW_ADDED: { desktopId: string };
+  DESKTOP_REMOVE_WINDOW_REQUEST: {
+    desktopId: string;
+    windowId: string;
+  };
+  DESKTOP_WINDOW_REMOVED: { desktopId: string };
 };
 
 export type ZirconDesktopEventRegistry = MergeZirconRegistries<
@@ -42,6 +52,8 @@ export type ZirconDesktopEventRegistry = MergeZirconRegistries<
       | 'DESKTOP_ACTIVATE_REQUEST'
       | 'DESKTOP_DEACTIVATE_REQUEST'
       | 'DESKTOP_DEACTIVATE_REQUEST'
+      | 'DESKTOP_ADD_WINDOW_REQUEST'
+      | 'DESKTOP_REMOVE_WINDOW_REQUEST'
     >;
     outgoing: PickEvents<
       ZirconDesktopEvents,
@@ -51,6 +63,8 @@ export type ZirconDesktopEventRegistry = MergeZirconRegistries<
       | 'DESKTOP_DEACTIVATE_ERROR'
       | 'DESKTOP_WINDOW_IDS_CHANGED'
       | 'DESKTOP_WINDOW_IDS_ERROR'
+      | 'DESKTOP_WINDOW_ADDED'
+      | 'DESKTOP_WINDOW_REMOVED'
     >;
   },
   ZirconAppObjectEventRegistry
@@ -82,8 +96,8 @@ export class ZirconDesktop<
    * constructor
    * @param param
    */
-  constructor(app: ZirconApplication, state?: ZirconDesktopState) {
-    super(app, state);
+  constructor(app: ZirconApplication) {
+    super(app);
   }
 
   public override getType(): string {
@@ -98,6 +112,32 @@ export class ZirconDesktop<
     this.addListener('DESKTOP_DEACTIVATE_REQUEST', (arg) =>
       this.onDESKTOP_DEACTIVATE_REQUEST(arg.desktopId),
     );
+    this.addListener('DESKTOP_ADD_WINDOW_REQUEST', (arg) =>
+      this.onDESKTOP_ADD_WINDOW_REQUEST(arg.desktopId, arg.windowId),
+    );
+    this.addListener('DESKTOP_REMOVE_WINDOW_REQUEST', (arg) =>
+      this.onDESKTOP_REMOVE_WINDOW_REQUEST(arg.desktopId, arg.windowId),
+    );
+  }
+
+  private onDESKTOP_ADD_WINDOW_REQUEST(
+    desktopId: string,
+    windowId: string,
+  ): void {
+    if (desktopId !== this.getId()) {
+      return;
+    }
+    this.displayWindow(windowId);
+  }
+
+  private onDESKTOP_REMOVE_WINDOW_REQUEST(
+    desktopId: string,
+    windowId: string,
+  ): void {
+    if (desktopId !== this.getId()) {
+      return;
+    }
+    this.undisplayWindow(windowId);
   }
 
   private onDESKTOP_ACTIVATE_REQUEST(desktopId: string): void {
@@ -155,7 +195,7 @@ export class ZirconDesktop<
     }
   }
 
-  protected override async setState(state: ZirconDesktopState): Promise<void> {
+  public override async setState(state: ZirconDesktopState): Promise<void> {
     if (!state) {
       return;
     }
@@ -261,6 +301,28 @@ export class ZirconDesktop<
   //   this.getContainer().appendChild(paramWindow.getPanel());
   //   paramWindow.setParentDesktop(this);
   // }
+  public async displayUnregisteredWindow(
+    windowState: ZirconObjectState,
+  ): Promise<void> {
+    if (!windowState) {
+      return Promise.resolve();
+    }
+    const window: ZirconObject = await this.getApplication()
+      .getObjectManager()
+      .createInstance(windowState);
+    if (!window) {
+      throw new Error(`Cannot create Window with id ${windowState.id}.`);
+    }
+    if (!(window instanceof ZirconWindow)) {
+      throw new Error(
+        `Cannot display Window with id ${windowState.id} object is not a Window: type ${window.getType()}`,
+      );
+    }
+    // add Window in desktop
+    const panel: HTMLElement = window.getPanel();
+    this.getContainer().appendChild(panel);
+    window.setParentDesktop(this);
+  }
 
   private async displayWindow(windowId: string): Promise<void> {
     if (!windowId) {
@@ -302,9 +364,9 @@ export class ZirconDesktop<
     return true;
   }
 
-  private displayWindows(): Promise<void> {
-    return Promise.all(
-      this._windowIds.map((id) => this.displayWindow(id)),
-    ).then(null);
-  }
+  // private displayWindows(): Promise<void> {
+  //   return Promise.all(
+  //     this._windowIds.map((id) => this.displayWindow(id)),
+  //   ).then(null);
+  // }
 }

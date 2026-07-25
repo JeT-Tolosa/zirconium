@@ -79,8 +79,8 @@ export class VizCesiumWithDataProviders<
   /**
    * constructor
    */
-  constructor(state?: VizCesiumWithDataProvidersState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   protected override listenToEvents(): void {

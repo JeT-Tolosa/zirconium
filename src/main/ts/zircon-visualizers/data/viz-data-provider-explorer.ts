@@ -91,8 +91,8 @@ export class VizDataProviderExplorer<
 
   private _currentSelectedDataProviderId: string = null;
 
-  constructor(app: ZirconApplication, state?: VizDataProviderExplorerState) {
-    super(state);
+  constructor(app: ZirconApplication) {
+    super();
     this.__app = app;
   }
 
@@ -359,7 +359,7 @@ export class VizDataProviderExplorer<
 //   private _currentSelectedDataProviderId: string = null;
 
 //   constructor(app: ZirconApplication, state?: VizDataProviderExplorerState) {
-//     super(state);
+//     super();
 //     this.__app = app;
 //   }
 //   protected override listenToEvents(): void {

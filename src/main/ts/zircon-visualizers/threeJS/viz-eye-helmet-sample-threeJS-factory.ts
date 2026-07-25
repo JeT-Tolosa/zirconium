@@ -8,7 +8,9 @@ import {
 async function createObject(
   state: VizHelmetSampleThreeJSState,
 ): Promise<VizHelmetSampleThreeJS> {
-  return new VizHelmetSampleThreeJS(state);
+  const instance = new VizHelmetSampleThreeJS();
+  await instance.setState(state);
+  return instance;
 }
 export class VizHelmetSampleThreeJSFactory extends SimpleZirconObjectFactory {
   constructor() {

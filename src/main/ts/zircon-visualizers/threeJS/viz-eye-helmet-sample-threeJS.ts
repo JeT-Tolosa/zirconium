@@ -28,8 +28,8 @@ export class VizHelmetSampleThreeJS extends VizThreeJS {
   /**
    * constructor
    */
-  constructor(state?: VizHelmetSampleThreeJSState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   public override getType(): string {

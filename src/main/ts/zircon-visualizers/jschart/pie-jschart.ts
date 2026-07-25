@@ -22,8 +22,8 @@ export class VizPieJSChart extends VizJSChart<'pie'> {
   public static readonly PIE_JSCHART_VISUALIZER_TYPE =
     'jschar-pie-visualizer-type';
 
-  constructor(state?: VizPieJSChartState) {
-    super(state);
+  constructor() {
+    super();
     Chart.register(PieController, CategoryScale, LinearScale, Tooltip, Legend);
   }
 

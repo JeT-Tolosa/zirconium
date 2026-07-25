@@ -3,8 +3,11 @@ import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-ob
 import { VizBarJSChart, VizBarJSChartState } from './bar-jschart';
 
 async function createObject(state: VizBarJSChartState): Promise<VizBarJSChart> {
-  return new VizBarJSChart(state);
+  const instance = new VizBarJSChart();
+  await instance.setState(state);
+  return instance;
 }
+
 export class VizBarJSChartFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

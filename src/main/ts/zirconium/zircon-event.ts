@@ -1,11 +1,27 @@
 // event argument
-export type ZirconEventArgument = { [key: string]: unknown };
+export type ZirconEventPayload = { [key: string]: unknown };
 
 // registry for Zircon events
 export type ZirconRegistry = {
-  incoming: Record<string, ZirconEventArgument>;
-  outgoing: Record<string, ZirconEventArgument>;
+  incoming: Record<string, ZirconEventPayload>;
+  outgoing: Record<string, ZirconEventPayload>;
 };
+
+// type Events<
+//   TEvents extends Record<string, PropertyKey>,
+//   TPayloads extends { [K in TEvents[keyof TEvents]]: unknown },
+//   TKeys extends keyof TEvents,
+// > = {
+//   [K in TKeys as TEvents[K]]: TPayloads[TEvents[K]];
+// };
+
+// export type EventsSubset<
+//   TEvents extends Record<string, PropertyKey>,
+//   TPayloads extends {
+//     [K in TEvents[keyof TEvents]]: unknown;
+//   },
+//   TKeys extends keyof TEvents,
+// > = Events<TEvents, TPayloads, TKeys>;
 
 // merge two registries
 export type MergeZirconRegistries<
@@ -18,7 +34,7 @@ export const EmptyRegistry: ZirconRegistry = {
   outgoing: {},
 };
 
-export type PickEvents<E, K extends keyof E> = Pick<E,K>;
+export type PickEvents<E, K extends keyof E> = Pick<E, K>;
 // {
 //   [P in K]: E[P];
 // };

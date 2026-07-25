@@ -22,8 +22,8 @@ export class VizCubeSampleThreeJS extends VizThreeJS {
   /**
    * constructor
    */
-  constructor(state?: VizCubeSampleThreeJSState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   public override getType(): string {

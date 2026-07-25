@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
+import { ZirconObject, ZirconObjectState } from './zircon-object';
 
 export const ZIRCON_FACTORY_LEVEL_NONE = 0;
 export const ZIRCON_FACTORY_LEVEL_TYPE = 10;
@@ -48,13 +49,13 @@ export abstract class ZirconObjectFactory {
 export class SimpleZirconObjectFactory extends ZirconObjectFactory {
   private _objectType: string = null;
   private _ancestorType: string = null;
-  private _create: (state: any) => Promise<any>;
+  private _create: (state: any) => Promise<ZirconObject>;
   private _contextMenuFactory: ZirconContextMenuFactory = null;
 
   constructor(
     objectType: string,
     ancestorType: string,
-    create: (state: any) => Promise<any>,
+    create: (state: any) => Promise<ZirconObject>,
     contextMenuFactory: ZirconContextMenuFactory,
   ) {
     super(`${objectType}-factory`);
@@ -76,7 +77,9 @@ export class SimpleZirconObjectFactory extends ZirconObjectFactory {
     return this._contextMenuFactory;
   }
 
-  public override createObject(state: any): Promise<any> {
+  public override async createObject(
+    state: ZirconObjectState,
+  ): Promise<ZirconObject> {
     return this._create(state);
   }
 }

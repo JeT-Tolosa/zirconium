@@ -6,7 +6,9 @@ import { VizLoaderState } from '../data-loader/viz-loader';
 async function createObject(
   state: VizLoaderState,
 ): Promise<VizGroundStationLoader> {
-  return new VizGroundStationLoader(state);
+  const instance = new VizGroundStationLoader();
+  await instance.setState(state);
+  return instance;
 }
 
 export class VizGroundStationLoaderFactory extends SimpleZirconObjectFactory {

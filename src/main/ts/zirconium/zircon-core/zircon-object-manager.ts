@@ -12,7 +12,7 @@ import {
 import {
   ZIRCON_OBJECT_MANAGER_TYPE,
   ZIRCON_OBJECT_TYPE,
-  ZIRCON_OBJECT_HIERARCHY,
+  ZIRCON_OBJECTS_HIERARCHY,
   ZirconType,
 } from './zircon-types';
 import { ZirconContextMenuFactory } from '../zircon-menu/zircon-context-menu-factory';
@@ -23,21 +23,33 @@ import {
 } from '../zircon-event';
 
 export type ZirconObjectManagerEvents = {
-  ZIRCON_OBJECT_STATE_REQUEST: { id: string };
-  OBJECT_STATE_REGISTERED: { state: ZirconObjectState };
-  ZIRCON_OBJECT_STATE: { state: ZirconObjectState };
+  // ZIRCON_OBJECT_STATE_REQUEST: { id: string };
+  // OBJECT_STATE_REGISTERED: { state: ZirconObjectState };
+  // ZIRCON_OBJECT_STATE: { state: ZirconObjectState };
+  GET_STATE_SNAPSHOT_REQUEST: { id: string };
+  GET_STATE_SNAPSHOT_ERROR: { id: string; error: string };
+  STORE_STATE_SNAPSHOT_REQUEST: { state: ZirconObjectState };
+  STATE_SNAPSHOT_REGISTERED: { state: ZirconObjectState };
+  STATE_SNAPSHOT_UNREGISTERED: { id: string };
+  STATE_SNAPSHOT_MODIFIED: { state: ZirconObjectState };
+  STATE_SNAPSHOT: { state: ZirconObjectState };
 };
 
 export type ZirconObjectManagerEventRegistry = MergeZirconRegistries<
   {
     incoming: MergePickEvents<
-      [PickEvents<ZirconObjectManagerEvents, 'ZIRCON_OBJECT_STATE_REQUEST'>]
+      [
+        PickEvents<
+          ZirconObjectManagerEvents,
+          'GET_STATE_SNAPSHOT_REQUEST' | 'STORE_STATE_SNAPSHOT_REQUEST'
+        >,
+      ]
     >;
     outgoing: MergePickEvents<
       [
         PickEvents<
           ZirconObjectManagerEvents,
-          'ZIRCON_OBJECT_STATE' | 'OBJECT_STATE_REGISTERED'
+          'STATE_SNAPSHOT_REGISTERED' | 'STATE_SNAPSHOT'
         >,
       ]
     >;
@@ -56,19 +68,22 @@ export class ZirconObjectManager<
   constructor(app: ZirconApplication) {
     super(app);
     // initialize object hierarchy with default ZIRCON values
-    Object.keys(ZIRCON_OBJECT_HIERARCHY).forEach((key) => {
-      this.__objectHierarchy[key] = ZIRCON_OBJECT_HIERARCHY[key]
+    Object.keys(ZIRCON_OBJECTS_HIERARCHY).forEach((key) => {
+      this.__objectHierarchy[key] = ZIRCON_OBJECTS_HIERARCHY[key]
         .parent as string;
     });
   }
 
   protected override listenToEvents(): void {
-    this.addListener('ZIRCON_OBJECT_STATE_REQUEST', (arg) => {
+    this.addListener('GET_STATE_SNAPSHOT_REQUEST', (arg) => {
       if (arg.id) {
-        this.emit('ZIRCON_OBJECT_STATE', {
+        this.emit('STATE_SNAPSHOT', {
           state: this.__registeredStates[arg.id],
         });
       }
+    });
+    this.addListener('STORE_STATE_SNAPSHOT_REQUEST', (arg) => {
+      this.registerObjectState(arg.state);
     });
   }
 
@@ -284,7 +299,7 @@ export class ZirconObjectManager<
     }
     // add or update state
     this.__registeredStates[state.id] = state;
-    this.emit('OBJECT_STATE_REGISTERED', { state: state });
+    this.emit('STATE_SNAPSHOT_REGISTERED', { state: state });
     return true;
   }
 

@@ -122,17 +122,16 @@ export class ZirconDataProvider<
 
   constructor(
     outDataType: string,
-    state: ZirconDataProviderState,
     compareElements: (a: T, b: T) => number = compareDefaultData,
   ) {
-    super(state);
+    super();
     this._outputDataType = outDataType;
     if (compareElements) {
       this.__compareElements = compareElements;
     }
   }
 
-  protected override async setState(
+  public override async setState(
     state: ZirconDataProviderState,
   ): Promise<void> {
     await super.setState(state);
@@ -344,7 +343,7 @@ export class ZirconDataProviderConstant<
     data: T,
     compareElements: (a: T, b: T) => number = compareDefaultData,
   ) {
-    super(outDataType, state, compareElements);
+    super(outDataType, compareElements);
     this.setData(data);
   }
 }

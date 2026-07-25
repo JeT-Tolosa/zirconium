@@ -9,8 +9,11 @@ import {
 async function createObject(
   state: VizGroundStationCatalogTabulatorState,
 ): Promise<VizGroundStationCatalogTabulator> {
-  return new VizGroundStationCatalogTabulator(state);
+  const instance = new VizGroundStationCatalogTabulator();
+  await instance.setState(state);
+  return instance;
 }
+
 export class VizGroundStationCatalogTabulatorFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

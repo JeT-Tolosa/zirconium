@@ -8,8 +8,11 @@ import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-ob
 async function createObject(
   state: VizMessageLoggerState,
 ): Promise<VizMessageLogger> {
-  return new VizMessageLogger(state);
+  const instance = new VizMessageLogger();
+  await instance.setState(state);
+  return instance;
 }
+
 export class VizMessageLoggerFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

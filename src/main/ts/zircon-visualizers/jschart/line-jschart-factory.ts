@@ -5,7 +5,9 @@ import { VizLineJSChart, VizLineJSChartState } from './line-jschart';
 async function createObject(
   state: VizLineJSChartState,
 ): Promise<VizLineJSChart> {
-  return new VizLineJSChart(state);
+  const instance = new VizLineJSChart();
+  await instance.setState(state);
+  return instance;
 }
 
 export class VizLineJSChartFactory extends SimpleZirconObjectFactory {

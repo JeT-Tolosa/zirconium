@@ -19,15 +19,15 @@ export class DigitalClock extends AbstractClock {
   /**
    * Constructor
    */
-  constructor(state?: DigitalClockState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   public override getType(): string {
     return DigitalClock.DIGITAL_CLOCK_VISUALIZER_TYPE;
   }
 
-  protected override async setState(state: DigitalClockState): Promise<void> {
+  public override async setState(state: DigitalClockState): Promise<void> {
     if (!state) {
       return Promise.resolve();
     }

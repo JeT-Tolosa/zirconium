@@ -34,6 +34,8 @@ export class ZirconDesktopManagerFactory extends ZirconAppObjectFactory {
   }
 
   public override async createObject(state: any): Promise<any> {
-    return new ZirconDesktopManager(this.getApplication(), state);
+    const instance = new ZirconDesktopManager(this.getApplication());
+    await instance.setState(state);
+    return instance;
   }
 }

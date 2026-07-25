@@ -46,8 +46,8 @@ export abstract class AbstractClock<
   /**
    * Constructor
    */
-  constructor(state?: ClockState) {
-    super(state);
+  constructor() {
+    super();
     this._timeRunner = null;
     this._timeDescriptor = TimingHelper.createRealTimeDescriptor();
   }
@@ -59,7 +59,7 @@ export abstract class AbstractClock<
     });
   }
 
-  protected override async setState(state: ClockState): Promise<void> {
+  public override async setState(state: ClockState): Promise<void> {
     if (!state) {
       return Promise.resolve();
     }

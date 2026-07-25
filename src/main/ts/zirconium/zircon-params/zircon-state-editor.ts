@@ -32,11 +32,11 @@ export abstract class ZirconStateEditor<
   private __state: ZirconObjectState = null;
 
   constructor(obj: ZirconObject) {
-    super(null);
+    super();
     if (!obj) {
       throw new Error(`Unable to create an editor for a Null object`);
     }
-    this.setEditedObject(obj);
+    this.setSourceObject(obj);
   }
 
   public override listenToEvents(): void {
@@ -49,19 +49,19 @@ export abstract class ZirconStateEditor<
     return ZIRCON_STATE_EDITOR_COMPONENT;
   }
 
-  public getEditedObjId(): string {
+  public getSourceObjId(): string {
     return this._objId;
   }
 
-  public getEditedObjName(): string {
+  public getSourceObjName(): string {
     return this._objName;
   }
 
-  public getEditedObjType(): string {
+  public getSourceObjType(): string {
     return this._objType;
   }
 
-  private setEditedObject(obj: ZirconObject) {
+  private setSourceObject(obj: ZirconObject) {
     if (!obj) {
       this._objId = null;
       this._objName = null;
@@ -71,18 +71,21 @@ export abstract class ZirconStateEditor<
       this._objId = obj.getId();
       this._objName = obj.getName() || obj.getType();
       this._objType = obj.getType();
-      this.setEditedObjState(obj.generateCurrentState());
+      this.setSourceObjState(obj.generateCurrentState());
     }
   }
+
+  public abstract getEditorName(): string;
+  public abstract getEditedState(): unknown;
 
   private onStateChanged(objId: string, state: ZirconObjectState) {
     if (objId !== this._objId) {
       return;
     }
-    this.setEditedObjState(state);
+    this.setSourceObjState(state);
   }
 
-  public setEditedObjState(state: ZirconObjectState) {
+  public setSourceObjState(state: ZirconObjectState) {
     if (state.id !== this._objId) {
       throw new Error(
         `Invalid edited object state! edited Id: ${this._objId} state Id: ${state.id}`,
@@ -92,33 +95,10 @@ export abstract class ZirconStateEditor<
     this.updateUI();
   }
 
-  protected getEditedObjState(): ZirconObjectState {
+  protected getSourceObjState(): ZirconObjectState {
     return this.__state;
   }
 
   public abstract getContainer(): HTMLElement;
   public abstract updateUI(): void;
-}
-
-export class ZirconStateEditorPre extends ZirconStateEditor {
-  private _pre: HTMLPreElement = null;
-
-  constructor(obj: ZirconObject) {
-    super(obj);
-  }
-
-  public override getContainer(): HTMLElement {
-    if (this._pre) {
-      return this._pre;
-    }
-    this._pre = document.createElement('pre');
-    this.updateUI();
-    return this._pre;
-  }
-
-  public override updateUI(): void {
-    if (this._pre) {
-      this._pre.innerText = JSON.stringify(this.getEditedObjState(), null, 2);
-    }
-  }
 }

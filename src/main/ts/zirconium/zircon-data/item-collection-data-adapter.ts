@@ -56,19 +56,16 @@ export class ItemCollectionDataAdapter<
   constructor(
     inputItemCollectionDataType: string,
     outputDataType: string,
-    state: ItemCollectionDataAdapterState,
     transformData: (data: Tin) => Tout,
     compareData: (a: Tout, b: Tout) => number,
   ) {
     super(
       inputItemCollectionDataType,
       outputDataType,
-      state,
       transformData,
       compareData,
     );
     this._inputItemCollectionDataType = inputItemCollectionDataType;
-    this.setState(state);
   }
 
   protected override listenToEvents(): void {

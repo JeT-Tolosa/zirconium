@@ -7,7 +7,6 @@ import {
 import { ZirconContextMenuFactoryVizWindow } from '../zircon-menu/zircon-viz-window-context-menu';
 import { ZirconVizWindow, ZirconVizWindowState } from './zircon-viz-window';
 
-
 export class ZirconVizWindowFactory extends SimpleZirconAppObjectFactory {
   constructor(app: ZirconApplication) {
     super(
@@ -18,7 +17,9 @@ export class ZirconVizWindowFactory extends SimpleZirconAppObjectFactory {
         app: ZirconApplication,
         state: ZirconVizWindowState,
       ): Promise<ZirconVizWindow> => {
-        return new ZirconVizWindow(app, state);
+        const instance = new ZirconVizWindow(app);
+        await instance.setState(state);
+        return instance;
       },
       new ZirconContextMenuFactoryVizWindow(app),
     );

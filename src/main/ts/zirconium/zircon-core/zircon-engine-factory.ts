@@ -8,7 +8,9 @@ export class ZirconEngineFactory extends SimpleZirconObjectFactory {
       ZIRCON_ENGINE_TYPE,
       ZIRCON_APP_OBJECT_TYPE,
       async (state: ZirconEngineState): Promise<ZirconEngine> => {
-        return new ZirconEngine(state);
+        const instance = new ZirconEngine();
+        await instance.setState(state);
+        return instance;
       },
       null,
     );

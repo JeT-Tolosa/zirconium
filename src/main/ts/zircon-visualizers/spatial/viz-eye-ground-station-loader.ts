@@ -2,11 +2,7 @@ import usRadioGuyGroundJson from '../../../../../assets/data/spatial/usradioguy/
 import usRadioGuyXFilesJson from '../../../../../assets/data/spatial/usradioguy/xfiles.json';
 import usRadioGuyNOAAJson from '../../../../../assets/data/spatial/usradioguy/NASANOAA.json';
 import { USRadioGuyGroundStationLocalLoaderJson } from '../../libraries/spatial/ground-station/ground-station-loader-usradioguy';
-import {
-  LoaderDescriptor,
-  VizLoader,
-  VizLoaderState,
-} from '../data-loader/viz-loader';
+import { LoaderDescriptor, VizLoader } from '../data-loader/viz-loader';
 import {
   GROUND_STATION_TYPE,
   GroundStation,
@@ -37,8 +33,8 @@ export class VizGroundStationLoader extends VizLoader<GroundStation> {
   public static readonly VIZ_GROUND_STATION_LOADER_TYPE =
     'ground-station-loader-type';
 
-  constructor(state?: VizLoaderState) {
-    super(GROUND_STATION_TYPE, loaderDescriptors, state);
+  constructor() {
+    super(GROUND_STATION_TYPE, loaderDescriptors);
   }
 
   public override getType(): string {

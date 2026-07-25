@@ -7,13 +7,15 @@ import {
 } from '../zircon-event';
 import { ZirconApplicationEvents } from './zircon-app';
 import { ZIRCON_OBJECT_TYPE } from './zircon-types';
-import { ZirconObjectManagerEvents } from './zircon-object-manager';
+import { ZirconNameGenerator } from './zircon-name-generator';
 
 type PickEvents<E, K extends keyof E> = {
   [P in K]: E[P];
 };
 
 export type ZirconObjectEvents = {
+  ZIRCON_OBJECT_SET_STATE_REQUEST: { id: string; state: ZirconObjectState };
+  ZIRCON_OBJECT_GET_STATE_REQUEST: { id: string };
   ZIRCON_OBJECT_STATE_CHANGED: {
     id: string;
     state?: ZirconObjectState;
@@ -24,12 +26,20 @@ export type ZirconObjectEvents = {
     timestamp: number;
   };
   ZIRCON_OBJECT_ID_CHANGED: { oldId: string; newId: string };
-  ZIRCON_OBJECT_NAME_CHANGED: { id: string; name: string };
+  ZIRCON_OBJECT_STATE: { state: ZirconObjectState };
+  // ZIRCON_OBJECT_NAME_CHANGED: { id: string; name: string };
 };
 
 export type ZirconObjectEventRegistry = MergeZirconRegistries<
   {
-    incoming: PickEvents<ZirconObjectManagerEvents, 'OBJECT_STATE_REGISTERED'>;
+    incoming: MergePickEvents<
+      [
+        PickEvents<
+          ZirconObjectEvents,
+          'ZIRCON_OBJECT_SET_STATE_REQUEST' | 'ZIRCON_OBJECT_GET_STATE_REQUEST'
+        >,
+      ]
+    >;
 
     outgoing: MergePickEvents<
       [
@@ -37,8 +47,8 @@ export type ZirconObjectEventRegistry = MergeZirconRegistries<
           ZirconObjectEvents,
           | 'ZIRCON_OBJECT_CREATED'
           | 'ZIRCON_OBJECT_ID_CHANGED'
-          | 'ZIRCON_OBJECT_NAME_CHANGED'
           | 'ZIRCON_OBJECT_STATE_CHANGED'
+          | 'ZIRCON_OBJECT_STATE'
         >,
         PickEvents<ZirconApplicationEvents, 'UNCAUGHT_EXCEPTION'>,
       ]
@@ -68,6 +78,7 @@ export abstract class ZirconObject<
 > {
   private _id: string = null;
   private _name: string = null;
+  private _factoryId: string = null;
   private __eventEmitter: EventEmitter2 = null;
   private __stateModified: boolean = false;
   private __stateModificationNotification: boolean = true; // fires an event when state is modified
@@ -77,10 +88,9 @@ export abstract class ZirconObject<
   /**
    * constructor
    */
-  constructor(state?: ZirconObjectState) {
+  constructor() {
     this.__eventEmitter = new EventEmitter2();
     this._id = uuid();
-    this.setState(state);
   }
 
   /**
@@ -98,6 +108,9 @@ export abstract class ZirconObject<
 
   protected stateModified() {
     this.__stateModified = true;
+    if (this.__stateModificationNotification) {
+      this.notifyStateModifcation();
+    }
   }
 
   public setStateMoficitationNotification(b: boolean) {
@@ -125,13 +138,27 @@ export abstract class ZirconObject<
   }
 
   protected listenToEvents(): void {
-    this.addListener('OBJECT_STATE_REGISTERED', (arg) => {
-      this.onOBJECT_STATE_REGISTERED(arg.state);
+    this.addListener('ZIRCON_OBJECT_SET_STATE_REQUEST', (arg) =>
+      this.onZIRCON_OBJECT_SET_STATE_REQUEST(arg.id, arg.state),
+    );
+    this.addListener('ZIRCON_OBJECT_GET_STATE_REQUEST', (arg) => {
+      this.onZIRCON_OBJECT_GET_STATE_REQUEST(arg.id);
     });
   }
 
-  private onOBJECT_STATE_REGISTERED(state: ZirconObjectState): void {
-    if (state?.id === this.getId()) {
+  private onZIRCON_OBJECT_GET_STATE_REQUEST(objId: string): void {
+    if (objId === this.getId()) {
+      this.emit('ZIRCON_OBJECT_STATE', {
+        state: this.generateCurrentState(),
+      });
+    }
+  }
+
+  private onZIRCON_OBJECT_SET_STATE_REQUEST(
+    objId: string,
+    state: ZirconObjectState,
+  ): void {
+    if (objId === this.getId()) {
       this.setState(state);
     }
   }
@@ -175,7 +202,15 @@ export abstract class ZirconObject<
     }
     this._name = name;
     this.stateModified();
-    this.emit('ZIRCON_OBJECT_NAME_CHANGED', { id: this._id, name: this._name });
+    return true;
+  }
+
+  public setFactoryId(factoryId: string): boolean {
+    if (this._factoryId === factoryId) {
+      return false;
+    }
+    this._factoryId = factoryId;
+    this.stateModified();
     return true;
   }
 
@@ -183,12 +218,15 @@ export abstract class ZirconObject<
    * set object state.
    * @param state *
    */
-  protected async setState(state: ZirconObjectState): Promise<void> {
+  public async setState(state: ZirconObjectState): Promise<void> {
     if (!state) {
       return;
     }
     this.setId(state.id);
-    this.setName(state.name);
+    this.setName(
+      state.name || `${this.getType()} ${ZirconNameGenerator.generateName()}`,
+    );
+    this.setFactoryId(state.factoryId);
   }
 
   /**
@@ -303,6 +341,6 @@ export abstract class ZirconObject<
   // }
 
   public getEditedIds(): string[] {
-    return [ ];
+    return [];
   }
 }

@@ -40,8 +40,8 @@ export abstract class ZirconAppObject<
    * constructor
    * @param app the application this object belongs to
    */
-  constructor(app: ZirconApplication, state?: ZirconAppObjectState) {
-    super(state);
+  constructor(app: ZirconApplication) {
+    super();
     if (!app) {
       throw new Error(
         `parent application cannot be null in ${this.constructor.name} constructor`,

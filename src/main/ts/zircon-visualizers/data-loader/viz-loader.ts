@@ -65,9 +65,8 @@ export class VizLoader<
     private readonly _loaderDescriptors: {
       [id: string]: LoaderDescriptor<T>;
     },
-    state?: VizLoaderState,
   ) {
-    super(state);
+    super();
   }
 
   // ---------------------------

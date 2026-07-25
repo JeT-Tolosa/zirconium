@@ -31,8 +31,8 @@ export class VizOpenGlobus extends ZirconViz {
   /**
    * constructor
    */
-  constructor(state?: VizOpenGlobusState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   public override getType(): string {

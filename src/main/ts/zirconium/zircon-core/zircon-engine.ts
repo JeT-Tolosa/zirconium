@@ -59,8 +59,8 @@ export class ZirconEngine<
   /**
    * Constructor
    */
-  constructor(state?: ZirconEngineState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   public override getType(): string {

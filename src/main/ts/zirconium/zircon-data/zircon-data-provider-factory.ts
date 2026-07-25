@@ -40,10 +40,11 @@ export class ZirconDataProviderFactory extends ZirconObjectFactory {
   public override async createObject(
     state: ZirconDataProviderState,
   ): Promise<ZirconDataProvider> {
-    return new ZirconDataProvider(
+    const instance = new ZirconDataProvider(
       this.getOutputDataType(),
-      state,
       this.getCompareDataFunction(),
     );
+    await instance.setState(state);
+    return instance;
   }
 }

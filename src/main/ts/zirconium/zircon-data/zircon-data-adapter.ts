@@ -56,11 +56,10 @@ export class ZirconDataAdapter<
   constructor(
     inputDataType: string,
     outputDataType: string,
-    state: ZirconDataAdapterState,
     transformData?: (data: Tin) => Tout,
     compareData?: (a: Tout, b: Tout) => number,
   ) {
-    super(outputDataType, state, compareData);
+    super(outputDataType, compareData);
     this._inputDataType = inputDataType;
     this.__transformData = transformData;
   }

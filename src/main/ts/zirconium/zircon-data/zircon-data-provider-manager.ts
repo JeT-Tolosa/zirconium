@@ -71,7 +71,7 @@ export type ZirconDataProviderManagerRegistry = MergeZirconRegistries<
           | 'REGISTER_DATA_PROVIDER_REQUEST'
           | 'UNREGISTER_DATA_PROVIDER_REQUEST'
         >,
-        PickEvents<ZirconObjectManagerEvents, 'OBJECT_STATE_REGISTERED'>,
+        PickEvents<ZirconObjectManagerEvents, 'STATE_SNAPSHOT_REGISTERED'>,
       ]
     >;
 
@@ -115,12 +115,12 @@ export class ZirconDataProviderManager<
     this.addListener('DATA_PROVIDER_REQUEST', (arg) => {
       this.onDATA_PROVIDER_REQUEST(arg.dataProviderId);
     });
-    this.addListener('OBJECT_STATE_REGISTERED', (arg) => {
-      this.onOBJECT_STATE_REGISTERED2(arg.state);
+    this.addListener('STATE_SNAPSHOT_REGISTERED', (arg) => {
+      this.onSTATE_SNAPSHOT_REGISTERED(arg.state);
     });
   }
 
-  private async onOBJECT_STATE_REGISTERED2(
+  private async onSTATE_SNAPSHOT_REGISTERED(
     state: ZirconObjectState,
   ): Promise<void> {
     if (!state) {
@@ -151,6 +151,7 @@ export class ZirconDataProviderManager<
       }
     }
   }
+
   private onDATA_PROVIDER_REQUEST(dataProviderId: string): void {
     const dataProvider = this.getDataProvider(dataProviderId);
     if (!dataProvider) {

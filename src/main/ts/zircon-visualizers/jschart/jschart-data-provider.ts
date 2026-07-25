@@ -1,8 +1,5 @@
 import { ChartData, ChartType } from 'chart.js';
-import {
-  ZirconDataProvider,
-  ZirconDataProviderState,
-} from '../../zirconium/zircon-data/zircon-data-provider';
+import { ZirconDataProvider } from '../../zirconium/zircon-data/zircon-data-provider';
 import { VIZ_JSCHART_REGISTRY } from './viz-jschart-types';
 
 export function getChartDataType(chartType: ChartType): string {
@@ -14,10 +11,9 @@ export class DataProviderChartJS<
 > extends ZirconDataProvider<ChartData<TType>> {
   private _chartType: TType = null;
 
-  constructor(chartType: TType, state: ZirconDataProviderState) {
+  constructor(chartType: TType) {
     super(
       VIZ_JSCHART_REGISTRY[chartType].dataType,
-      state,
       (a: ChartData<TType>, b: ChartData<TType>) => {
         this._chartType = chartType;
         return this.compareChartDataType(a, b);

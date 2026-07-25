@@ -36,7 +36,6 @@ import {
   ZIRCON_DESKTOP_MANAGER_TYPE,
 } from './zircon-types';
 import { ToolbarElement as ToolbarElementDescriptor } from './zircon-desktop-manager-toolbar';
-import { ZirconObjectManagerEvents } from './zircon-object-manager';
 
 export interface ZirconDesktopManagerState extends ZirconObjectState {
   type: typeof ZIRCON_DESKTOP_MANAGER_TYPE;
@@ -65,8 +64,7 @@ export type ZirconDesktopManagerEventRegistry = MergeZirconRegistries<
           | 'DESKTOP_ACTIVATE_REQUEST'
         >,
         // PickEvents<ZirconDesktopManagerEvents, 'DESKTOP_MANAGER_STATE'>,
-        PickEvents<ZirconObjectEvents, 'ZIRCON_OBJECT_NAME_CHANGED'>,
-        PickEvents<ZirconObjectManagerEvents, 'OBJECT_STATE_REGISTERED'>,
+        PickEvents<ZirconObjectEvents, 'ZIRCON_OBJECT_STATE_CHANGED'>,
       ]
     >;
     outgoing: MergePickEvents<
@@ -125,8 +123,8 @@ export class ZirconDesktopManager<
    * Constructor for ZirconDesktopManager
    * @param appUI The Zircon application instance
    */
-  constructor(appUI: ZirconApplication, state?: ZirconDesktopManagerState) {
-    super(appUI, state);
+  constructor(appUI: ZirconApplication) {
+    super(appUI);
   }
 
   protected override listenToEvents(): void {
@@ -137,11 +135,11 @@ export class ZirconDesktopManager<
     this.addListener('DESKTOP_DEACTIVATED', (arg) =>
       this.onDESKTOP_DEACTIVATE_REQUEST(arg.desktopId),
     );
-    this.addListener('ZIRCON_OBJECT_NAME_CHANGED', (arg) =>
-      this.onZIRCON_OBJECT_NAME_CHANGED(arg.id, arg.name),
-    );
+    // this.addListener('ZIRCON_OBJECT_NAME_CHANGED', (arg) =>
+    //   this.onZIRCON_OBJECT_NAME_CHANGED(arg.id, arg.name),
+    // );
 
-    this.addListener('OBJECT_STATE_REGISTERED', (arg) =>
+    this.addListener('ZIRCON_OBJECT_STATE_CHANGED', (arg) =>
       this.onOBJECT_DESKTOP_MANAGER_STATE_REGISTERED(arg.state),
     );
   }
@@ -210,7 +208,7 @@ export class ZirconDesktopManager<
    * @param state The new state to apply
    * @returns A promise that resolves when the state is set
    */
-  protected override async setState(
+  public override async setState(
     state: ZirconDesktopManagerState,
   ): Promise<void> {
     if (!state) {
@@ -228,6 +226,7 @@ export class ZirconDesktopManager<
    * @param desktopIds Array of desktop IDs to manage
    */
   private setDesktopIds(desktopIds: string[]): void {
+    let changes = false;
     const res: ArrayComparisonResult = Zircon.arrayComparison(
       this.getDesktopIds(),
       desktopIds,
@@ -236,12 +235,16 @@ export class ZirconDesktopManager<
     if (this.isDisplayed()) {
       res.inserted?.forEach((desktopId) => {
         this.displayDesktop(desktopId);
+        changes = true;
       });
       res.deleted?.forEach((desktopId) => {
         this.undisplayDesktop(desktopId);
+        changes = true;
       });
     }
-    this.stateModified();
+    if (changes) {
+      this.stateModified();
+    }
     // this.emit('DESKTOP_MANAGER_DESKTOP_IDS_CHANGED', {
     //   desktopManagerId: this.getId(),
     //   desktopIds: desktopIds,

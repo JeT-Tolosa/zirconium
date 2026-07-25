@@ -10,7 +10,12 @@ import {
   ZirconAppObjectState,
 } from '../zircon-core/zircon-app-object';
 import menuIcon from './hamburger-icon.svg';
-import { jsPanel, IJSPanelInstance, IJSPanelData } from 'jspanel4';
+import {
+  jsPanel,
+  IJSPanelInstance,
+  IJSPanelData,
+  JSPanelStatus,
+} from 'jspanel4';
 import {
   MergePickEvents,
   MergeZirconRegistries,
@@ -18,6 +23,7 @@ import {
 } from '../zircon-event';
 import { ZirconDesktop } from './zircon-desktop';
 import { ZirconHelper } from '../zircon-helper';
+import { ZirconObjectManagerEvents } from '../zircon-core/zircon-object-manager';
 import {
   ZIRCON_PARAMETER_WINDOW_TYPE,
   ZIRCON_WINDOW_TYPE,
@@ -87,6 +93,7 @@ export type ZirconWindowEventRegistry = MergeZirconRegistries<
           // | 'WINDOW_DIMENSION_CHANGED'
           // | 'WINDOW_POSITION_CHANGED'
         >,
+        PickEvents<ZirconObjectManagerEvents, 'STORE_STATE_SNAPSHOT_REQUEST'>,
       ]
     >;
   },
@@ -100,6 +107,7 @@ export interface ZirconWindowState extends ZirconAppObjectState {
   top?: number;
   width?: number;
   height?: number;
+  windowStatus?: JSPanelStatus;
 }
 
 /**
@@ -115,12 +123,10 @@ export class ZirconWindow<
   private _height: number = 500;
   private __parentDesktop: ZirconDesktop = null;
   private __panel: IJSPanelInstance = null;
-  private __dragSource: HTMLElement = null; // parent element when drag is initialized
-  private __dragPosition: { x: number; y: number } = null; // window position when drag is initialized
   private __paramWindow: ZirconParamWindow = null;
 
-  constructor(app: ZirconApplication, state?: ZirconWindowState) {
-    super(app, state);
+  constructor(app: ZirconApplication) {
+    super(app);
   }
 
   public override getType(): string {
@@ -167,7 +173,7 @@ export class ZirconWindow<
     }
   }
 
-  protected override async setState(state: ZirconWindowState): Promise<void> {
+  public override async setState(state: ZirconWindowState): Promise<void> {
     if (!state) {
       return;
     }
@@ -190,6 +196,7 @@ export class ZirconWindow<
       top: this.__panel?.getBoundingClientRect().top,
       width: this.__panel?.offsetWidth,
       height: this.__panel?.offsetHeight,
+      windowStatus: this.__panel?.status,
     };
   }
 
@@ -246,8 +253,8 @@ export class ZirconWindow<
 
           panel.style.pointerEvents = 'none';
           panel.classList.add('drag');
-          this.__dragSource = panel.parentElement;
-          this.__dragPosition = { x: panel.offsetLeft, y: panel.offsetTop };
+          // this.__dragSource = panel.parentElement;
+          // this.__dragPosition = { x: panel.offsetLeft, y: panel.offsetTop };
         },
         drag: (
           panel: IJSPanelInstance,
@@ -297,6 +304,7 @@ export class ZirconWindow<
             this.getId(),
             targetDesktopId,
           );
+          this.stateModified();
         },
         // drop: {
         //   dropZones: [`.${ZIRCON_DROPPABLE_CLASS}`],
@@ -325,13 +333,26 @@ export class ZirconWindow<
         //   },
         // },
       },
-      onminimized: () =>
-        this.emit('WINDOW_MINIMIZED', { windowId: this.getId() }),
-      onmaximized: () =>
-        this.emit('WINDOW_MAXIMIZED', { windowId: this.getId() }),
-      onnormalized: () =>
-        this.emit('WINDOW_NORMALIZED', { windowId: this.getId() }),
-      onclosed: () => this.emit('WINDOW_CLOSED', { windowId: this.getId() }),
+      onminimized: () => {
+        this.emit('WINDOW_MINIMIZED', { windowId: this.getId() });
+        this.stateModified();
+        return true;
+      },
+      onmaximized: () => {
+        this.emit('WINDOW_MAXIMIZED', { windowId: this.getId() });
+        this.stateModified();
+        return true;
+      },
+      onnormalized: () => {
+        this.emit('WINDOW_NORMALIZED', { windowId: this.getId() });
+        this.stateModified();
+        return true;
+      },
+      onclosed: () => {
+        this.emit('WINDOW_CLOSED', { windowId: this.getId() });
+        this.stateModified();
+        return true;
+      },
 
       callback: async (panel: IJSPanelInstance) => {
         this.__panel = panel;
@@ -361,14 +382,17 @@ export class ZirconWindow<
       sourceId: this.getId(),
     };
     if (!this.__paramWindow) {
-      this.__paramWindow = (await this.getApplication()
-        .getObjectManager()
-        .createInstance(paramWindowState)) as ZirconParamWindow;
       ZirconHelper.addParamWindowToDesktop(
         this.getApplication(),
-        this.__paramWindow,
-        this.getParentDesktop()?.getId(),
+        paramWindowState,
+        this.getParentDesktop().getId(),
       );
+
+      // ZirconHelper.addParamWindowToDesktop(
+      //   this.getApplication(),
+      //   this.__paramWindow,
+      //   this.getParentDesktop()?.getId(),
+      // );
     }
     return this.__paramWindow;
   }
@@ -482,11 +506,6 @@ export class ZirconWindow<
     if (this.__panel) {
       this.__panel.title = this._title;
     }
-    // this.emit('WINDOW_TITLE_CHANGED', {
-    //   windowId: this.getId(),
-    //   title: this._title,
-    // });
-    this.stateModified();
     return true;
   }
 }

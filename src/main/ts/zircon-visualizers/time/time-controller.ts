@@ -97,8 +97,8 @@ export class TimeController<
     { label: '1 year', ms: 365 * 24 * 60 * 60 * 1000 },
   ];
 
-  constructor(state: TimeControllerState) {
-    super(state);
+  constructor() {
+    super();
     defineCustomElements(window);
   }
 
@@ -113,7 +113,7 @@ export class TimeController<
     return TimeController.TIME_CONTROLLER_VISUALIZER_TYPE;
   }
 
-  protected override async setState(state: TimeControllerState): Promise<void> {
+  public override async setState(state: TimeControllerState): Promise<void> {
     await super.setState(state);
     if (!state) {
       return;

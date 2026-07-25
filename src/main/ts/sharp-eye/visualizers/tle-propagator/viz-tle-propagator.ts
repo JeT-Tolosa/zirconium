@@ -45,13 +45,11 @@ export class VizTLEPropagator<
   /**
    * constructor
    */
-  constructor(state?: VizTLEPropagatorState) {
-    super(state);
+  constructor() {
+    super();
   }
 
-  protected override async setState(
-    state?: VizTLEPropagatorState,
-  ): Promise<void> {
+  public override async setState(state?: VizTLEPropagatorState): Promise<void> {
     if (!state) {
       return;
     }

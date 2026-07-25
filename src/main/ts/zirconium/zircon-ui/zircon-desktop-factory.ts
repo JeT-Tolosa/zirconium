@@ -38,6 +38,8 @@ export class ZirconDesktopFactory extends ZirconAppObjectFactory {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public override async createObject(state: any): Promise<ZirconDesktop> {
-    return new ZirconDesktop(this.getApplication(), state);
+    const instance = new ZirconDesktop(this.getApplication());
+    await instance.setState(state);
+    return instance;
   }
 }

@@ -85,7 +85,7 @@ export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory 
           //     return {
           //       label: `${objId} (${obj == null ? 'not used' : `used in ${obj.getParentWindow()?.getId()}`})`,
           //       action: () => {
-          //         this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
+          //         this.getApplication().emit('ZIRCON_OBJECT_SET_STATE_REQUEST', {
           //           objectId: window.getId(),
           //           state: {
           //             ...window.generateCurrentState(),
@@ -132,14 +132,14 @@ export class ZirconContextMenuFactoryVizWindow extends ZirconContextMenuFactory 
       id: `${vizType}-${uuid()}`,
     };
 
-    this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
-      objectId: vizState.id,
+    this.getApplication().emit('ZIRCON_OBJECT_SET_STATE_REQUEST', {
+      id: vizState.id,
       state: vizState,
     });
     const windowState: ZirconVizWindowState = window.generateCurrentState();
     windowState.vizIds.push(vizState.id);
-    this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
-      objectId: windowState.id,
+    this.getApplication().emit('ZIRCON_OBJECT_SET_STATE_REQUEST', {
+      id: windowState.id,
       state: windowState,
     });
   }

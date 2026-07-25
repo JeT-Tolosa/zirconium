@@ -21,8 +21,8 @@ export class VizBubbleJSChart extends VizJSChart<'bubble'> {
   public static readonly BUBBLE_JSCHART_VISUALIZER_TYPE =
     'jschar-bubble-visualizer-type';
 
-  constructor(state?: VizBubbleJSChartState) {
-    super(state);
+  constructor() {
+    super();
     Chart.register(
       BubbleController,
       CategoryScale,

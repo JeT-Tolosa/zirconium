@@ -18,8 +18,8 @@ export class AnalogClock extends AbstractClock {
   // Stockage de la dernière date reçue pour pouvoir redessiner si le canvas change de taille
   private __lastDate: Date = new Date();
 
-  constructor(state?: AnalogClockState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   public override getType(): string {

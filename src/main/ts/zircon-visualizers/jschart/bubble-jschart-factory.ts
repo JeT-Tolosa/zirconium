@@ -5,7 +5,9 @@ import { VizBubbleJSChart, VizBubbleJSChartState } from './bubble-jschart';
 async function createObject(
   state: VizBubbleJSChartState,
 ): Promise<VizBubbleJSChart> {
-  return new VizBubbleJSChart(state);
+  const instance = new VizBubbleJSChart();
+  await instance.setState(state);
+  return instance;
 }
 
 export class VizBubbleJSChartFactory extends SimpleZirconObjectFactory {

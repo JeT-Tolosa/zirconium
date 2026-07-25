@@ -7,6 +7,7 @@ import '../zircon-ui5.css';
 import EventEmitter2 from 'eventemitter2';
 import {
   ZirconDesktopManager,
+  ZirconDesktopManagerEvents,
   ZirconDesktopManagerState,
 } from './zircon-desktop-manager';
 import { v4 as uuid } from 'uuid';
@@ -21,7 +22,11 @@ import {
 } from '../zircon-event';
 import { ZirconContextMenu } from '../zircon-menu/zircon-context-menu';
 import pino from 'pino';
-import { ZirconObject, ZirconObjectState } from './zircon-object';
+import {
+  ZirconObject,
+  ZirconObjectEvents,
+  ZirconObjectState,
+} from './zircon-object';
 import { ZirconWindowFactory } from '../zircon-ui/zircon-window-factory';
 import { ZirconEngine, ZirconEngineEvents } from './zircon-engine';
 import { ZirconVizWindowEvents } from '../zircon-ui/zircon-viz-window';
@@ -32,7 +37,10 @@ import {
   ZIRCON_ENGINE_TYPE,
   ZIRCON_OBJECT_TYPE,
 } from './zircon-types';
-import { ZirconObjectManager } from './zircon-object-manager';
+import {
+  ZirconObjectManager,
+  ZirconObjectManagerEvents,
+} from './zircon-object-manager';
 import { ZirconDesktopFactory } from '../zircon-ui/zircon-desktop-factory';
 import { ZirconDesktopManagerFactory } from './zircon-desktop-manager-factory';
 import { ZirconObjectFactory } from './zircon-object-factory';
@@ -46,8 +54,9 @@ import { ZirconContextMenuFactoryApplication } from '../zircon-menu/zircon-app-c
 import { ZirconStateEditorManager } from '../zircon-params/zircon-state-editor-manager';
 import { ZirconEngineFactory } from './zircon-engine-factory';
 import { ZirconVizWindowFactory } from '../zircon-ui/zircon-viz-window-factory';
-import { ZirconStateEditorFactoryPre } from '../zircon-params/zircon-state-editor-factory';
 import { ZirconParamWindowFactory } from '../zircon-params/zircon-param-window-factory';
+import { ZirconStateEditorPreFactory } from '../zircon-params/zircon-state-editor-pre';
+import { ZirconStateJsonEditorFactory } from '../zircon-params/zircon-state-editor-jsoneditor';
 
 /**
  * Composition of this application UI
@@ -71,7 +80,6 @@ export const ZIRCON_TARGET_DESKTOP_ID: string = 'desktop-id';
 export type ZirconApplicationEvents = {
   APPLICATION_START_REQUEST: { applicationId: string };
   APPLICATION_STARTED: { applicationId: string };
-  SET_OBJECT_STATE_REQUEST: { objectId: string; state: ZirconObjectState };
   UNCAUGHT_EXCEPTION: { error: string };
   APPLICATION_SAVE_WORKSPACE_REQUEST: { filePath: string };
   APPLICATION_LOAD_WORKSPACE_REQUEST: { filePath: string };
@@ -85,26 +93,26 @@ export type ZirconApplicationEventRegistry = MergeZirconRegistries<
         PickEvents<
           ZirconApplicationEvents,
           | 'APPLICATION_START_REQUEST'
-          | 'SET_OBJECT_STATE_REQUEST'
           | 'APPLICATION_SAVE_WORKSPACE_REQUEST'
           | 'APPLICATION_LOAD_WORKSPACE_REQUEST'
           | 'APPLICATION_QUIT_REQUEST'
+          | 'UNCAUGHT_EXCEPTION'
+          | 'APPLICATION_STARTED'
         >,
         PickEvents<
           ZirconWindowEvents,
           'WINDOW_SET_PARENT_DESKTOP_REQUEST' | 'WINDOW_SET_PARENT_DESKTOP_DONE'
-        >,
-        PickEvents<
-          ZirconApplicationEvents,
-          'UNCAUGHT_EXCEPTION' | 'APPLICATION_STARTED'
         >,
       ]
     >;
     outgoing: MergePickEvents<
       [
         ZirconApplicationEvents,
+        ZirconObjectManagerEvents,
+        ZirconObjectEvents,
         ZirconWindowEvents,
         ZirconDesktopEvents,
+        ZirconDesktopManagerEvents,
         ZirconParamWindowEvents,
         ZirconVizWindowEvents,
         ZirconEngineEvents,
@@ -182,9 +190,7 @@ export class ZirconApplication<
     this.addListener('APPLICATION_START_REQUEST', (arg) =>
       this.onAPPLICATION_START_REQUEST(arg.applicationId),
     );
-    this.addListener('SET_OBJECT_STATE_REQUEST', (arg) =>
-      this.onSET_OBJECT_STATE_REQUEST(arg.objectId, arg.state),
-    );
+
     this.addListener('UNCAUGHT_EXCEPTION', (arg) => {
       this.onUNCAUGHT_EXCEPTION(arg.error);
     });
@@ -237,15 +243,15 @@ export class ZirconApplication<
     console.error(`Uncaught exception in object ${this.getId()} : ${error}`);
   }
 
-  private onSET_OBJECT_STATE_REQUEST(
-    objectId: string,
-    state: ZirconObjectState,
-  ): void {
-    if (objectId !== state.id) {
-      throw new Error('Object ID mismatch');
-    }
-    this.getObjectManager().registerObjectState(state);
-  }
+  // private onZIRCON_OBJECT_SET_STATE_REQUEST(
+  //   objectId: string,
+  //   state: ZirconObjectState,
+  // ): void {
+  //   if (objectId !== state.id) {
+  //     throw new Error('Object ID mismatch');
+  //   }
+  //   this.getObjectManager().registerObjectState(state);
+  // }
 
   public isStarted(): boolean {
     return this.__isStarted;
@@ -292,7 +298,11 @@ export class ZirconApplication<
       this.__stateEditorManager = new ZirconStateEditorManager(this);
       this.__stateEditorManager.registerStateEditorFactory(
         ZIRCON_OBJECT_TYPE,
-        new ZirconStateEditorFactoryPre(),
+        new ZirconStateEditorPreFactory(),
+      );
+      this.__stateEditorManager.registerStateEditorFactory(
+        ZIRCON_OBJECT_TYPE,
+        new ZirconStateJsonEditorFactory(),
       );
     }
     return this.__stateEditorManager;
@@ -456,7 +466,7 @@ export class ZirconApplication<
   }
 
   public registerObjectState(state: ZirconObjectState): boolean {
-    return this.getObjectManager().registerObjectState(state);
+    return this.emit('STORE_STATE_SNAPSHOT_REQUEST', { state: state });
   }
 
   public registerPlugin(plugin: ZirconPlugin): boolean {
@@ -544,8 +554,8 @@ export class ZirconApplication<
     if (!desktopManagerState) {
       throw new Error(`createDesktopManager does not have a valid state`);
     }
-    this.__desktopManager = new ZirconDesktopManager(
-      this,
+    this.__desktopManager = new ZirconDesktopManager(this);
+    await this.__desktopManager.setState(
       desktopManagerState as ZirconDesktopManagerState,
     );
     return this.__desktopManager;

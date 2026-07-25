@@ -4,8 +4,11 @@ import { VIZ_AIS_LOADER_TYPE, VizAISLoader } from './viz-eye-ais-loader';
 import { VizLoaderState } from '../data-loader/viz-loader';
 
 async function createObject(state: VizLoaderState): Promise<VizAISLoader> {
-  return new VizAISLoader(state);
+  const instance = new VizAISLoader();
+  await instance.setState(state);
+  return instance;
 }
+
 export class VizAISLoaderFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(VIZ_AIS_LOADER_TYPE, SHARP_EYE_VIZ_TYPE, createObject, null);

@@ -124,7 +124,8 @@ function registerDataProviderBar(
     ],
   };
   const dataProvider: DataProviderChartJS<'bar'> =
-    new DataProviderChartJS<'bar'>('bar', state);
+    new DataProviderChartJS<'bar'>('bar');
+  dataProvider.setState(state);
   dataProvider.setData(data);
 
   app.registerDataProviderFactory(`${state.id}-factory`, state.outputDataType);

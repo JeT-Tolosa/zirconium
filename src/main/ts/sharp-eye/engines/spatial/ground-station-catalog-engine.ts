@@ -29,13 +29,15 @@ const groundStationArrayDataProviderCreator: ItemArrayDataProviderCreatorFunctio
   }
   const dataProvider = new ZirconDataProvider<ItemArray<GroundStation>>(
     dataType,
-    {
-      id: `ground-station-data-provider-engine-${dataProviderName}`,
-      type: GROUND_STATION_CATALOG_DATA_PROVIDER_TYPE,
-      outputDataType: dataType,
-      name: dataProviderName,
-    },
   );
+  // TODO: may be we should not call setState
+  // but give all id, name etc... in constructor
+  dataProvider.setState({
+    id: `ground-station-data-provider-engine-${dataProviderName}`,
+    type: GROUND_STATION_CATALOG_DATA_PROVIDER_TYPE,
+    outputDataType: dataType,
+    name: dataProviderName,
+  });
   const itemArray = new ItemArray<GroundStation>({
     itemType: dataType,
     name: `${dataProviderName}-item-array`,

@@ -35,7 +35,7 @@ type ZirconObjectProperties = {
   parent: ZirconType | null;
 };
 
-export const ZIRCON_OBJECT_HIERARCHY: {
+export const ZIRCON_OBJECTS_HIERARCHY: {
   [key: string]: ZirconObjectProperties;
 } = {
   [ZIRCON_APPLICATION_TYPE]: {
@@ -105,4 +105,4 @@ export const ZIRCON_OBJECT_HIERARCHY: {
   },
 } as const;
 
-export type ZirconType = keyof typeof ZIRCON_OBJECT_HIERARCHY;
+export type ZirconType = keyof typeof ZIRCON_OBJECTS_HIERARCHY;

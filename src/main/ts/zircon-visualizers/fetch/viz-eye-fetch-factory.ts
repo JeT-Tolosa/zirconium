@@ -3,8 +3,11 @@ import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-ob
 import { VizFetch, VizFetchState } from './viz-eye-fetch';
 
 async function createObject(state: VizFetchState): Promise<VizFetch> {
-  return new VizFetch(state);
+  const instance = new VizFetch();
+  await instance.setState(state);
+  return instance;
 }
+
 export class VizFetchFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

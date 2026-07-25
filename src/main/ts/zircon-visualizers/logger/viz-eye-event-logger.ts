@@ -24,8 +24,8 @@ export class VizEventLogger extends ZirconViz {
   /**
    * constructor
    */
-  constructor(state?: VizEventLoggerState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   protected override listenToEvents(): void {

@@ -21,8 +21,8 @@ export class VizRadarJSChart extends VizJSChart<'radar'> {
   public static readonly RADAR_JSCHART_VISUALIZER_TYPE =
     'jschar-radar-visualizer-type';
 
-  constructor(state?: VizRadarJSChartState) {
-    super(state);
+  constructor() {
+    super();
     Chart.register(
       RadarController,
       CategoryScale,

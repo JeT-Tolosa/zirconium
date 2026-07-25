@@ -9,8 +9,11 @@ import {
 async function createObject(
   state: VizAISCatalogTabulatorState,
 ): Promise<VizAISCatalogTabulator> {
-  return new VizAISCatalogTabulator(state);
+  const instance = new VizAISCatalogTabulator();
+  await instance.setState(state);
+  return instance;
 }
+
 export class VizAISCatalogTabulatorFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

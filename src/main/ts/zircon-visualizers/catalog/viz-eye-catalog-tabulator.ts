@@ -116,12 +116,8 @@ export class VizCollectionCatalogTabulator<
   /**
    * constructor
    */
-  constructor(
-    dataType: string,
-    indexationMethod: (el: T) => string,
-    state?: VizCollectionCatalogTabulatorState,
-  ) {
-    super(state);
+  constructor(dataType: string, indexationMethod: (el: T) => string) {
+    super();
     this.setIndexMethod(indexationMethod);
     this._dataType = dataType;
   }

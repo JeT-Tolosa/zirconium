@@ -17,8 +17,8 @@ export abstract class VizThreeJS extends ZirconViz {
   /**
    * constructor
    */
-  constructor(state: VizThreeJSState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   public abstract createScene(): void;

@@ -43,8 +43,8 @@ export class VizFetch extends ZirconViz {
   /**
    * constructor
    */
-  constructor(state?: VizFetchState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   public override getType(): string {

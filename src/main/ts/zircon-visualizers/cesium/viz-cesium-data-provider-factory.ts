@@ -8,8 +8,11 @@ import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
 async function createObject(
   state: VizCesiumWithDataProvidersState,
 ): Promise<VizCesiumWithDataProviders> {
-  return new VizCesiumWithDataProviders(state);
+  const instance = new VizCesiumWithDataProviders();
+  await instance.setState(state);
+  return instance;
 }
+
 export class VizCesiumDataProviderFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

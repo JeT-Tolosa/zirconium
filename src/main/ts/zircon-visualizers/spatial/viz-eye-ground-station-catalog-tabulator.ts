@@ -12,13 +12,13 @@ export class VizGroundStationCatalogTabulator extends VizCollectionCatalogTabula
   public static readonly VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE =
     'ground-station-tabulator-catalog-visualizer-type';
 
-  constructor(state?: VizGroundStationCatalogTabulatorState) {
-    super('GroundStation', (el: GroundStation) => el.name, state);
-    this.setState({
-      name: 'Ground Station Catalog Tabulator',
-      ...state,
-      type: VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE,
-    });
+  constructor() {
+    super('GroundStation', (el: GroundStation) => el.name);
+    // this.setState({
+    //   name: 'Ground Station Catalog Tabulator',
+    //   ...state,
+    //   type: VizGroundStationCatalogTabulator.VIZ_GROUND_STATION_CATALOG_TABULATOR_TYPE,
+    // });
   }
 
   public override getType(): string {

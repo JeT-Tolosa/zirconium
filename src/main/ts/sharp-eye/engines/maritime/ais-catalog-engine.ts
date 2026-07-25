@@ -22,7 +22,10 @@ const aisArrayDataProviderCreator: ItemArrayDataProviderCreatorFunction<AIS> = (
   if (dataType !== AIS_TYPE) {
     throw new Error(`${dataType} should be ${AIS_TYPE}`);
   }
-  const dataProvider = new ZirconDataProvider<ItemArray<AIS>>(dataType, {
+  const dataProvider = new ZirconDataProvider<ItemArray<AIS>>(dataType);
+  // TODO: may be we should not call setState
+  // but give all id, name etc... in constructor
+  dataProvider.setState({
     id: `ais-data-provider-engine-${dataProviderName}`,
     type: AIS_CATALOG_DATA_PROVIDER_TYPE,
     outputDataType: dataType,

@@ -8,8 +8,11 @@ import {
 async function createObject(
   state: TimeManagerEngineState,
 ): Promise<TimeManagerEngine> {
-  return new TimeManagerEngine(state);
+  const instance = new TimeManagerEngine();
+  await instance.setState(state);
+  return instance;
 }
+
 export class TimeManagerEngineFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

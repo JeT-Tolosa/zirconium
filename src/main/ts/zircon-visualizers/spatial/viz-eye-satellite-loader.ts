@@ -2,11 +2,7 @@ import {
   Satellite,
   SATELLITE_TYPE,
 } from '../../libraries/spatial/satellite/satellite';
-import {
-  LoaderDescriptor,
-  VizLoader,
-  VizLoaderState,
-} from '../data-loader/viz-loader';
+import { LoaderDescriptor, VizLoader } from '../data-loader/viz-loader';
 
 import gpsJson from '../../../../../assets/data/spatial/celestrak/gps-celestrak.json';
 import starlinkJson from '../../../../../assets/data/spatial/celestrak/starlink-celestrak.json';
@@ -57,8 +53,8 @@ export class VizSatCatLoader extends VizLoader<Satellite> {
   public static readonly VIZ_SAT_CAT_LOADER_TYPE =
     'satcat-loader-visualizer-type';
 
-  constructor(state?: VizLoaderState) {
-    super(SATELLITE_TYPE, loaderDescriptors, state);
+  constructor() {
+    super(SATELLITE_TYPE, loaderDescriptors);
   }
 
   public override getType(): string {

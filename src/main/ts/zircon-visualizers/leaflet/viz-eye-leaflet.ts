@@ -27,8 +27,8 @@ export class VizLeaflet extends ZirconViz {
   /**
    * constructor
    */
-  constructor(state?: VizLeafletState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   public override getType(): string {

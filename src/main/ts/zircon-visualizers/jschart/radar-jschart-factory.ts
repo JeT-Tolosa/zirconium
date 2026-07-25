@@ -5,7 +5,9 @@ import { VizRadarJSChart, VizRadarJSChartState } from './radar-jschart';
 async function createObject(
   state: VizRadarJSChartState,
 ): Promise<VizRadarJSChart> {
-  return new VizRadarJSChart(state);
+  const instance = new VizRadarJSChart();
+  await instance.setState(state);
+  return instance;
 }
 
 export class VizRadarJSChartFactory extends SimpleZirconObjectFactory {

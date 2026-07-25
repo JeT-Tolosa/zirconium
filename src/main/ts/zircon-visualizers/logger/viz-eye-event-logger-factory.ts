@@ -5,8 +5,11 @@ import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-ob
 async function createObject(
   state: VizEventLoggerState,
 ): Promise<VizEventLogger> {
-  return new VizEventLogger(state);
+  const instance = new VizEventLogger();
+  await instance.setState(state);
+  return instance;
 }
+
 export class VizEventLoggerFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

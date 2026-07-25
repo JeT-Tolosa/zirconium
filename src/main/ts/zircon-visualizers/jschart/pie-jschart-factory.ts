@@ -3,7 +3,9 @@ import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-ob
 import { VizPieJSChart, VizPieJSChartState } from './pie-jschart';
 
 async function createObject(state: VizPieJSChartState): Promise<VizPieJSChart> {
-  return new VizPieJSChart(state);
+  const instance = new VizPieJSChart();
+  await instance.setState(state);
+  return instance;
 }
 
 export class VizPieJSChartFactory extends SimpleZirconObjectFactory {

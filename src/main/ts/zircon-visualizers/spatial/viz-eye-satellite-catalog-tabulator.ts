@@ -12,13 +12,13 @@ export class VizSatelliteCatalogTabulator extends VizCollectionCatalogTabulator<
   public static readonly VIZ_SATELLITE_CATALOG_TABULATOR_TYPE =
     'satellite-tabulator-catalog-visualizer-type';
 
-  constructor(state?: VizSatelliteCatalogTabulatorState) {
+  constructor() {
     super('Satellite', (el: Satellite) => el.OBJECT_ID);
-    this.setState({
-      name: 'Satellite Catalog Tabulator',
-      ...state,
-      type: VizSatelliteCatalogTabulator.VIZ_SATELLITE_CATALOG_TABULATOR_TYPE,
-    });
+    // this.setState({
+    //   name: 'Satellite Catalog Tabulator',
+    //   ...state,
+    //   type: VizSatelliteCatalogTabulator.VIZ_SATELLITE_CATALOG_TABULATOR_TYPE,
+    // });
   }
 
   public override getType(): string {

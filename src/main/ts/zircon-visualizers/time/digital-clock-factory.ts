@@ -3,8 +3,11 @@ import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-ob
 import { DigitalClock, DigitalClockState } from './digital-clock';
 
 async function createObject(state: DigitalClockState): Promise<DigitalClock> {
-  return new DigitalClock(state);
+  const instance = new DigitalClock();
+  await instance.setState(state);
+  return instance;
 }
+
 export class DigitalClockFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

@@ -8,7 +8,9 @@ import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-ob
 async function createObject(
   state: VizCubeSampleThreeJSState,
 ): Promise<VizCubeSampleThreeJS> {
-  return new VizCubeSampleThreeJS(state);
+  const instance = new VizCubeSampleThreeJS();
+  await instance.setState(state);
+  return instance;
 }
 export class VizCubeSampleThreeJSFactory extends SimpleZirconObjectFactory {
   constructor() {

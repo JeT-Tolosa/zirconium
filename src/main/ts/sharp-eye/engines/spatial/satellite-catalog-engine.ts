@@ -27,12 +27,14 @@ const satelliteArrayDataProviderCreator: ItemArrayDataProviderCreatorFunction<
   if (dataType !== SATELLITE_TYPE) {
     throw new Error(`${dataType} should be ${SATELLITE_TYPE}`);
   }
-  const dataProvider = new ZirconDataProvider<ItemArray<Satellite>>(dataType, {
+  const dataProvider = new ZirconDataProvider<ItemArray<Satellite>>(dataType);
+  dataProvider.setState({
     id: `satellite-data-provider-engine-${dataProviderName}`,
     type: SATELLITE_CATALOG_DATA_PROVIDER_TYPE,
     outputDataType: dataType,
     name: dataProviderName,
   });
+
   const itemArray = new ItemArray<Satellite>({
     itemType: dataType,
     name: `${dataProviderName}-item-array`,

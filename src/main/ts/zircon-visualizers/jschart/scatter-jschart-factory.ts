@@ -5,7 +5,9 @@ import { VizScatterJSChart, VizScatterJSChartState } from './scatter-jschart';
 async function createObject(
   state: VizScatterJSChartState,
 ): Promise<VizScatterJSChart> {
-  return new VizScatterJSChart(state);
+  const instance = new VizScatterJSChart();
+  await instance.setState(state);
+  return instance;
 }
 
 export class VizScatterJSChartFactory extends SimpleZirconObjectFactory {

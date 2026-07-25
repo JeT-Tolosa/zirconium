@@ -16,7 +16,9 @@ export class VizDataProviderFactory extends SimpleZirconAppObjectFactory {
         app: ZirconApplication,
         state: VizDataProviderExplorerState,
       ): Promise<VizDataProviderExplorer> => {
-        return new VizDataProviderExplorer(app, state);
+        const instance = new VizDataProviderExplorer(app);
+        await instance.setState(state);
+        return instance;
       },
       null,
     );

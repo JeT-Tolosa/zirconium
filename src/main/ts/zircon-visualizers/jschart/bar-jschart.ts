@@ -23,8 +23,8 @@ export class VizBarJSChart extends VizJSChart<'bar'> {
   public static readonly BAR_JSCHART_VISUALIZER_TYPE =
     'jschar-bar-visualizer-type';
 
-  constructor(state?: VizBarJSChartState) {
-    super(state);
+  constructor() {
+    super();
     Chart.register(
       BarController,
       BarElement,

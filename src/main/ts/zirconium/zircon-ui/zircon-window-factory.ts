@@ -18,7 +18,9 @@ export class ZirconWindowFactory extends SimpleZirconAppObjectFactory {
         app: ZirconApplication,
         state: ZirconWindowState,
       ): Promise<ZirconWindow> => {
-        return new ZirconWindow(app, state);
+        const instance = new ZirconWindow(app);
+        await instance.setState(state);
+        return instance;
       },
       new ZirconContextMenuFactoryWindow(app),
     );

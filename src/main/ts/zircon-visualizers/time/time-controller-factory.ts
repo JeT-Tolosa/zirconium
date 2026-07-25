@@ -5,8 +5,11 @@ import { SimpleZirconObjectFactory } from '../../zirconium/zircon-core/zircon-ob
 async function createObject(
   state: TimeControllerState,
 ): Promise<TimeController> {
-  return new TimeController(state);
+  const instance = new TimeController();
+  await instance.setState(state);
+  return instance;
 }
+
 export class TimeControllerFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

@@ -11,13 +11,8 @@ export interface VizAISCatalogTabulatorState extends VizCollectionCatalogTabulat
 export class VizAISCatalogTabulator extends VizCollectionCatalogTabulator<AIS> {
   public static readonly VIZ_AIS_CATALOG_TABULATOR_TYPE =
     'viz-ais-catalog-tabulator';
-  constructor(state?: VizAISCatalogTabulatorState) {
+  constructor() {
     super('AIS', (el: AIS) => el.id);
-    this.setState({
-      name: 'AIS Catalog Tabulator',
-      ...state,
-      type: VizAISCatalogTabulator.VIZ_AIS_CATALOG_TABULATOR_TYPE,
-    });
   }
 
   public override getType(): string {

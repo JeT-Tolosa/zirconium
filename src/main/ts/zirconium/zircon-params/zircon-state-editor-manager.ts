@@ -29,8 +29,8 @@ export class ZirconStateEditorManager<
    * Constructor for ZirconStateEditorManager
    * @param appUI The Zircon application instance
    */
-  constructor(appUI: ZirconApplication, state?: ZirconStateEditorManagerState) {
-    super(appUI, state);
+  constructor(appUI: ZirconApplication) {
+    super(appUI);
   }
 
   protected override listenToEvents(): void {
@@ -53,7 +53,7 @@ export class ZirconStateEditorManager<
    * @param state The new state to apply
    * @returns A promise that resolves when the state is set
    */
-  protected override async setState(
+  public override async setState(
     state: ZirconStateEditorManagerState,
   ): Promise<void> {
     if (!state) {

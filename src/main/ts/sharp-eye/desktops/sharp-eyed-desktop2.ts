@@ -77,7 +77,8 @@ function registerDataProviderLine(
     ],
   };
   const dataProvider: DataProviderChartJS<'line'> =
-    new DataProviderChartJS<'line'>('line', state);
+    new DataProviderChartJS<'line'>('line');
+  dataProvider.setState(state);
   dataProvider.setData(data);
 
   app.registerDataProviderFactory(`${state.id}-factory`, state.outputDataType);

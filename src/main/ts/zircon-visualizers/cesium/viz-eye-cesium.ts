@@ -49,8 +49,8 @@ export class VizCesium<
   /**
    * constructor
    */
-  constructor(state?: VizCesiumState) {
-    super(state);
+  constructor() {
+    super();
   }
 
   public override getType(): string {
@@ -68,7 +68,9 @@ export class VizCesium<
   }
 
   public override async setState(state?: VizCesiumState): Promise<void> {
-    if (!state) {return;}
+    if (!state) {
+      return;
+    }
     await super.setState(state);
     if (state.token) {
       this.setToken(state.token);
@@ -108,7 +110,9 @@ export class VizCesium<
   }
 
   private async createViewer(): Promise<void> {
-    if (this.__viewer) {return;}
+    if (this.__viewer) {
+      return;
+    }
     const cesiumOptions = {
       token: this.getToken(),
       sunLightning: this.getSunLightning(),
@@ -117,7 +121,9 @@ export class VizCesium<
   }
 
   private async displayViewer(): Promise<void> {
-    if (!this.__viewer) {await this.createViewer();}
+    if (!this.__viewer) {
+      await this.createViewer();
+    }
     this.__viewer.displayIn(this.getContainer());
   }
 
@@ -129,7 +135,9 @@ export class VizCesium<
    * Get Main div element
    */
   public override getContainer(): HTMLDivElement {
-    if (this.__mainDiv) {return this.__mainDiv;}
+    if (this.__mainDiv) {
+      return this.__mainDiv;
+    }
     this.__mainDiv = document.createElement('div');
     this.__mainDiv.style.width = '100%';
     this.__mainDiv.style.height = '100%';

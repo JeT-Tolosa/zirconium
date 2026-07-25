@@ -34,8 +34,8 @@ export class VizMessageLogger extends ZirconViz {
   /**
    * constructor
    */
-  constructor(state?: ZirconVizState) {
-    super(state);
+  constructor() {
+    super();
     this.getEventDispatcher().onAny(
       (event: string | string[], ..._values: unknown[]) => {
         if (event === 'MESSAGE') {

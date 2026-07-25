@@ -81,8 +81,8 @@ export class ZirconVizWindow<
   private __viewContainer: HTMLDivElement = null;
   private __segment: HTMLIonSegmentElement = null; // tabs container
 
-  constructor(app: ZirconApplication, state?: ZirconVizWindowState) {
-    super(app, state);
+  constructor(app: ZirconApplication) {
+    super(app);
   }
 
   protected override listenToEvents(): void {
@@ -112,9 +112,7 @@ export class ZirconVizWindow<
     return ZIRCON_VISUALIZER_WINDOW_TYPE;
   }
 
-  protected override async setState(
-    state: ZirconVizWindowState,
-  ): Promise<void> {
+  public override async setState(state: ZirconVizWindowState): Promise<void> {
     if (!state) {
       return;
     }
@@ -180,7 +178,17 @@ export class ZirconVizWindow<
   }
 
   public override getEditedIds(): string[] {
-    return this.getVisualizerIds();
+    let editedIds = super.getEditedIds();
+    editedIds = editedIds.concat(this.getVisualizerIds());
+    this.getVisualizerIds().forEach((vizId) => {
+      const viz = this.getApplication()
+        .getObjectManager()
+        .getExistingInstance(vizId);
+      if (viz) {
+        editedIds = editedIds.concat(viz.getEditedIds());
+      }
+    });
+    return [...new Set(editedIds)];
   }
 
   protected override async onPanelCreated(

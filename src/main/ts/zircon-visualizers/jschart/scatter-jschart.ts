@@ -22,8 +22,8 @@ export class VizScatterJSChart extends VizJSChart<'scatter'> {
   public static readonly SCATTER_JSCHART_VISUALIZER_TYPE =
     'jschar-scatter-visualizer-type';
 
-  constructor(state?: VizScatterJSChartState) {
-    super(state);
+  constructor() {
+    super();
     Chart.register(
       ScatterController,
       CategoryScale,

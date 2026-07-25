@@ -23,6 +23,8 @@ export class VizJSSandboxFactory extends ZirconAppObjectFactory {
   public override async createObject(
     state: VizJSSandboxState,
   ): Promise<VizJSSandbox> {
-    return new VizJSSandbox(this.getApplication(), state);
+    const instance = new VizJSSandbox(this.getApplication());
+    await instance.setState(state);
+    return instance;
   }
 }

@@ -17,7 +17,6 @@ import {
   ZirconObjectEvents,
   ZirconObjectState,
 } from '../zircon-core/zircon-object';
-import { ZirconObjectManagerEvents } from '../zircon-core/zircon-object-manager';
 import '@ui5/webcomponents/dist/Button.js';
 import type Button from '@ui5/webcomponents/dist/Button.js';
 import '@ui5/webcomponents/dist/CheckBox.js';
@@ -46,12 +45,23 @@ export type ZirconParamWindowEventRegistry = MergeZirconRegistries<
   {
     incoming: MergePickEvents<
       [
-        PickEvents<ZirconObjectEvents, 'ZIRCON_OBJECT_STATE_CHANGED'>,
-        PickEvents<ZirconObjectManagerEvents, 'ZIRCON_OBJECT_STATE'>,
+        PickEvents<
+          ZirconObjectEvents,
+          'ZIRCON_OBJECT_STATE_CHANGED' | 'ZIRCON_OBJECT_STATE'
+        >,
+        // PickEvents<
+        //   ZirconObjectManagerEvents,
+        //   'STATE_SNAPSHOT_MODIFIED' | 'STATE_SNAPSHOT'
+        // >,
       ]
     >;
     outgoing: MergePickEvents<
-      [PickEvents<ZirconObjectManagerEvents, 'ZIRCON_OBJECT_STATE_REQUEST'>]
+      [
+        PickEvents<
+          ZirconObjectEvents,
+          'ZIRCON_OBJECT_SET_STATE_REQUEST' | 'ZIRCON_OBJECT_GET_STATE_REQUEST'
+        >,
+      ]
     >;
   },
   ZirconWindowEventRegistry
@@ -80,26 +90,26 @@ export class ZirconParamWindow<
     };
   } = {};
 
-  constructor(app: ZirconApplication, state?: ZirconParamWindowState) {
-    super(app, state);
+  constructor(app: ZirconApplication) {
+    super(app);
   }
 
   public override listenToEvents(): void {
     this.addListener('ZIRCON_OBJECT_STATE', (arg) => {
-      this.onState(arg.state?.id, arg.state);
+      this.onStateChanged(arg.state?.id, arg.state);
     });
     this.addListener('ZIRCON_OBJECT_STATE_CHANGED', (arg) => {
-      this.onState(arg.id, arg.state);
+      this.onStateChanged(arg.id, arg.state);
     });
   }
 
-  private onState(objId: string, state: ZirconObjectState) {
+  private onStateChanged(objId: string, state: ZirconObjectState) {
     if (Object.keys(this.__objectEditors).indexOf(objId) === -1) {
       return;
     }
     const editors: ZirconStateEditor[] = this.__objectEditors[objId].editors;
     editors.forEach((editor) => {
-      editor.setEditedObjState(state);
+      editor.setSourceObjState(state);
       editor.updateUI();
     });
   }
@@ -131,17 +141,18 @@ export class ZirconParamWindow<
   //   //   });
   // }
 
-  private requestObjectState(): void {
+  /**
+   * @fires ZIRCON_OBJECT_GET_STATE_REQUEST
+   */
+  private requestEditedObjectStates(): void {
     Object.keys(this.__objectEditors).forEach((objId) => {
-      this.emit('ZIRCON_OBJECT_STATE_REQUEST', {
+      this.emit('ZIRCON_OBJECT_GET_STATE_REQUEST', {
         id: objId,
       });
     });
   }
 
-  protected override async setState(
-    state: ZirconParamWindowState,
-  ): Promise<void> {
+  public override async setState(state: ZirconParamWindowState): Promise<void> {
     if (!state) {
       return;
     }
@@ -265,6 +276,7 @@ export class ZirconParamWindow<
     this.__objIdSelect.disabled = true;
     this.__objIdSelect.replaceChildren();
 
+    let firstOptionId: string = null;
     for (const [objId, objDescriptors] of Object.entries(
       this.__objectEditors,
     )) {
@@ -272,11 +284,18 @@ export class ZirconParamWindow<
       option.textContent = objDescriptors.sourceObjName;
       option.value = objId;
       this.__objIdSelect.append(option);
+      if (!firstOptionId) {
+        firstOptionId = option.value;
+      }
     }
-    this.__objIdSelect.value = this._selectedObjId;
-    if (this.__objIdSelect.options?.length > 0) {
+    // NB: Do not use select.options it is updated when rendered
+    if (this.__objIdSelect.children.length > 0) {
       this.__objIdSelect.disabled = false;
     }
+
+    this.__objIdSelect.value = this._selectedObjId || firstOptionId;
+    // setting value programmatically does not trigger event: launch update manually
+    this.fillEditorsSelect();
   }
 
   private fillEditorsSelect(): void {
@@ -303,19 +322,20 @@ export class ZirconParamWindow<
     // Add editors options
     for (const editor of editors) {
       const option = document.createElement('ui5-option') as Option;
-      option.textContent = editor.getName();
+      option.textContent = editor.getEditorName();
       option.value = editor.getId();
       // option.setAttribute('data-editor-id', editor.getId());
       this.__objEditorSelect.append(option);
     }
+    // NB: Do not use select.options it is updated when rendered
+    if (this.__objEditorSelect.children.length > 0) {
+      this.__objEditorSelect.disabled = false;
+    }
+
     if (editors.length > 0) {
       this.__objEditorSelect.value =
         this.__objectEditors[objId]?.selectedEditorId || editors[0].getId();
     }
-    if (this.__objEditorSelect.options?.length > 0) {
-      this.__objEditorSelect.disabled = false;
-    }
-
     this.fillViewContent();
   }
 
@@ -337,6 +357,7 @@ export class ZirconParamWindow<
       return;
     }
     this.getViewContainer().append(editor.getContainer());
+    editor.updateUI();
   }
 
   private async reconstructUI(): Promise<void> {
@@ -345,7 +366,7 @@ export class ZirconParamWindow<
     }
     this.retrieveAllEditors();
     this.fillObjIdsSelect();
-    this.requestObjectState();
+    this.requestEditedObjectStates();
     return;
   }
 
@@ -385,14 +406,19 @@ export class ZirconParamWindow<
     }
     this.__applyButton = document.createElement('ui5-button');
     this.__applyButton.textContent = 'Apply';
-    this.__applyButton.design = 'Emphasized';
+    // this.__applyButton.design = 'Emphasized';
     this.__applyButton.addEventListener('click', () => {
-      const id = this.getObjIdSelect().selectedOption?.textContent ?? '';
-      const editorId = this.getObjEditorSelect().selectedOption?.textContent;
-      const editor = this.__objectEditors[id]?.editors?.find(
+      const objId = this.getObjIdSelect().value;
+      const editorId = this.getObjEditorSelect().value;
+      const editor = this.__objectEditors[objId]?.editors?.find(
         (e) => e.getId() === editorId,
       );
-      console.info('Apply button clicked for editor:', editor?.getId());
+      // TODO: minimal verifications: id & type exists
+      const newState = editor.getEditedState() as ZirconObjectState;
+      this.emit('ZIRCON_OBJECT_SET_STATE_REQUEST', {
+        id: objId,
+        state: newState,
+      });
     });
     return this.__applyButton;
   }

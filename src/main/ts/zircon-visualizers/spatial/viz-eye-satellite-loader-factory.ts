@@ -4,8 +4,11 @@ import { SHARP_EYE_VIZ_TYPE } from '../../sharp-eye/sharp-eye-app';
 import { VizLoaderState } from '../data-loader/viz-loader';
 
 async function createObject(state: VizLoaderState): Promise<VizSatCatLoader> {
-  return new VizSatCatLoader(state);
+  const instance = new VizSatCatLoader();
+  await instance.setState(state);
+  return instance;
 }
+
 export class VizSatCatLoaderFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

@@ -9,8 +9,11 @@ import {
 async function createObject(
   state: VizSatelliteCatalogTabulatorState,
 ): Promise<VizSatelliteCatalogTabulator> {
-  return new VizSatelliteCatalogTabulator(state);
+  const instance = new VizSatelliteCatalogTabulator();
+  await instance.setState(state);
+  return instance;
 }
+
 export class VizSatelliteCatalogTabulatorFactory extends SimpleZirconObjectFactory {
   constructor() {
     super(

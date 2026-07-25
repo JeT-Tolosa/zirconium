@@ -20,8 +20,8 @@ export class VizLineJSChart extends VizJSChart<'line'> {
   public static readonly LINE_JSCHART_VISUALIZER_TYPE =
     'jschar-line-visualizer-type';
 
-  constructor(state?: VizLineJSChartState) {
-    super(state);
+  constructor() {
+    super();
     Chart.register(
       LineController,
       LineElement,

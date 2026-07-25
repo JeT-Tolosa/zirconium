@@ -42,12 +42,13 @@ export class ZirconDataAdapterFactory extends ZirconDataProviderFactory {
   }
 
   public override async createObject(state: any): Promise<any> {
-    return new ZirconDataAdapter(
+    const instance = new ZirconDataAdapter(
       this.getInputDataType(),
       this.getOutputDataType(),
-      state as ZirconDataAdapterState,
       this.getTransformDataFunction(),
       this.getCompareDataFunction(),
     );
+    await instance.setState(state as ZirconDataAdapterState);
+    return instance;
   }
 }

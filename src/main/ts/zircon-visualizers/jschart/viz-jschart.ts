@@ -96,8 +96,8 @@ export abstract class VizJSChart<
   /**
    * constructor
    */
-  constructor(state?: VizJSChartState<TType>) {
-    super(state);
+  constructor() {
+    super();
   }
 
   protected override listenToEvents(): void {
@@ -150,9 +150,7 @@ export abstract class VizJSChart<
     return VIZ_JSCHART_REGISTRY[this.getChartType()].dataType;
   }
 
-  protected override async setState(
-    state: VizJSChartState<TType>,
-  ): Promise<void> {
+  public override async setState(state: VizJSChartState<TType>): Promise<void> {
     await super.setState(state);
     if (!state) {
       return;
@@ -230,7 +228,7 @@ export abstract class VizJSChart<
   }
 
   public override getEditedIds(): string[] {
-    return [this._dataProviderId];
+    return [...new Set([this._dataProviderId].concat(super.getEditedIds()))];
   }
 
   // /**

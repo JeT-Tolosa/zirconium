@@ -1,12 +1,12 @@
-import { ZirconApplication } from './zircon-core/zircon-app';
-import { ZirconDesktop, ZirconDesktopState } from './zircon-ui/zircon-desktop';
-import { ZirconDesktopManager } from './zircon-core/zircon-desktop-manager';
-import {
-  DEFAULT_VISUALIZER_WINDOW_STATE,
-  ZirconVizWindow,
-  ZirconVizWindowState,
-} from './zircon-ui/zircon-viz-window';
-import { ZirconWindow } from './zircon-ui/zircon-window';
+// import { ZirconApplication } from './zircon-core/zircon-app';
+// import { ZirconDesktop, ZirconDesktopState } from './zircon-ui/zircon-desktop';
+// import { ZirconDesktopManager } from './zircon-core/zircon-desktop-manager';
+// import {
+//   DEFAULT_VISUALIZER_WINDOW_STATE,
+//   ZirconVizWindow,
+//   ZirconVizWindowState,
+// } from './zircon-ui/zircon-viz-window';
+// import { ZirconWindow } from './zircon-ui/zircon-window';
 
 // export type InstancesMap = {
 //   DesktopManager: ZirconDesktopManager;
@@ -33,39 +33,40 @@ export interface ArrayComparisonResult {
 }
 
 export class Zircon {
-  /**
-   * Create a new Window
-   * @param app
-   * @param state
-   * @returns
-   */
-  public static createWindowInstance(
-    app: ZirconApplication,
-    state: ZirconVizWindowState = DEFAULT_VISUALIZER_WINDOW_STATE,
-  ): ZirconWindow {
-    const window = new ZirconVizWindow(app, state);
-    return window;
-  }
+  // /**
+  //  * Create a new Window
+  //  * @param app
+  //  * @param state
+  //  * @returns
+  //  */
+  // public static async createWindowInstance(
+  //   app: ZirconApplication,
+  //   state: ZirconVizWindowState = DEFAULT_VISUALIZER_WINDOW_STATE,
+  // ): Promise<ZirconWindow> {
+  //   const window = new ZirconVizWindow(app);
+  //   window.setState(state);
+  //   return window;
+  // }
 
-  /**
-   * Create a new Desktop
-   * @param app
-   * @param state
-   * @returns
-   */
-  public static createDesktopInstance(
-    app: ZirconApplication,
-    state: ZirconDesktopState,
-  ): ZirconDesktop {
-    const desktop = new ZirconDesktop(app, state);
-    return desktop;
-  }
+  // /**
+  //  * Create a new Desktop
+  //  * @param app
+  //  * @param state
+  //  * @returns
+  //  */
+  // public static createDesktopInstance(
+  //   app: ZirconApplication,
+  //   state: ZirconDesktopState,
+  // ): ZirconDesktop {
+  //   const desktop = new ZirconDesktop(app, state);
+  //   return desktop;
+  // }
 
-  public static createDesktopManagerInstance(
-    app: ZirconApplication,
-  ): ZirconDesktopManager {
-    return new ZirconDesktopManager(app);
-  }
+  // public static createDesktopManagerInstance(
+  //   app: ZirconApplication,
+  // ): ZirconDesktopManager {
+  //   return new ZirconDesktopManager(app);
+  // }
 
   //   public static createApplicationObject<T extends keyof InstancesMap>(
   //     type: T,

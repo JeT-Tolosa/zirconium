@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SharpEyedApp } from '../sharp-eye-app';
 import { v4 as uuid } from 'uuid';
 import { ZirconVizWindowState } from '../../zirconium/zircon-ui/zircon-viz-window';
@@ -39,7 +38,7 @@ export class CardiacDataProvider extends DataProviderChartJS<'line'> {
   private arrhythmiaState!: RealtimeHeartState;
 
   constructor() {
-    super('line', null);
+    super('line');
     this.athleteSignal = this.createEmptyBuffer();
     this.arrhythmiaSignal = this.createEmptyBuffer();
     this.athleteState = this.createState(55, false);

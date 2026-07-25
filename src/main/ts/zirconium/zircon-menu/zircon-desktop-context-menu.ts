@@ -95,8 +95,8 @@ export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
       top: y,
       vizIds: null,
     };
-    this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
-      objectId: windowState.id,
+    this.getApplication().emit('ZIRCON_OBJECT_SET_STATE_REQUEST', {
+      id: windowState.id,
       state: windowState,
     });
 
@@ -106,8 +106,8 @@ export class ZirconContextMenuFactoryDesktop extends ZirconContextMenuFactory {
     } else {
       desktopState.windowIds = [windowState.id];
     }
-    this.getApplication().emit('SET_OBJECT_STATE_REQUEST', {
-      objectId: desktop.getId(),
+    this.getApplication().emit('ZIRCON_OBJECT_SET_STATE_REQUEST', {
+      id: desktop.getId(),
       state: desktopState,
     });
   }

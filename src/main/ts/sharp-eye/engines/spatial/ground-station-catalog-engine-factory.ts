@@ -8,7 +8,9 @@ import {
 async function createGroundStationCatalogEngine(
   state: GroundStationCatalogEngineState,
 ): Promise<GroundStationCatalogEngine> {
-  return new GroundStationCatalogEngine(state?.name);
+  const instance = new GroundStationCatalogEngine(state?.name);
+  await instance.setState(state);
+  return instance;
 }
 
 export class GroundStationCatalogEngineFactory extends SimpleZirconObjectFactory {

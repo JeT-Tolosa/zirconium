@@ -90,8 +90,8 @@ export class TimeManagerEngine<
   );
   private _timeRunners: { [timeSource: string]: TimeRunner } = {};
 
-  constructor(state?: TimeManagerEngineState) {
-    super(state);
+  constructor() {
+    super();
     this._timeRunners[TimeManagerEngine.DEFAULT_TIME_SOURCE] =
       TimeManagerEngine.DEFAULT_TIME_RUNNER;
   }
@@ -157,9 +157,7 @@ export class TimeManagerEngine<
     this.setTimeDescriptor(timeSource, timeDescriptor);
   }
 
-  protected override async setState(
-    state: TimeManagerEngineState,
-  ): Promise<void> {
+  public override async setState(state: TimeManagerEngineState): Promise<void> {
     if (!state) {
       return;
     }

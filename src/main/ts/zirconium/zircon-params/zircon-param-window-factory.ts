@@ -19,7 +19,9 @@ export class ZirconParamWindowFactory extends SimpleZirconAppObjectFactory {
         app: ZirconApplication,
         state: ZirconParamWindowState,
       ): Promise<ZirconParamWindow> => {
-        return new ZirconParamWindow(app, state);
+        const instance = new ZirconParamWindow(app);
+        await instance.setState(state);
+        return instance;
       },
       null,
     );
