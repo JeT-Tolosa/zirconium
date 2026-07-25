@@ -12,7 +12,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../../zirconium/zircon-event';
+} from '../../zirconium/zircon-event/zircon-event';
 import {
   TimeManagerEngine,
   TimeManagerEngineEvents,

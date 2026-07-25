@@ -5,7 +5,7 @@ import {
   ZirconVizEventRegistry,
   ZirconVizState,
 } from '../../zirconium/zircon-ui/zircon-visualizer';
-import { MergeZirconRegistries } from '../../zirconium/zircon-event';
+import { MergeZirconRegistries } from '../../zirconium/zircon-event/zircon-event';
 import { GlobeViewer } from '../../libraries/spatial/globe-viewer/globe-viewer';
 import { GlobeViewerCesium } from '../../libraries/spatial/globe-viewer/globe-viewer-cesium';
 

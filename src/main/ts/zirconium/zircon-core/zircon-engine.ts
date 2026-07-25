@@ -7,7 +7,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../zircon-event';
+} from '../zircon-event/zircon-event';
 import { ZIRCON_ENGINE_TYPE } from './zircon-types';
 
 export type ZirconEngineEvents = {

@@ -8,7 +8,10 @@ import {
   ZirconAppObjectState,
   ZirconAppObjectEventRegistry,
 } from '../zircon-core/zircon-app-object';
-import { MergeZirconRegistries, PickEvents } from '../zircon-event';
+import {
+  MergeZirconRegistries,
+  PickEvents,
+} from '../zircon-event/zircon-event';
 import { ZirconObject, ZirconObjectState } from '../zircon-core/zircon-object';
 import { ArrayComparisonResult, Zircon } from '../zircon';
 import {

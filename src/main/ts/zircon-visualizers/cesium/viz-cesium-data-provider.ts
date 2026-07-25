@@ -8,7 +8,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../../zirconium/zircon-event';
+} from '../../zirconium/zircon-event/zircon-event';
 import { GlobeViewer } from '../../libraries/spatial/globe-viewer/globe-viewer';
 import {
   CesiumPrimitive,

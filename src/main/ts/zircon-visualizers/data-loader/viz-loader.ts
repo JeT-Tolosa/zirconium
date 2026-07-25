@@ -7,7 +7,7 @@ import { ItemLoader } from '../../libraries/collection/item-loader';
 import {
   MergeZirconRegistries,
   PickEvents,
-} from '../../zirconium/zircon-event';
+} from '../../zirconium/zircon-event/zircon-event';
 
 import { CatalogEngineEvents } from '../../sharp-eye/engines/catalog-engine';
 

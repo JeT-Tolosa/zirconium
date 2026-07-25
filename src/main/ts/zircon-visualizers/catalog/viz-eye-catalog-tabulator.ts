@@ -8,7 +8,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../../zirconium/zircon-event';
+} from '../../zirconium/zircon-event/zircon-event';
 
 import {
   ZirconViz,
@@ -350,7 +350,9 @@ export class VizCollectionCatalogTabulator<
     });
 
     this._dataTable.on('rowClick', (e, row) => {
-      this.emit('CATALOG_ITEM_SELECTED', { rowData: row.getData() });
+      this.emit('CATALOG_ITEM_SELECTED', {
+        rowData: row.getData(),
+      });
     });
 
     this._dataTable.on('rowContext', function (e, row) {

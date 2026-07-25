@@ -18,7 +18,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../../zirconium/zircon-event';
+} from '../../zirconium/zircon-event/zircon-event';
 // import { ZirconDataProviderManagerEvents } from '../../zirconium/zircon-data/zircon-data-provider-manager';
 import { ZirconDataProviderManagerEvents } from '../../zirconium/zircon-data/zircon-data-provider-manager';
 import '@ui5/webcomponents/dist/Button.js';

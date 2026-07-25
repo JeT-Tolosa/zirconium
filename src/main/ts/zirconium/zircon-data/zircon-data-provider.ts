@@ -11,7 +11,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../zircon-event';
+} from '../zircon-event/zircon-event';
 
 export interface ZirconDataProviderDescriptor {
   id: string;

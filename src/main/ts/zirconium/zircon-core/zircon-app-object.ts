@@ -4,7 +4,7 @@ import {
   ZirconObjectEventRegistry,
 } from './zircon-object';
 import { ZirconApplication } from './zircon-app';
-import { MergeZirconRegistries } from '../zircon-event';
+import { MergeZirconRegistries } from '../zircon-event/zircon-event';
 import { ZIRCON_APP_OBJECT_TYPE } from './zircon-types';
 import pino from 'pino';
 

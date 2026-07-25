@@ -16,7 +16,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../../zirconium/zircon-event';
+} from '../../zirconium/zircon-event/zircon-event';
 
 /**
  * CATALOG ENGINE is a zircon engine that manage collections of items.

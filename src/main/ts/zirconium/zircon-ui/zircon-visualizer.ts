@@ -7,7 +7,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../zircon-event';
+} from '../zircon-event/zircon-event';
 import { ZirconVizWindow } from './zircon-viz-window';
 import { ZIRCON_VISUALIZER_TYPE } from '../zircon-core/zircon-types';
 import { ZirconDataProviderEvents } from '../zircon-data/zircon-data-provider';

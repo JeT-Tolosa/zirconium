@@ -8,7 +8,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../zircon-event';
+} from '../zircon-event/zircon-event';
 
 const ZIRCON_STATE_EDITOR_COMPONENT = 'zircon-state-editor-component';
 

@@ -4,7 +4,6 @@ setTheme('sap_horizon');
 // zircon-ui must be after ui5 theme setTheme
 import '../zircon-ui.css';
 import '../zircon-ui5.css';
-import EventEmitter2 from 'eventemitter2';
 import {
   ZirconDesktopManager,
   ZirconDesktopManagerEvents,
@@ -16,10 +15,10 @@ import 'jspanel4/dist/jspanel.min.css';
 import { ZirconWindowEvents } from '../zircon-ui/zircon-window';
 import { ZirconDesktopEvents } from '../zircon-ui/zircon-desktop';
 import {
-  MergeZirconRegistries,
   MergePickEvents,
   PickEvents,
-} from '../zircon-event';
+  ZirconEventInfo,
+} from '../zircon-event/zircon-event';
 import { ZirconContextMenu } from '../zircon-menu/zircon-context-menu';
 import pino from 'pino';
 import {
@@ -57,6 +56,7 @@ import { ZirconVizWindowFactory } from '../zircon-ui/zircon-viz-window-factory';
 import { ZirconParamWindowFactory } from '../zircon-params/zircon-param-window-factory';
 import { ZirconStateEditorPreFactory } from '../zircon-params/zircon-state-editor-pre';
 import { ZirconStateJsonEditorFactory } from '../zircon-params/zircon-state-editor-jsoneditor';
+import { ZirconEventDispatcher } from '../zircon-event/zircon-event-dispatcher';
 
 /**
  * Composition of this application UI
@@ -86,44 +86,38 @@ export type ZirconApplicationEvents = {
   APPLICATION_QUIT_REQUEST: { filePath: string };
 };
 
-export type ZirconApplicationEventRegistry = MergeZirconRegistries<
-  {
-    incoming: MergePickEvents<
-      [
-        PickEvents<
-          ZirconApplicationEvents,
-          | 'APPLICATION_START_REQUEST'
-          | 'APPLICATION_SAVE_WORKSPACE_REQUEST'
-          | 'APPLICATION_LOAD_WORKSPACE_REQUEST'
-          | 'APPLICATION_QUIT_REQUEST'
-          | 'UNCAUGHT_EXCEPTION'
-          | 'APPLICATION_STARTED'
-        >,
-        PickEvents<
-          ZirconWindowEvents,
-          'WINDOW_SET_PARENT_DESKTOP_REQUEST' | 'WINDOW_SET_PARENT_DESKTOP_DONE'
-        >,
-      ]
-    >;
-    outgoing: MergePickEvents<
-      [
+export type ZirconApplicationEventRegistry = {
+  incoming: MergePickEvents<
+    [
+      PickEvents<
         ZirconApplicationEvents,
-        ZirconObjectManagerEvents,
-        ZirconObjectEvents,
+        | 'APPLICATION_START_REQUEST'
+        | 'APPLICATION_SAVE_WORKSPACE_REQUEST'
+        | 'APPLICATION_LOAD_WORKSPACE_REQUEST'
+        | 'APPLICATION_QUIT_REQUEST'
+        | 'UNCAUGHT_EXCEPTION'
+        | 'APPLICATION_STARTED'
+      >,
+      PickEvents<
         ZirconWindowEvents,
-        ZirconDesktopEvents,
-        ZirconDesktopManagerEvents,
-        ZirconParamWindowEvents,
-        ZirconVizWindowEvents,
-        ZirconEngineEvents,
-      ]
-    >;
-  },
-  {
-    incoming: {};
-    outgoing: {};
-  }
->;
+        'WINDOW_SET_PARENT_DESKTOP_REQUEST' | 'WINDOW_SET_PARENT_DESKTOP_DONE'
+      >,
+    ]
+  >;
+  outgoing: MergePickEvents<
+    [
+      ZirconApplicationEvents,
+      ZirconObjectManagerEvents,
+      ZirconObjectEvents,
+      ZirconWindowEvents,
+      ZirconDesktopEvents,
+      ZirconDesktopManagerEvents,
+      ZirconParamWindowEvents,
+      ZirconVizWindowEvents,
+      ZirconEngineEvents,
+    ]
+  >;
+};
 
 /**
  * Zircon Application is a collection of UI objects connected to a Zircon application
@@ -137,7 +131,7 @@ export class ZirconApplication<
   private __isProduction: boolean = false;
   private __isStarted: boolean = true;
   private _applicationName: string = null;
-  private _eventEmitter: EventEmitter2 = null;
+  private _eventDispatcher: ZirconEventDispatcher<R> = null;
   private _uiClass: string = 'zircon-ui';
   private _parent: HTMLElement = null;
   private __mainDiv: HTMLDivElement = null;
@@ -172,8 +166,7 @@ export class ZirconApplication<
     });
     this._applicationName = applicationName;
     // create event dispatcher
-    this._eventEmitter = new EventEmitter2();
-    this._eventEmitter.setMaxListeners(1000);
+    this._eventDispatcher = new ZirconEventDispatcher();
     // // create object manager
     // this.__objectManager = new ZirconObjectManager(this);
     // // create data provider manager
@@ -315,7 +308,9 @@ export class ZirconApplication<
     try {
       return this.getObjectManager().getInstance(objId, type);
     } catch (error) {
-      this.emit('UNCAUGHT_EXCEPTION', { error: error.toString() });
+      this.emit('UNCAUGHT_EXCEPTION', {
+        error: error.toString(),
+      });
       return null;
     }
   }
@@ -382,35 +377,8 @@ export class ZirconApplication<
     return this.__contextMenu;
   }
 
-  /**
-   * emit an event
-   * @param event
-   * @param args
-   * @returns
-   */
-  public emit<K extends keyof R['outgoing']>(
-    eventName: K,
-    arg: R['outgoing'][K],
-  ): boolean {
-    return this._eventEmitter?.emit(eventName as string, arg);
-  }
-
-  /**
-   * Add a listener
-   * @param event
-   * @param cb
-   * @returns
-   */
-  public addListener<K extends keyof R['incoming']>(
-    eventName: K,
-    cb: (arg: R['incoming'][K]) => void,
-  ): this {
-    this._eventEmitter?.addListener(eventName as string, cb);
-    return this;
-  }
-
-  public getEventDispatcher(): EventEmitter2 {
-    return this._eventEmitter;
+  public getEventDispatcher(): ZirconEventDispatcher<R> {
+    return this._eventDispatcher;
   }
 
   /**
@@ -466,7 +434,10 @@ export class ZirconApplication<
   }
 
   public registerObjectState(state: ZirconObjectState): boolean {
-    return this.emit('STORE_STATE_SNAPSHOT_REQUEST', { state: state });
+    this.emit('STORE_STATE_SNAPSHOT_REQUEST', {
+      state: state,
+    });
+    return true;
   }
 
   public registerPlugin(plugin: ZirconPlugin): boolean {
@@ -542,7 +513,9 @@ export class ZirconApplication<
       });
     }
     // set UI5 web components theme to sap_horizon_dark
-    this.emit('APPLICATION_STARTED', { applicationId: this.getId() });
+    this.emit('APPLICATION_STARTED', {
+      applicationId: this.getId(),
+    });
   }
 
   private async createDesktopManager(): Promise<ZirconDesktopManager> {
@@ -598,5 +571,36 @@ export class ZirconApplication<
       desktopManagerId: this._desktopManagerId,
       uiClass: this.getUIClass(),
     } as ZirconApplicationState;
+  }
+
+  /**
+   * emit an event
+   * @param event
+   * @param args
+   * @returns
+   */
+  public emit<K extends keyof R['outgoing']>(
+    eventName: K,
+    payload: R['outgoing'][K],
+    info?: { emitterId: string; parentId: string },
+  ): ZirconEventInfo {
+    return this.getEventDispatcher().emit(eventName, payload, info);
+  }
+
+  /**
+   * Add a listener
+   * @param event
+   * @param cb
+   * @returns
+   */
+  public addListener<K extends keyof R['incoming']>(
+    eventName: K,
+    cb: (
+      arg: R['incoming'][K],
+      info?: { emitterId: string; parentId: string },
+    ) => void,
+  ): this {
+    this.getEventDispatcher().addListener(eventName, cb);
+    return this;
   }
 }

@@ -10,3 +10,5 @@
 - séparer Zircon et sharp-eye. Faire de zircon une librairie avec code et API (utilisée par sharp-eye)
 - Mettre en place un système d'internationalisation
 - create events to request all ids or all states (or filtered) in ZirconObjectManager
+- faire un système de synchronisation d'evenements en réponse à une requête
+- 

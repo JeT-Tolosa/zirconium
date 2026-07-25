@@ -20,7 +20,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../zircon-event';
+} from '../zircon-event/zircon-event';
 import { ZirconDesktop } from './zircon-desktop';
 import { ZirconHelper } from '../zircon-helper';
 import { ZirconObjectManagerEvents } from '../zircon-core/zircon-object-manager';
@@ -334,22 +334,30 @@ export class ZirconWindow<
         // },
       },
       onminimized: () => {
-        this.emit('WINDOW_MINIMIZED', { windowId: this.getId() });
+        this.emit('WINDOW_MINIMIZED', {
+          windowId: this.getId(),
+        });
         this.stateModified();
         return true;
       },
       onmaximized: () => {
-        this.emit('WINDOW_MAXIMIZED', { windowId: this.getId() });
+        this.emit('WINDOW_MAXIMIZED', {
+          windowId: this.getId(),
+        });
         this.stateModified();
         return true;
       },
       onnormalized: () => {
-        this.emit('WINDOW_NORMALIZED', { windowId: this.getId() });
+        this.emit('WINDOW_NORMALIZED', {
+          windowId: this.getId(),
+        });
         this.stateModified();
         return true;
       },
       onclosed: () => {
-        this.emit('WINDOW_CLOSED', { windowId: this.getId() });
+        this.emit('WINDOW_CLOSED', {
+          windowId: this.getId(),
+        });
         this.stateModified();
         return true;
       },
@@ -361,7 +369,9 @@ export class ZirconWindow<
           this.getId(),
         );
         await this.onPanelCreated(panel);
-        this.emit('WINDOW_DISPLAYED', { windowId: this.getId() });
+        this.emit('WINDOW_DISPLAYED', {
+          windowId: this.getId(),
+        });
       },
       theme: 'primary',
     });

@@ -7,7 +7,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../../../zirconium/zircon-event';
+} from '../../../zirconium/zircon-event/zircon-event';
 import {
   TimeDescriptor,
   TimeRunner,
@@ -197,7 +197,9 @@ export class TimeManagerEngine<
     }
     this._timeRunners[timeSource]?.stop();
     delete this._timeRunners[timeSource];
-    this.emit('SIMULATED_TIME_SOURCE_DELETED', { timeSource: timeSource });
+    this.emit('SIMULATED_TIME_SOURCE_DELETED', {
+      timeSource: timeSource,
+    });
   }
 
   public override generateCurrentState(): TimeManagerEngineState {

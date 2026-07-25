@@ -3,7 +3,7 @@ import {
   MergeZirconRegistries,
   MergePickEvents,
   PickEvents,
-} from '../zircon-event';
+} from '../zircon-event/zircon-event';
 import { ZirconApplication } from '../zircon-core/zircon-app';
 import {
   ZirconWindow,

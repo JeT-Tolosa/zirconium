@@ -1,13 +1,14 @@
 import { v4 as uuid } from 'uuid';
-import EventEmitter2 from 'eventemitter2';
 import {
   MergePickEvents,
   MergeZirconRegistries,
-  ZirconRegistry,
-} from '../zircon-event';
+  ZirconEventInfo,
+  ZirconEventRegistry,
+} from '../zircon-event/zircon-event';
 import { ZirconApplicationEvents } from './zircon-app';
 import { ZIRCON_OBJECT_TYPE } from './zircon-types';
 import { ZirconNameGenerator } from './zircon-name-generator';
+import { ZirconEventDispatcher } from '../zircon-event/zircon-event-dispatcher';
 
 type PickEvents<E, K extends keyof E> = {
   [P in K]: E[P];
@@ -54,7 +55,7 @@ export type ZirconObjectEventRegistry = MergeZirconRegistries<
       ]
     >;
   },
-  ZirconRegistry
+  ZirconEventRegistry
 >;
 
 /**
@@ -79,7 +80,7 @@ export abstract class ZirconObject<
   private _id: string = null;
   private _name: string = null;
   private _factoryId: string = null;
-  private __eventEmitter: EventEmitter2 = null;
+  private __eventDispatcher: ZirconEventDispatcher<R> = null;
   private __stateModified: boolean = false;
   private __stateModificationNotification: boolean = true; // fires an event when state is modified
   public static readonly ZIRCON_OBJECT_ATTRIBUTE_ID: string =
@@ -89,20 +90,21 @@ export abstract class ZirconObject<
    * constructor
    */
   constructor() {
-    this.__eventEmitter = new EventEmitter2();
+    this.__eventDispatcher = new ZirconEventDispatcher<R>();
     this._id = uuid();
   }
 
   /**
    * // TODO: memory leak if setEventDispatcher is used (we should remove listeners !)
    * Set the event emitter to be used
-   * @param eventEmitter
+   * @param eventDispatcher
    */
-  public setEventDispatcher(eventEmitter: EventEmitter2): void {
-    if (this.__eventEmitter === eventEmitter) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public setEventDispatcher(eventDispatcher: ZirconEventDispatcher<any>): void {
+    if (this.__eventDispatcher === eventDispatcher) {
       return;
     }
-    this.__eventEmitter = eventEmitter;
+    this.__eventDispatcher = eventDispatcher;
     this.listenToEvents();
   }
 
@@ -188,7 +190,10 @@ export abstract class ZirconObject<
       return false;
     }
     this._id = id;
-    this.emit('ZIRCON_OBJECT_ID_CHANGED', { oldId: this._id, newId: id });
+    this.emit('ZIRCON_OBJECT_ID_CHANGED', {
+      oldId: this._id,
+      newId: id,
+    });
     this.stateModified();
     return true;
   }
@@ -233,8 +238,39 @@ export abstract class ZirconObject<
    * event dispatcher lazy getter
    * @returns event dispatcher. Connot be null
    */
-  public getEventDispatcher(): EventEmitter2 {
-    return this.__eventEmitter;
+  public getEventDispatcher(): ZirconEventDispatcher<R> {
+    return this.__eventDispatcher;
+  }
+
+  /**
+   * emit an event
+   * @param event
+   * @param args
+   * @returns
+   */
+  public emit<K extends keyof R['outgoing']>(
+    eventName: K,
+    payload: R['outgoing'][K],
+    info?: { emitterId: string; parentId: string },
+  ): ZirconEventInfo {
+    return this.getEventDispatcher().emit(eventName, payload, info);
+  }
+
+  /**
+   * Add a listener
+   * @param event
+   * @param cb
+   * @returns
+   */
+  public addListener<K extends keyof R['incoming']>(
+    eventName: K,
+    cb: (
+      arg: R['incoming'][K],
+      info?: { emitterId: string; parentId: string },
+    ) => void,
+  ): this {
+    this.getEventDispatcher().addListener(eventName, cb);
+    return this;
   }
 
   /**
@@ -252,33 +288,6 @@ export abstract class ZirconObject<
 
   public getName(): string {
     return this._name || this.getId();
-  }
-
-  /**
-   * emit an event
-   * @param event
-   * @param args
-   * @returns
-   */
-  public emit<K extends keyof R['outgoing']>(
-    eventName: K,
-    arg: R['outgoing'][K],
-  ): boolean {
-    return this.getEventDispatcher()?.emit(eventName as string, arg);
-  }
-
-  /**
-   * Add a listener
-   * @param event
-   * @param cb
-   * @returns
-   */
-  public addListener<K extends keyof R['incoming']>(
-    eventName: K,
-    cb: (arg: R['incoming'][K]) => void,
-  ): this {
-    this.getEventDispatcher()?.addListener(eventName as string, cb);
-    return this;
   }
 
   /**
@@ -322,19 +331,19 @@ export abstract class ZirconObject<
   //   return this;
   // }
 
-  /**
-   * Removes a listener
-   * @param event
-   * @param listener
-   * @returns
-   */
-  public removeListener(
-    event: string | symbol,
-    listener: (...args: unknown[]) => void,
-  ): this {
-    this.getEventDispatcher().removeListener(event, listener);
-    return this;
-  }
+  // /**
+  //  * Removes a listener
+  //  * @param event
+  //  * @param listener
+  //  * @returns
+  //  */
+  // public removeListener(
+  //   event: string | symbol,
+  //   listener: (...args: unknown[]) => void,
+  // ): this {
+  //   this.getEventDispatcher().removeListener(event, listener);
+  //   return this;
+  // }
 
   // public getParameterComponents(): ZirconParameterComponent[] {
   //   return [new ZirconDefaultParameterComponent(this.getId())];

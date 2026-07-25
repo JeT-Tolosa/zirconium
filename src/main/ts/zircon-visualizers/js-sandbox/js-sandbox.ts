@@ -1,7 +1,7 @@
 import './js-sandbox.css';
 import { v4 as uuid } from 'uuid';
 
-import { MergeZirconRegistries } from '../../zirconium/zircon-event';
+import { MergeZirconRegistries } from '../../zirconium/zircon-event/zircon-event';
 
 import {
   ZirconViz,

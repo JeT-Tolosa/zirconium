@@ -1,4 +1,4 @@
-import { PickEvents } from '../../zirconium/zircon-event';
+import { PickEvents } from '../../zirconium/zircon-event/zircon-event';
 import {
   ItemCollection,
   ItemCollectionDescriptor,

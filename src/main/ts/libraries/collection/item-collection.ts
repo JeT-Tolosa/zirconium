@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { v4 as uuid } from 'uuid';
-import { PickEvents } from '../../zirconium/zircon-event';
+import { PickEvents } from '../../zirconium/zircon-event/zircon-event';
 
 export type ItemCollectionEvents<T = unknown> = {
   ITEM_COLLECTION_CONTENT_CHANGED: {

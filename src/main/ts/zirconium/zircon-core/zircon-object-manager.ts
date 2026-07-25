@@ -20,7 +20,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../zircon-event';
+} from '../zircon-event/zircon-event';
 
 export type ZirconObjectManagerEvents = {
   // ZIRCON_OBJECT_STATE_REQUEST: { id: string };
@@ -299,7 +299,9 @@ export class ZirconObjectManager<
     }
     // add or update state
     this.__registeredStates[state.id] = state;
-    this.emit('STATE_SNAPSHOT_REGISTERED', { state: state });
+    this.emit('STATE_SNAPSHOT_REGISTERED', {
+      state: state,
+    });
     return true;
   }
 

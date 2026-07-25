@@ -21,7 +21,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
-} from '../zircon-event';
+} from '../zircon-event/zircon-event';
 import { ArrayComparisonResult, Zircon } from '../zircon';
 import { ZirconWindow } from '../zircon-ui/zircon-window';
 import {
@@ -526,7 +526,9 @@ export class ZirconDesktopManager<
         console.log(
           'Hover stable détecté ! switch to desktop ' + desktop.getId(),
         );
-        this.emit('DESKTOP_ACTIVATE_REQUEST', { desktopId: desktop.getId() });
+        this.emit('DESKTOP_ACTIVATE_REQUEST', {
+          desktopId: desktop.getId(),
+        });
       }, delay);
     });
     desktopSelectorElement.addEventListener('mousemove', (e: MouseEvent) => {
@@ -556,7 +558,9 @@ export class ZirconDesktopManager<
     });
 
     desktopSelectorElement.addEventListener('click', () =>
-      this.emit('DESKTOP_ACTIVATE_REQUEST', { desktopId: desktop.getId() }),
+      this.emit('DESKTOP_ACTIVATE_REQUEST', {
+        desktopId: desktop.getId(),
+      }),
     );
     return desktopSelectorElement;
   }
