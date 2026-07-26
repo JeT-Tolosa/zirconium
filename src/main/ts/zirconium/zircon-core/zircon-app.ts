@@ -595,12 +595,11 @@ export class ZirconApplication<
    */
   public addListener<K extends keyof R['incoming']>(
     eventName: K,
-    cb: (
-      arg: R['incoming'][K],
-      info?: { emitterId: string; parentId: string },
-    ) => void,
-  ): this {
-    this.getEventDispatcher().addListener(eventName, cb);
-    return this;
+    cb: (arg: R['incoming'][K], info?: ZirconEventInfo) => void,
+  ): boolean {
+    if (!this.getEventDispatcher().addListener(eventName, cb)) {
+      return false;
+    }
+    return true;
   }
 }

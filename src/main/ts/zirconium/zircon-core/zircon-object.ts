@@ -264,10 +264,7 @@ export abstract class ZirconObject<
    */
   public addListener<K extends keyof R['incoming']>(
     eventName: K,
-    cb: (
-      arg: R['incoming'][K],
-      info?: { emitterId: string; parentId: string },
-    ) => void,
+    cb: (arg: R['incoming'][K], info?: ZirconEventInfo) => void,
   ): this {
     this.getEventDispatcher().addListener(eventName, cb);
     return this;

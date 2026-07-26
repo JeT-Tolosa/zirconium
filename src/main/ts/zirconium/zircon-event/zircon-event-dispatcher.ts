@@ -2,8 +2,16 @@ import EventEmitter2, { EventAndListener } from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import { ZirconEventInfo, ZirconEventRegistry } from './zircon-event';
 
+type ZirconEventCallback = (payload: unknown, info?: ZirconEventInfo) => void;
+type ListenerDescriptor = {
+  eventName: string;
+  cb: ZirconEventCallback;
+};
+
 export class ZirconEventDispatcher<R extends ZirconEventRegistry> {
   private _eventEmitter: EventEmitter2 = null;
+  private readonly _listeners: { [listenerId: string]: ListenerDescriptor } =
+    {};
 
   constructor() {
     this._eventEmitter = new EventEmitter2();
@@ -27,7 +35,7 @@ export class ZirconEventDispatcher<R extends ZirconEventRegistry> {
   ): ZirconEventInfo {
     const eventInfo: ZirconEventInfo = {
       eventId: uuid(),
-      timestamp: new Date().getTime(),
+      timestamp: Date.now(),
       emitterId: info?.emitterId,
       parentEventId: info?.parentId,
     };
@@ -43,12 +51,34 @@ export class ZirconEventDispatcher<R extends ZirconEventRegistry> {
    */
   public addListener<K extends keyof R['incoming']>(
     eventName: K,
-    cb: (
-      arg: R['incoming'][K],
-      info?: { emitterId: string; parentId: string },
-    ) => void,
-  ): this {
-    this._eventEmitter?.addListener(eventName as string, cb);
-    return this;
+    cb: (payload: R['incoming'][K], info?: ZirconEventInfo) => void,
+  ): string {
+    for (const listener of Object.values(this._listeners)) {
+      if (listener.eventName === String(eventName) && listener.cb === cb) {
+        throw new Error(
+          `Listener already registered for event "${String(eventName)}".`,
+        );
+      }
+    }
+    const listenerId = uuid();
+    this._listeners[listenerId] = {
+      eventName: String(eventName),
+      cb: cb as ZirconEventCallback,
+    };
+    this._eventEmitter.addListener(eventName as string, cb);
+    return listenerId;
+  }
+
+  public removeListener(listenerId: string): boolean {
+    const listenerDescriptor = this._listeners[listenerId];
+    if (!listenerDescriptor) {
+      return false;
+    }
+    this._eventEmitter.removeListener(
+      listenerDescriptor.eventName,
+      listenerDescriptor.cb,
+    );
+    delete this._listeners[listenerId];
+    return true;
   }
 }

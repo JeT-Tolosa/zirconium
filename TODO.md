@@ -11,4 +11,4 @@
 - Mettre en place un système d'internationalisation
 - create events to request all ids or all states (or filtered) in ZirconObjectManager
 - faire un système de synchronisation d'evenements en réponse à une requête
-- 
+- remove inheritence from ZirconAppObject but from Managers: ZirconDesktop, ZirconWindow, ...

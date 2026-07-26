@@ -12,7 +12,7 @@ import {
   MergeZirconRegistries,
   PickEvents,
 } from '../zircon-event/zircon-event';
-import { ZirconObject, ZirconObjectState } from '../zircon-core/zircon-object';
+import { ZirconObject } from '../zircon-core/zircon-object';
 import { ArrayComparisonResult, Zircon } from '../zircon';
 import {
   ACTIVE_DESKTOP_CLASS,
@@ -40,7 +40,14 @@ export type ZirconDesktopEvents = {
     desktopId: string;
     windowId: string;
   };
-  DESKTOP_WINDOW_ADDED: { desktopId: string };
+  DESKTOP_ADD_WINDOW_ERROR: {
+    desktopId: string;
+    error: string;
+  };
+  DESKTOP_WINDOW_ADDED: {
+    desktopId: string;
+    windowId: string;
+  };
   DESKTOP_REMOVE_WINDOW_REQUEST: {
     desktopId: string;
     windowId: string;
@@ -67,6 +74,7 @@ export type ZirconDesktopEventRegistry = MergeZirconRegistries<
       | 'DESKTOP_WINDOW_IDS_CHANGED'
       | 'DESKTOP_WINDOW_IDS_ERROR'
       | 'DESKTOP_WINDOW_ADDED'
+      | 'DESKTOP_ADD_WINDOW_ERROR'
       | 'DESKTOP_WINDOW_REMOVED'
     >;
   },
@@ -123,14 +131,25 @@ export class ZirconDesktop<
     );
   }
 
-  private onDESKTOP_ADD_WINDOW_REQUEST(
+  private async onDESKTOP_ADD_WINDOW_REQUEST(
     desktopId: string,
     windowId: string,
-  ): void {
+  ) {
     if (desktopId !== this.getId()) {
       return;
     }
-    this.displayWindow(windowId);
+    try {
+      await this.displayWindow(windowId);
+      this.emit('DESKTOP_WINDOW_ADDED', {
+        desktopId: desktopId,
+        windowId: windowId,
+      });
+    } catch (error) {
+      this.emit('DESKTOP_ADD_WINDOW_ERROR', {
+        desktopId: desktopId,
+        error: JSON.stringify(error),
+      });
+    }
   }
 
   private onDESKTOP_REMOVE_WINDOW_REQUEST(
@@ -304,28 +323,28 @@ export class ZirconDesktop<
   //   this.getContainer().appendChild(paramWindow.getPanel());
   //   paramWindow.setParentDesktop(this);
   // }
-  public async displayUnregisteredWindow(
-    windowState: ZirconObjectState,
-  ): Promise<void> {
-    if (!windowState) {
-      return Promise.resolve();
-    }
-    const window: ZirconObject = await this.getApplication()
-      .getObjectManager()
-      .createInstance(windowState);
-    if (!window) {
-      throw new Error(`Cannot create Window with id ${windowState.id}.`);
-    }
-    if (!(window instanceof ZirconWindow)) {
-      throw new Error(
-        `Cannot display Window with id ${windowState.id} object is not a Window: type ${window.getType()}`,
-      );
-    }
-    // add Window in desktop
-    const panel: HTMLElement = window.getPanel();
-    this.getContainer().appendChild(panel);
-    window.setParentDesktop(this);
-  }
+  // public async displayUnregisteredWindow(
+  //   windowState: ZirconObjectState,
+  // ): Promise<void> {
+  //   if (!windowState) {
+  //     return Promise.resolve();
+  //   }
+  //   const window: ZirconObject = await this.getApplication()
+  //     .getObjectManager()
+  //     .createInstance(windowState);
+  //   if (!window) {
+  //     throw new Error(`Cannot create Window with id ${windowState.id}.`);
+  //   }
+  //   if (!(window instanceof ZirconWindow)) {
+  //     throw new Error(
+  //       `Cannot display Window with id ${windowState.id} object is not a Window: type ${window.getType()}`,
+  //     );
+  //   }
+  //   // add Window in desktop
+  //   const panel: HTMLElement = window.getPanel();
+  //   this.getContainer().appendChild(panel);
+  //   window.setParentDesktop(this);
+  // }
 
   private async displayWindow(windowId: string): Promise<void> {
     if (!windowId) {
