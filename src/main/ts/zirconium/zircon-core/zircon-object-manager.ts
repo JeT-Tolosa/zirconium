@@ -20,6 +20,7 @@ import {
   MergePickEvents,
   MergeZirconRegistries,
   PickEvents,
+  ZirconEventTrace,
 } from '../zircon-event/zircon-event';
 
 export type ZirconObjectManagerEvents = {
@@ -28,7 +29,7 @@ export type ZirconObjectManagerEvents = {
   // ZIRCON_OBJECT_STATE: { state: ZirconObjectState };
   GET_STATE_SNAPSHOT_REQUEST: { id: string };
   GET_STATE_SNAPSHOT_ERROR: { id: string; error: string };
-  STORE_STATE_SNAPSHOT_REQUEST: { state: ZirconObjectState };
+  REGISTER_STATE_SNAPSHOT_REQUEST: { state: ZirconObjectState };
   STATE_SNAPSHOT_REGISTERED: { state: ZirconObjectState };
   STATE_SNAPSHOT_UNREGISTERED: { id: string };
   STATE_SNAPSHOT_MODIFIED: { state: ZirconObjectState };
@@ -41,7 +42,7 @@ export type ZirconObjectManagerEventRegistry = MergeZirconRegistries<
       [
         PickEvents<
           ZirconObjectManagerEvents,
-          'GET_STATE_SNAPSHOT_REQUEST' | 'STORE_STATE_SNAPSHOT_REQUEST'
+          'GET_STATE_SNAPSHOT_REQUEST' | 'REGISTER_STATE_SNAPSHOT_REQUEST'
         >,
       ]
     >;
@@ -82,8 +83,8 @@ export class ZirconObjectManager<
         });
       }
     });
-    this.addListener('STORE_STATE_SNAPSHOT_REQUEST', (arg) => {
-      this.registerObjectState(arg.state);
+    this.addListener('REGISTER_STATE_SNAPSHOT_REQUEST', (arg, trace) => {
+      this.registerObjectState(arg.state, trace);
     });
   }
 
@@ -287,7 +288,10 @@ export class ZirconObjectManager<
    * @param state
    * @returns
    */
-  public registerObjectState(state: ZirconObjectState): boolean {
+  public registerObjectState(
+    state: ZirconObjectState,
+    trace?: ZirconEventTrace,
+  ): boolean {
     if (!state) {
       return false;
     }
@@ -299,9 +303,13 @@ export class ZirconObjectManager<
     }
     // add or update state
     this.__registeredStates[state.id] = state;
-    this.emit('STATE_SNAPSHOT_REGISTERED', {
-      state: state,
-    });
+    this.emit(
+      'STATE_SNAPSHOT_REGISTERED',
+      {
+        state: state,
+      },
+      trace,
+    );
     return true;
   }
 

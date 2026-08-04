@@ -3,22 +3,29 @@ export type ZirconEventPayload = { [key: string]: unknown };
 
 export type ZirconEventGenericPayload = {};
 
+export type ZirconEventListenerCallback<
+  R extends ZirconEventRegistry,
+  K extends keyof R['incoming'],
+> = (payload: R['incoming'][K], trace: ZirconEventTrace) => void;
+
 export type ZirconEventInfo = {
   eventId: string;
-  parentEventId?: string;
+  eventName: string;
   timestamp: number;
-  emitterId?: string;
+  emitterId: string;
 };
 
-export type ZirconEvent<
-  Payload extends ZirconEventPayload = ZirconEventGenericPayload,
-> = {
-  eventId: string;
-  parentEventId: string;
-  timestamp: number;
-  sourceId: string;
-  payload: Payload;
-};
+export type ZirconEventTrace = ZirconEventInfo[];
+
+// export type ZirconEvent<
+//   Payload extends ZirconEventPayload = ZirconEventGenericPayload,
+// > = {
+//   eventId: string;
+//   timestamp: number;
+//   sourceId: string;
+//   payload: Payload;
+//   info: ZirconEventInfo;
+// };
 
 // registry for Zircon events
 export type ZirconEventRegistry = {

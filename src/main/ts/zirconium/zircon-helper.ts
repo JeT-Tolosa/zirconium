@@ -1,4 +1,5 @@
 import { ZirconApplication } from './zircon-core/zircon-app';
+import { ZirconObjectManagerEventRegistry } from './zircon-core/zircon-object-manager';
 import {
   ZIRCON_DESKTOP_TYPE,
   ZIRCON_WINDOW_TYPE,
@@ -75,6 +76,7 @@ export class ZirconHelper {
 
   public static async addParamWindowToDesktop(
     application: ZirconApplication,
+    sourceWindow: ZirconWindow,
     paramWindowState: ZirconParamWindowState,
     desktopId: string,
   ) {
@@ -90,14 +92,40 @@ export class ZirconHelper {
     if (!desktopId) {
       throw new Error('Desktop ID is required.');
     }
-    // register
-    application.emit('STORE_STATE_SNAPSHOT_REQUEST', {
-      state: paramWindowState,
+    // OLD Way: Using emit to request state snapshot, wait and add window to desktop
+
+    // setTimeout(
+    //   () =>
+    //     application.emit('REGISTER_STATE_SNAPSHOT_REQUEST', {
+    //       state: paramWindowState,
+    //     }),
+    //   2000,
+    // );
+
+    // // application.emit('REGISTER_STATE_SNAPSHOT_REQUEST', {
+    // //   state: paramWindowState,
+    // // });
+
+    // application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
+    //   desktopId: desktopId,
+    //   windowId: paramWindowState.id,
+    // });
+
+    // NEW Way: Create an emit transaction to request state snapshot and add window to desktop when first is fulfilled
+    const storeSnapshotTransaction = application
+      .getEventDispatcher()
+      .createEmitTransaction('REGISTER_STATE_SNAPSHOT_REQUEST', {
+        state: paramWindowState,
+      });
+    storeSnapshotTransaction.onResponse<
+      ZirconObjectManagerEventRegistry,
+      'STATE_SNAPSHOT_REGISTERED'
+    >('STATE_SNAPSHOT_REGISTERED', () => {
+      application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
+        desktopId: desktopId,
+        windowId: paramWindowState.id,
+      });
     });
-    await this.sleep(1000);
-    application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
-      desktopId: desktopId,
-      windowId: paramWindowState.id,
-    });
+    storeSnapshotTransaction.execute();
   }
 }

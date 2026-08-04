@@ -17,7 +17,8 @@ import { ZirconDesktopEvents } from '../zircon-ui/zircon-desktop';
 import {
   MergePickEvents,
   PickEvents,
-  ZirconEventInfo,
+  ZirconEventListenerCallback,
+  ZirconEventTrace,
 } from '../zircon-event/zircon-event';
 import { ZirconContextMenu } from '../zircon-menu/zircon-context-menu';
 import pino from 'pino';
@@ -166,7 +167,7 @@ export class ZirconApplication<
     });
     this._applicationName = applicationName;
     // create event dispatcher
-    this._eventDispatcher = new ZirconEventDispatcher();
+    this._eventDispatcher = new ZirconEventDispatcher(this.getId());
     // // create object manager
     // this.__objectManager = new ZirconObjectManager(this);
     // // create data provider manager
@@ -180,8 +181,8 @@ export class ZirconApplication<
   }
 
   private listenToEvents(): void {
-    this.addListener('APPLICATION_START_REQUEST', (arg) =>
-      this.onAPPLICATION_START_REQUEST(arg.applicationId),
+    this.addListener('APPLICATION_START_REQUEST', (arg, trace) =>
+      this.onAPPLICATION_START_REQUEST(arg.applicationId, trace),
     );
 
     this.addListener('UNCAUGHT_EXCEPTION', (arg) => {
@@ -226,9 +227,12 @@ export class ZirconApplication<
 
   private onAPPLICATION_QUIT_REQUEST(): void {}
 
-  private onAPPLICATION_START_REQUEST(applicationId: string): void {
+  private async onAPPLICATION_START_REQUEST(
+    applicationId: string,
+    trace: ZirconEventTrace,
+  ) {
     if (this.getId() === applicationId) {
-      this.start();
+      await this.start(trace);
     }
   }
 
@@ -434,7 +438,7 @@ export class ZirconApplication<
   }
 
   public registerObjectState(state: ZirconObjectState): boolean {
-    this.emit('STORE_STATE_SNAPSHOT_REQUEST', {
+    this.emit('REGISTER_STATE_SNAPSHOT_REQUEST', {
       state: state,
     });
     return true;
@@ -499,7 +503,7 @@ export class ZirconApplication<
   /**
    * start application UI by displaying it in the body and starting engines
    */
-  public async start(): Promise<void> {
+  public async start(startRequestTrace?: ZirconEventTrace): Promise<void> {
     await this.createDesktopManager();
     await this.getPluginManager().startPlugins();
     await this.startEngines();
@@ -513,9 +517,13 @@ export class ZirconApplication<
       });
     }
     // set UI5 web components theme to sap_horizon_dark
-    this.emit('APPLICATION_STARTED', {
-      applicationId: this.getId(),
-    });
+    this.emit(
+      'APPLICATION_STARTED',
+      {
+        applicationId: this.getId(),
+      },
+      startRequestTrace,
+    );
   }
 
   private async createDesktopManager(): Promise<ZirconDesktopManager> {
@@ -582,9 +590,9 @@ export class ZirconApplication<
   public emit<K extends keyof R['outgoing']>(
     eventName: K,
     payload: R['outgoing'][K],
-    info?: { emitterId: string; parentId: string },
-  ): ZirconEventInfo {
-    return this.getEventDispatcher().emit(eventName, payload, info);
+    trace?: ZirconEventTrace,
+  ): ZirconEventTrace {
+    return this.getEventDispatcher().emit(eventName, payload, trace);
   }
 
   /**
@@ -595,7 +603,7 @@ export class ZirconApplication<
    */
   public addListener<K extends keyof R['incoming']>(
     eventName: K,
-    cb: (arg: R['incoming'][K], info?: ZirconEventInfo) => void,
+    cb: ZirconEventListenerCallback<R, K>,
   ): boolean {
     if (!this.getEventDispatcher().addListener(eventName, cb)) {
       return false;

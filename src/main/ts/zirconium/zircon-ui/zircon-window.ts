@@ -93,7 +93,10 @@ export type ZirconWindowEventRegistry = MergeZirconRegistries<
           // | 'WINDOW_DIMENSION_CHANGED'
           // | 'WINDOW_POSITION_CHANGED'
         >,
-        PickEvents<ZirconObjectManagerEvents, 'STORE_STATE_SNAPSHOT_REQUEST'>,
+        PickEvents<
+          ZirconObjectManagerEvents,
+          'REGISTER_STATE_SNAPSHOT_REQUEST'
+        >,
       ]
     >;
   },
@@ -394,6 +397,7 @@ export class ZirconWindow<
     if (!this.__paramWindow) {
       ZirconHelper.addParamWindowToDesktop(
         this.getApplication(),
+        this,
         paramWindowState,
         this.getParentDesktop().getId(),
       );
