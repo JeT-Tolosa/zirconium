@@ -41,14 +41,12 @@ export class ZirconEventDispatcher<R extends ZirconEventRegistry> {
   public createEmitTransaction<K extends keyof R['outgoing']>(
     eventName: K,
     payload: R['outgoing'][K],
-    ancestorTrace?: ZirconEventTrace,
   ): ZirconEventEmitTransaction<R, K> {
     return new ZirconEventEmitTransaction<R, K>(
       this.__eventEmitter,
       this.__emitterId,
       eventName,
       payload,
-      ancestorTrace,
     );
   }
 
