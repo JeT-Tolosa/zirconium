@@ -4,11 +4,13 @@ import {
   ZIRCON_DESKTOP_TYPE,
   ZIRCON_WINDOW_TYPE,
 } from './zircon-core/zircon-types';
+import { ZirconIncomingPayload } from './zircon-event/zircon-event';
 import {
   ZirconTransitionConditionTimeout,
   ZirconTransitionConditionWaitAny,
-  ZirconTransitionConditionWaitForEvent,
+  ZirconTransitionConditionWaitEventResponse,
 } from './zircon-event/zircon-event-condition';
+import { ZirconEventTransaction } from './zircon-event/zircon-event-transaction';
 import { ZirconParamWindowState } from './zircon-params/zircon-param-window';
 import { ZirconDesktop } from './zircon-ui/zircon-desktop';
 import { ZirconWindow } from './zircon-ui/zircon-window';
@@ -96,33 +98,56 @@ export class ZirconHelper {
     if (!desktopId) {
       throw new Error('Desktop ID is required.');
     }
-    // OLD Way: Using emit to request state snapshot, wait and add window to desktop
 
-    // setTimeout(
-    //   () =>
-    //     application.emit('REGISTER_STATE_SNAPSHOT_REQUEST', {
-    //       state: paramWindowState,
-    //     }),
-    //   2000,
-    // );
+    const storeSnapshotTransaction = ZirconHelper.createTransaction2(
+      application,
+      paramWindowState,
+      desktopId,
+    );
+    const trace = await storeSnapshotTransaction.execute();
+    console.log(trace);
+  }
 
-    // // application.emit('REGISTER_STATE_SNAPSHOT_REQUEST', {
-    // //   state: paramWindowState,
-    // // });
-
-    // application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
-    //   desktopId: desktopId,
-    //   windowId: paramWindowState.id,
-    // });
-
-    // NEW Way: Create an emit transaction to request state snapshot and add window to desktop when first is fulfilled
+  public static createTransaction1(
+    application: ZirconApplication,
+    paramWindowState: ZirconParamWindowState,
+    desktopId: string,
+  ): ZirconEventTransaction {
     const storeSnapshotTransaction = application
       .getEventDispatcher()
       .createEmitTransaction('REGISTER_STATE_SNAPSHOT_REQUEST', {
         state: paramWindowState,
       });
 
-    const onREGISTERED = (payload) => {
+    storeSnapshotTransaction.onResponse<
+      ZirconObjectManagerEventRegistry,
+      'STATE_SNAPSHOT_REGISTERED'
+    >('STATE_SNAPSHOT_REGISTERED', () => {
+      application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
+        desktopId: desktopId,
+        windowId: paramWindowState.id,
+      });
+    });
+    return storeSnapshotTransaction;
+  }
+
+  public static createTransaction2(
+    application: ZirconApplication,
+    paramWindowState: ZirconParamWindowState,
+    desktopId: string,
+  ): ZirconEventTransaction {
+    const storeSnapshotTransaction = application
+      .getEventDispatcher()
+      .createEmitTransaction('REGISTER_STATE_SNAPSHOT_REQUEST', {
+        state: paramWindowState,
+      });
+
+    const onREGISTERED = (
+      payload: ZirconIncomingPayload<
+        ZirconObjectManagerEventRegistry,
+        'STATE_SNAPSHOT_REGISTERED'
+      >,
+    ) => {
       console.log(
         `STATE SNAPSHOT registered payload = ${JSON.stringify(payload)}`,
       );
@@ -132,14 +157,120 @@ export class ZirconHelper {
       });
     };
 
-    const onERROR = () => {
-      console.log(`registration ERROR`);
+    const onERROR = (
+      payload: ZirconIncomingPayload<
+        ZirconObjectManagerEventRegistry,
+        'STATE_SNAPSHOT_ERROR'
+      >,
+    ) => {
+      console.log(`registration ERROR. payload = ${JSON.stringify(payload)}`);
     };
 
-    // TODO: faire des fonction helper dans transaction
+    storeSnapshotTransaction.setCondition(
+      storeSnapshotTransaction.waitAny(
+        storeSnapshotTransaction.onResponse<
+          ZirconObjectManagerEventRegistry,
+          'STATE_SNAPSHOT_REGISTERED'
+        >('STATE_SNAPSHOT_REGISTERED', onREGISTERED),
+        storeSnapshotTransaction.onResponse<
+          ZirconObjectManagerEventRegistry,
+          'STATE_SNAPSHOT_ERROR'
+        >('STATE_SNAPSHOT_ERROR', onERROR),
+        storeSnapshotTransaction.timeout(5000),
+      ),
+    );
+
+    return storeSnapshotTransaction;
+  }
+
+  // public static createTransaction3(
+  //   application: ZirconApplication,
+  //   paramWindowState: ZirconParamWindowState,
+  //   desktopId: string,
+  // ): ZirconEventTransaction {
+  //   const storeSnapshotTransaction = application
+  //     .getEventDispatcher()
+  //     .createEmitTransaction('REGISTER_STATE_SNAPSHOT_REQUEST', {
+  //       state: paramWindowState,
+  //     });
+
+  //   const onREGISTERED = (
+  //     payload: ZirconIncomingPayload<
+  //       ZirconObjectManagerEventRegistry,
+  //       'STATE_SNAPSHOT_REGISTERED'
+  //     >,
+  //   ) => {
+  //     console.log(
+  //       `STATE SNAPSHOT registered payload = ${JSON.stringify(payload)}`,
+  //     );
+  //     application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
+  //       desktopId: desktopId,
+  //       windowId: paramWindowState.id,
+  //     });
+  //   };
+
+  //   const onERROR = (
+  //     payload: ZirconIncomingPayload<
+  //       ZirconObjectManagerEventRegistry,
+  //       'STATE_SNAPSHOT_ERROR'
+  //     >,
+  //   ) => {
+  //     console.log(`registration ERROR. payload = ${JSON.stringify(payload)}`);
+  //   };
+
+  //   storeSnapshotTransaction.setCondition(
+  //     storeSnapshotTransaction.waitAny(
+  //       storeSnapshotTransaction.onRegistryResponse<ZirconObjectManagerEventRegistry>(
+  //         'STATE_SNAPSHOT_REGISTERED',
+  //         onREGISTERED,
+  //       ),
+  //       storeSnapshotTransaction.onRegistryResponse<ZirconObjectManagerEventRegistry>(
+  //         'STATE_SNAPSHOT_ERROR',
+  //         onERROR,
+  //       ),
+  //       storeSnapshotTransaction.timeout(5000),
+  //     ),
+  //   );
+  //   return storeSnapshotTransaction;
+  // }
+
+  public static createTransaction4(
+    application: ZirconApplication,
+    paramWindowState: ZirconParamWindowState,
+    desktopId: string,
+  ): ZirconEventTransaction {
+    const storeSnapshotTransaction = application
+      .getEventDispatcher()
+      .createEmitTransaction('REGISTER_STATE_SNAPSHOT_REQUEST', {
+        state: paramWindowState,
+      });
+
+    const onREGISTERED = (
+      payload: ZirconIncomingPayload<
+        ZirconObjectManagerEventRegistry,
+        'STATE_SNAPSHOT_REGISTERED'
+      >,
+    ) => {
+      console.log(
+        `STATE SNAPSHOT registered payload = ${JSON.stringify(payload)}`,
+      );
+      application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
+        desktopId: desktopId,
+        windowId: paramWindowState.id,
+      });
+    };
+
+    const onERROR = (
+      payload: ZirconIncomingPayload<
+        ZirconObjectManagerEventRegistry,
+        'STATE_SNAPSHOT_ERROR'
+      >,
+    ) => {
+      console.log(`registration ERROR. payload = ${JSON.stringify(payload)}`);
+    };
     storeSnapshotTransaction.setCondition(
       new ZirconTransitionConditionWaitAny([
-        new ZirconTransitionConditionWaitForEvent<
+        new ZirconTransitionConditionWaitEventResponse<
           ZirconObjectManagerEventRegistry,
           'STATE_SNAPSHOT_REGISTERED'
         >(
@@ -148,7 +279,7 @@ export class ZirconHelper {
           'STATE_SNAPSHOT_REGISTERED',
           onREGISTERED,
         ),
-        new ZirconTransitionConditionWaitForEvent<
+        new ZirconTransitionConditionWaitEventResponse<
           ZirconObjectManagerEventRegistry,
           'STATE_SNAPSHOT_ERROR'
         >(
@@ -160,17 +291,41 @@ export class ZirconHelper {
         new ZirconTransitionConditionTimeout(5000),
       ]),
     );
-
-    // storeSnapshotTransaction.onResponse<
-    //   ZirconObjectManagerEventRegistry,
-    //   'STATE_SNAPSHOT_REGISTERED'
-    // >('STATE_SNAPSHOT_REGISTERED', () => {
-    //   application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
-    //     desktopId: desktopId,
-    //     windowId: paramWindowState.id,
-    //   });
-    // });
-    const trace = await storeSnapshotTransaction.execute();
-    console.log(trace);
+    return storeSnapshotTransaction;
   }
+
+  //   const onREGISTERED = (
+  //     payload: ZirconIncomingPayload<
+  //       ZirconObjectManagerEventRegistry,
+  //       'STATE_SNAPSHOT_REGISTERED'
+  //     >,
+  //   ) => {
+  //     console.log(
+  //       `STATE SNAPSHOT registered payload = ${JSON.stringify(payload)}`,
+  //     );
+  //     application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
+  //       desktopId: desktopId,
+  //       windowId: paramWindowState.id,
+  //     });
+  //   };
+
+  //   const onERROR = (
+  //     payload: ZirconIncomingPayload<
+  //       ZirconObjectManagerEventRegistry,
+  //       'STATE_SNAPSHOT_ERROR'
+  //     >,
+  //   ) => {
+  //     console.log(`registration ERROR. payload = ${JSON.stringify(payload)}`);
+  //   };
+
+  //   // storeSnapshotTransaction.onResponse<
+  //   //   ZirconObjectManagerEventRegistry,
+  //   //   'STATE_SNAPSHOT_REGISTERED'
+  //   // >('STATE_SNAPSHOT_REGISTERED', () => {
+  //   //   application.emit('DESKTOP_ADD_WINDOW_REQUEST', {
+  //   //     desktopId: desktopId,
+  //   //     windowId: paramWindowState.id,
+  //   //   });
+  //   // });
+  // }
 }

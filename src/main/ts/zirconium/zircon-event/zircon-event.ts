@@ -6,7 +6,7 @@ export type ZirconEventGenericPayload = {};
 export type ZirconEventListenerCallback<
   R extends ZirconEventRegistry,
   K extends keyof R['incoming'],
-> = (payload: R['incoming'][K], trace: ZirconEventTrace) => void;
+> = (payload: ZirconIncomingPayload<R, K>, trace: ZirconEventTrace) => void;
 
 export type ZirconEventInfo = {
   eventId: string;
@@ -27,13 +27,16 @@ export type ZirconEventTrace = ZirconEventInfo[];
 //   info: ZirconEventInfo;
 // };
 
-// registry for Zircon events
+/** registry for Zircon events
+ * It is divided in two Records: incoming and outgoing
+ * Both are composed of eventNamle: EventPayload
+ */
 export type ZirconEventRegistry = {
   incoming: Record<string, ZirconEventPayload>;
   outgoing: Record<string, ZirconEventPayload>;
 };
 
-// merge two registries
+// merge two zircon registries
 export type MergeZirconRegistries<
   A extends ZirconEventRegistry,
   B extends ZirconEventRegistry,
@@ -43,6 +46,25 @@ export const EmptyRegistry: ZirconEventRegistry = {
   incoming: {},
   outgoing: {},
 };
+
+/**
+ * Specific payload
+ */
+export type ZirconIncomingPayload<
+  R extends ZirconEventRegistry,
+  K extends keyof R['incoming'],
+> = R['incoming'][K];
+
+export type ZirconOutgoingPayload<
+  R extends ZirconEventRegistry,
+  K extends keyof R['outgoing'],
+> = R['outgoing'][K];
+
+/**
+ * Union of all incoming payloads of the given registry
+ */
+export type ZirconIncomingPayloadUnion<R extends ZirconEventRegistry> =
+  R['incoming'][keyof R['incoming']];
 
 export type PickEvents<E, K extends keyof E> = Pick<E, K>;
 // {

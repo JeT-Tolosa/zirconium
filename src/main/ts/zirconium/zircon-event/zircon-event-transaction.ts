@@ -1,12 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import EventEmitter2 from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import {
   ZirconEventInfo,
   ZirconEventRegistry,
   ZirconEventTrace,
+  ZirconIncomingPayload,
 } from './zircon-event';
-import { ZirconTransactionCondition } from './zircon-event-condition';
+import {
+  ZirconTransactionCondition,
+  ZirconTransitionConditionTimeout,
+  ZirconTransitionConditionWaitAll,
+  ZirconTransitionConditionWaitAny,
+  ZirconTransitionConditionWaitEventResponse,
+} from './zircon-event-condition';
 
 export abstract class ZirconEventTransaction {
   private __transactionId: string;
@@ -70,7 +76,7 @@ export class ZirconEventEmitTransaction<
     };
     const trace: ZirconEventTrace = [info];
     try {
-      const condition = this.__condition.execute();
+      const condition = this.__condition?.execute();
       this.__eventEmitter.emit(this.__eventName, this.__payload, trace);
       return await condition;
     } finally {
@@ -79,13 +85,18 @@ export class ZirconEventEmitTransaction<
   }
 
   private destroy(): void {
-    this.__condition.dispose();
+    this.__condition?.dispose();
   }
 
   public setCondition(node: ZirconTransactionCondition) {
     this.__condition?.dispose();
     this.__condition = node;
   }
+
+  public getEventEmitter(): EventEmitter2 {
+    return this.__eventEmitter;
+  }
+
   //   public onTimeout(durationInSeconds: number) {
   //     this.__listenerInstallers.push(() =>
   //       this.createTimeoutInstaller(durationInSeconds),
@@ -94,26 +105,26 @@ export class ZirconEventEmitTransaction<
 
   //   private createTimeoutInstaller(durationInSeconds: number) {}
 
-  //   // first response is taken into account
-  //   // once received listeners are cleared
-  //   public onResponse<
-  //     Rin extends ZirconEventRegistry | null,
-  //     Kin extends keyof Rin['incoming'],
-  //   >(
-  //     eventName: Kin,
-  //     cb: (
-  //       _payload: ZirconEventListenerCallback<Rin, Kin>,
-  //       _trace: ZirconEventTrace,
-  //     ) => void,
-  //   ) {
-  //     const eventNameString = String(eventName);
-  //     // TODO: return a function that do all the stuff instead of storing an object that will be used to do the stuff afterward
-  //     // this.__listenerInstallers.push( new Function() );
+  // // first response is taken into account
+  // // once received listeners are cleared
+  // public onResponse<
+  //   Rin extends ZirconEventRegistry | null,
+  //   Kin extends keyof Rin['incoming'],
+  // >(
+  //   eventName: Kin,
+  //   cb: (
+  //     _payload: ZirconEventListenerCallback<Rin, Kin>,
+  //     _trace: ZirconEventTrace,
+  //   ) => void,
+  // ) {
+  //   const eventNameString = String(eventName);
+  //   // TODO: return a function that do all the stuff instead of storing an object that will be used to do the stuff afterward
+  //   // this.__listenerInstallers.push( new Function() );
 
-  //     // this.__listenerInstallers.push(() =>
-  //     //   this.createOnResponseInstaller(eventNameString, cb),
-  //     // );
-  //   }
+  //   // this.__listenerInstallers.push(() =>
+  //   //   this.createOnResponseInstaller(eventNameString, cb),
+  //   // );
+  // }
 
   //   private createOnResponseInstaller(
   //     responseEventName: string,
@@ -170,4 +181,137 @@ export class ZirconEventEmitTransaction<
   //     };
   //     return callback;
   //   }
+
+  // <Kin extends keyof Rin['incoming'],
+  // Rin extends ZirconEventRegistry>
+  public waitAny(
+    ...conditions: ZirconTransactionCondition[]
+  ): ZirconTransitionConditionWaitAny {
+    return new ZirconTransitionConditionWaitAny(conditions);
+  }
+
+  public waitAll(
+    ...conditions: ZirconTransactionCondition[]
+  ): ZirconTransitionConditionWaitAll {
+    return new ZirconTransitionConditionWaitAll(conditions);
+  }
+
+  public timeout(durationInseconds: number): ZirconTransitionConditionTimeout {
+    return new ZirconTransitionConditionTimeout(durationInseconds);
+  }
+
+  // /**
+  //  * if response comes from the same registry as <R>
+  //  * @param responseEventName
+  //  * @param cb
+  //  * @returns
+  //  */
+  // public onSameRegistryResponse<Kin extends keyof R['incoming']>(
+  //   responseEventName: Kin,
+  //   cb: (payload: ZirconIncomingPayload<R, Kin>) => void,
+  // ) {
+  //   return new ZirconTransitionConditionWaitEventResponse<R, Kin>(
+  //     this.getEventEmitter(),
+  //     this.getTransactionId(),
+  //     responseEventName,
+  //     cb,
+  //   );
+  // }
+
+  // /**
+  //  * if response comes from the same registry as <R>
+  //  * @param responseEventName
+  //  * @param cb
+  //  * @returns
+  //  */
+  // public onRegistryResponse<Rin extends ZirconEventRegistry>(
+  //   responseEventName: keyof Rin['incoming'],
+  //   cb: (payload: ZirconRegistryIncomingPayloads<Rin>) => void,
+  // ) {
+  //   return new ZirconTransitionConditionWaitEventResponse<
+  //     R,
+  //     keyof Rin['incoming']
+  //   >(this.getEventEmitter(), this.getTransactionId(), responseEventName, cb);
+  // }
+
+  public onResponse<
+    Rin extends ZirconEventRegistry,
+    Kin extends keyof Rin['incoming'],
+  >(
+    responseEventName: Kin,
+    cb: (payload: ZirconIncomingPayload<Rin, Kin>) => void,
+  ) {
+    return new ZirconTransitionConditionWaitEventResponse<Rin, Kin>(
+      this.getEventEmitter(),
+      this.getTransactionId(),
+      responseEventName,
+      cb,
+    );
+  }
 }
+
+/*
+USAGE
+
+LOW LEVEL
+=========
+
+    storeSnapshotTransaction.setCondition(
+      new ZirconTransitionConditionWaitAny([
+        new ZirconTransitionConditionWaitEventResponse<
+          ZirconObjectManagerEventRegistry,
+          'STATE_SNAPSHOT_REGISTERED'
+        >(
+          application.getEventDispatcher().getEventEmitter(),
+          storeSnapshotTransaction.getTransactionId(),
+          'STATE_SNAPSHOT_REGISTERED',
+          onREGISTERED,
+        ),
+        new ZirconTransitionConditionWaitEventResponse<
+          ZirconObjectManagerEventRegistry,
+          'STATE_SNAPSHOT_ERROR'
+        >(
+          application.getEventDispatcher().getEventEmitter(),
+          storeSnapshotTransaction.getTransactionId(),
+          'STATE_SNAPSHOT_ERROR',
+          onERROR,
+        ),
+        new ZirconTransitionConditionTimeout(5000),
+      ]),
+    );
+
+MID LEVEL
+=========
+
+
+
+CONDENSED LEVEL
+==============
+    storeSnapshotTransaction.setCondition(
+      storeSnapshotTransaction.waitAny(
+        storeSnapshotTransaction.onRegistryResponse<ZirconObjectManagerEventRegistry>(
+          'STATE_SNAPSHOT_REGISTERED',
+          onREGISTERED,
+        ),
+        storeSnapshotTransaction.onRegistryResponse<ZirconObjectManagerEventRegistry>(
+          'STATE_SNAPSHOT_ERROR',
+          onERROR,
+        ),
+        storeSnapshotTransaction.timeout(5000),
+      ),
+    );
+
+    const onREGISTERED = (
+      payload: ZirconRegistryIncomingPayloads<ZirconObjectManagerEventRegistry>,
+    ) => {
+      console.log( `STATE SNAPSHOT registered payload = ${JSON.stringify(payload)}` );
+    };
+
+    const onERROR = (
+      payload: ZirconRegistryIncomingPayloads<ZirconObjectManagerEventRegistry>,
+    ) => {
+      console.log(`registration ERROR. payload = ${JSON.stringify(payload)}`);
+    };
+
+
+*/

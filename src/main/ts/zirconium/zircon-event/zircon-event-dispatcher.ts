@@ -5,6 +5,7 @@ import {
   ZirconEventListenerCallback,
   ZirconEventRegistry,
   ZirconEventTrace,
+  ZirconOutgoingPayload,
 } from './zircon-event';
 import { ZirconEventEmitTransaction } from './zircon-event-transaction';
 
@@ -19,7 +20,7 @@ export class ZirconEventDispatcher<R extends ZirconEventRegistry> {
     string,
     {
       eventName: string;
-      // cb: (payload: ZirconEventPayload, trace: ZirconEventTrace) => void;
+      //cb: (payload: ZirconEventPayload, trace: ZirconEventTrace) => void;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cb: ZirconEventListenerCallback<any, any>;
     }
@@ -40,7 +41,7 @@ export class ZirconEventDispatcher<R extends ZirconEventRegistry> {
 
   public createEmitTransaction<K extends keyof R['outgoing']>(
     eventName: K,
-    payload: R['outgoing'][K],
+    payload: ZirconOutgoingPayload<R, K>,
   ): ZirconEventEmitTransaction<R, K> {
     return new ZirconEventEmitTransaction<R, K>(
       this.__eventEmitter,
@@ -55,7 +56,7 @@ export class ZirconEventDispatcher<R extends ZirconEventRegistry> {
    */
   public emit<K extends keyof R['outgoing']>(
     eventName: K,
-    payload: R['outgoing'][K],
+    payload: ZirconOutgoingPayload<R, K>,
     ancestorTrace?: ZirconEventTrace,
   ): ZirconEventTrace {
     const eventInfo: ZirconEventInfo = {

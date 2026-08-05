@@ -5,6 +5,7 @@ import {
   ZirconEventListenerCallback,
   ZirconEventInfo,
   ZirconEventRegistry,
+  ZirconIncomingPayload,
 } from './zircon-event';
 
 export abstract class ZirconTransactionCondition {
@@ -15,13 +16,13 @@ export abstract class ZirconTransactionCondition {
 /**
  * WAIT FOR RESPONSE
  */
-export class ZirconTransitionConditionWaitForEvent<
-  Rin extends ZirconEventRegistry,
-  Kin extends keyof Rin['incoming'],
+export class ZirconTransitionConditionWaitEventResponse<
+  R extends ZirconEventRegistry,
+  Kin extends keyof R['incoming'],
 > extends ZirconTransactionCondition {
-  private __userCallback?: ZirconEventListenerCallback<Rin, Kin> = null;
+  private __userCallback?: ZirconEventListenerCallback<R, Kin> = null;
   private __listener?: (
-    payload: Rin['incoming'][Kin],
+    payload: ZirconIncomingPayload<R, Kin>,
     trace: ZirconEventTrace,
   ) => void = null;
   private readonly __eventEmitter: EventEmitter2 = null;
@@ -35,7 +36,7 @@ export class ZirconTransitionConditionWaitForEvent<
     eventEmitter: EventEmitter2,
     transactionId: string,
     responseEventName: Kin,
-    cb?: ZirconEventListenerCallback<Rin, Kin>,
+    cb?: ZirconEventListenerCallback<R, Kin>,
   ) {
     super();
     this.__eventEmitter = eventEmitter;
@@ -60,9 +61,9 @@ export class ZirconTransitionConditionWaitForEvent<
     responseEventName: string,
     cb: ZirconEventListenerCallback<any, any>,
     resolve: (value: ZirconEventTrace | PromiseLike<ZirconEventTrace>) => void,
-  ): (payload: Rin['incoming'][Kin], trace: ZirconEventTrace) => void {
+  ): (payload: ZirconIncomingPayload<R, Kin>, trace: ZirconEventTrace) => void {
     const callback = (
-      payload: Rin['incoming'][Kin],
+      payload: ZirconIncomingPayload<R, Kin>,
       trace: ZirconEventTrace,
     ): void => {
       // a response is received

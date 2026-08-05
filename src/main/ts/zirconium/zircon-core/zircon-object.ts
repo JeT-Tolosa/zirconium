@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import {
   MergePickEvents,
   MergeZirconRegistries,
+  PickEvents,
   ZirconEventListenerCallback,
   ZirconEventRegistry,
   ZirconEventTrace,
@@ -10,10 +11,6 @@ import { ZirconApplicationEvents } from './zircon-app';
 import { ZIRCON_OBJECT_TYPE } from './zircon-types';
 import { ZirconNameGenerator } from './zircon-name-generator';
 import { ZirconEventDispatcher } from '../zircon-event/zircon-event-dispatcher';
-
-type PickEvents<E, K extends keyof E> = {
-  [P in K]: E[P];
-};
 
 export type ZirconObjectEvents = {
   ZIRCON_OBJECT_SET_STATE_REQUEST: { id: string; state: ZirconObjectState };
